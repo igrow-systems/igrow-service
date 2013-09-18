@@ -1,13 +1,10 @@
 
-package gjl;
+package com.argusat.gjl.observation;
 
-option java_package = "com.argusat.gjl";
-option java_outer_classname = "GpsJammerLocatorProtos";
+option java_package = "com.argusat.gjl.service.observation";
+option java_outer_classname = "ObservationProtoBuf";
 
-
-message Register {
-  
-}
+import "location.proto";
 
 message Observation {
   required uint32 timestamp = 1;        // The timestamp (unique ID in the context of a client)
@@ -42,6 +39,7 @@ message Observation {
       required float c0_n = 4;
     }
 
+    repeated ReceiverChannel channels = 1;
   }
 
   optional C0NObservation c0nobservation = 4;
@@ -62,6 +60,18 @@ message Observation {
   }
 
   optional MagneticCompassObservation magneticCompassObservation = 6;
+
+  message GeoMagneticObservation {
+    
+    message Direction {
+      required uint32 heading = 1;
+      required uint32 error = 2;
+    }
+
+    required Direction direction = 1;
+  }
+
+  optional GeoMagneticObservation geoMagneticObservation = 7;
  
   
 }
@@ -69,6 +79,7 @@ message Observation {
 // Our observation is just one of a collection of observations.
 message Observations {
 
+  required uint32 deviceId = 1;
 
-  repeated Observation observation = 1;
+  repeated Observation observations = 2;
 }
