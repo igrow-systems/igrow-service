@@ -14,57 +14,65 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
-		<dependencies>
-			<dependency>
-				<groupId>junit</groupId>
-				<artifactId>junit</artifactId>
-				<version>4.11</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>com.google.protobuf</groupId>
-				<artifactId>protobuf-java</artifactId>
-				<version>2.5.0</version>
-			</dependency>
-		</dependencies>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>dtrott</id>
+			<url>http://maven.davidtrott.com/repository</url>
+		</pluginRepository>
+	</pluginRepositories>
+
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.11</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.google.protobuf</groupId>
+			<artifactId>protobuf-java</artifactId>
+			<version>2.5.0</version>
+		</dependency>
+	</dependencies>
 	<build>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-compiler-plugin</artifactId>
-					<configuration>
-						<source>1.6</source>
-						<target>1.6</target>
-					</configuration>
-				</plugin>
-				<plugin>
-					<groupId>com.google.protobuf.tools</groupId>
-					<artifactId>maven-protoc-plugin</artifactId>
-					<version>0.1.11-SNAPSHOT</version>
-					<configuration>
-						<protocExecutable>protoc</protocExecutable>
-						<protoSourceRoot>${project.basedir}/../observation-service/interfaces/</protoSourceRoot>
-						<languageSpecifications>
-							<LanguageSpecification>
-								<language>JAVA</language>
-								<outputDirectory>
-									${project.basedir}/target/generated-sources/java
-								</outputDirectory>
-							</LanguageSpecification>
-							<!-- <LanguageSpecification> <language>CPP</language> <outputDirectory> 
-								${project.basedir}/target/generated-sources/cpp </outputDirectory> </LanguageSpecification> -->
-						</languageSpecifications>
-					</configuration>
-					<executions>
-						<execution>
-							<goals>
-								<goal>compile</goal>
-							</goals>
-						</execution>
-					</executions>
-				</plugin>
-			</plugins>
-		</pluginManagement>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.google.protobuf.tools</groupId>
+				<artifactId>maven-protoc-plugin</artifactId>
+				<version>0.1.10</version>
+				<configuration>
+					<protocExecutable>protoc</protocExecutable>
+					<protoSourceRoot>${project.basedir}/../observation-service/interfaces/</protoSourceRoot>
+					<languageSpecifications>
+						<LanguageSpecification>
+							<language>JAVA</language>
+							<outputDirectory>
+								${project.basedir}/target/generated-sources/java
+							</outputDirectory>
+						</LanguageSpecification>
+						<!-- <LanguageSpecification> <language>CPP</language> <outputDirectory> 
+							${project.basedir}/target/generated-sources/cpp </outputDirectory> </LanguageSpecification> -->
+					</languageSpecifications>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>compile</goal>
+							<goal>testCompile</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+
 	</build>
 </project>
