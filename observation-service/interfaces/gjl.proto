@@ -1,0 +1,74 @@
+
+package gjl;
+
+option java_package = "com.argusat.gjl";
+option java_outer_classname = "GpsJammerLocatorProtos";
+
+
+message Register {
+  
+}
+
+message Observation {
+  required uint32 timestamp = 1;        // The timestamp (unique ID in the context of a client)
+
+  message Location {
+    required uint32 latitude = 1;
+    required uint32 longitude = 2;
+    required uint32 error = 3;
+  }
+
+  required Location location = 2;
+
+  enum SensorType {
+    C0N_GNSS = 0;
+    ACCEL = 1;
+    MAG_COMPASS = 2;
+  }
+
+  required SensorType sensortype = 3;
+
+  enum ModeType {
+    PASSIVE = 0;
+    ACTIVE = 1;
+  }
+
+  message C0NObservation {
+    
+    message ReceiverChannel {
+      required uint32 prn = 1;
+      required float azimuth = 2;
+      required float elevation = 3;
+      required float c0_n = 4;
+    }
+
+  }
+
+  optional C0NObservation c0nobservation = 4;
+
+  message AccelerometerObservation {
+  }
+
+  optional AccelerometerObservation accelerometerobservation = 5;
+
+  message MagneticCompassObservation {
+    
+    message Direction {
+      required uint32 heading = 1;
+      required uint32 error = 2;
+    }
+
+    required Direction direction = 1;
+  }
+
+  optional MagneticCompassObservation magneticCompassObservation = 6;
+ 
+  
+}
+
+// Our observation is just one of a collection of observations.
+message Observations {
+
+
+  repeated Observation observation = 1;
+}

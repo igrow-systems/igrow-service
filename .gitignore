@@ -1,4 +1,6 @@
 *~
+*#
+gjl-api-java/target/
 *.o
 autom4te.cache/
 config.log
