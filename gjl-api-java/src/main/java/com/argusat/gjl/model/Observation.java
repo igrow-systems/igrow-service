@@ -29,6 +29,8 @@ public abstract class Observation {
 	
 	protected ObservationType type;
 	
+	protected Location location;
+
 	protected float values[];
 	
 	private ObservationProtoBuf.Observation observationProtoBuf;
@@ -64,6 +66,14 @@ public abstract class Observation {
 
 	public void setType(ObservationType type) {
 		this.type = type;
+	}
+	
+	public Location getLocation() {
+		return location;
+	}
+
+	public void setLocation(Location location) {
+		this.location = location;
 	}
 
 	public float[] getValues() {
