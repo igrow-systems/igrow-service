@@ -16,6 +16,11 @@
 
 package com.argusat.gjl.model;
 
+
 public class RotationVectorObservation extends Observation {
+
+	public RotationVectorObservation() {
+		this.type = ObservationType.TYPE_ROTATION_VECTOR;
+	}
 
 }

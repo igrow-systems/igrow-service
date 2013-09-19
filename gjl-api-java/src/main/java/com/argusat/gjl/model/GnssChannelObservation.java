@@ -27,6 +27,7 @@ public class GnssChannelObservation extends Observation {
 	public float c0_n;
 
 	public GnssChannelObservation() {
+		this.type = ObservationType.TYPE_GNSS_CHANNEL;
 		this.values = new float[3];
 	}
 	
