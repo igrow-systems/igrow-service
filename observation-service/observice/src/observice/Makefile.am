@@ -27,5 +27,5 @@ bin_PROGRAMS	= observice
 
 AM_CPPFLAGS = $(DEPS_CFLAGS) $(BOOST_CPPFLAGS)
 
-observice_SOURCES = observice.cpp 
-observice_LDADD = $(DEPS_LIBS) $(BOOST_LDFLAGS) $(BOOST_SYSTEM_LIB) $(BOOST_THREAD_LIB) -lpthread
+observice_SOURCES = ObservationService.cpp 
+observice_LDADD = $(log4cxx_LIBS) $(BOOST_LDFLAGS) $(BOOST_SYSTEM_LIB) $(BOOST_THREAD_LIB) -lSwiften -lpthread

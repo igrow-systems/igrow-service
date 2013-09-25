@@ -24,7 +24,7 @@ AC_PREREQ([2.68])
 
 AC_INIT([observice], [0.0.1], [jsr@argusat.com])
 AC_CONFIG_HEADERS([config.h:config-h.in])
-AC_CONFIG_SRCDIR([src/observice/observice.cpp])
+AC_CONFIG_SRCDIR([src/observice/ObservationService.cpp])
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -33,7 +33,9 @@ AM_INIT_AUTOMAKE([1.9 foreign])
 AC_PROG_CXX
 AC_PROG_LIBTOOL
 
-PKG_CHECK_MODULES([DEPS], [liblog4cxx >= 0.10.0])
+PKG_CHECK_MODULES([log4cxx], [liblog4cxx >= 0.10.0])
+#PKG_CHECK_MODULES([Swiften], [libSwiften >= 2.0.0])
+
 
 AX_PTHREAD
 

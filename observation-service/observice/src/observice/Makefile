@@ -67,7 +67,7 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_observice_OBJECTS = observice.$(OBJEXT)
+am_observice_OBJECTS = ObservationService.$(OBJEXT)
 observice_OBJECTS = $(am_observice_OBJECTS)
 am__DEPENDENCIES_1 =
 observice_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
@@ -119,8 +119,6 @@ CXXFLAGS = -g -O2
 CYGPATH_W = echo
 DEFS = -DHAVE_CONFIG_H
 DEPDIR = .deps
-DEPS_CFLAGS =  
-DEPS_LIBS = -llog4cxx  
 DLLTOOL = false
 DSYMUTIL = 
 DUMPBIN = 
@@ -212,6 +210,8 @@ libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
 localstatedir = ${prefix}/var
+log4cxx_CFLAGS =  
+log4cxx_LIBS = -llog4cxx  
 mandir = ${datarootdir}/man
 mkdir_p = $(MKDIR_P)
 oldincludedir = /usr/include
@@ -232,8 +232,8 @@ INCLUDES = -I$(top_builddir) -I$(top_builddir)/src \
 		-I$(top_srcdir) -I$(top_srcdir)/src
 
 AM_CPPFLAGS = $(DEPS_CFLAGS) $(BOOST_CPPFLAGS)
-observice_SOURCES = observice.cpp 
-observice_LDADD = $(DEPS_LIBS) $(BOOST_LDFLAGS) $(BOOST_SYSTEM_LIB) $(BOOST_THREAD_LIB) -lpthread
+observice_SOURCES = ObservationService.cpp 
+observice_LDADD = $(log4cxx_LIBS) $(BOOST_LDFLAGS) $(BOOST_SYSTEM_LIB) $(BOOST_THREAD_LIB) -lSwiften -lpthread
 all: all-am
 
 .SUFFIXES:
@@ -324,7 +324,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-include ./$(DEPDIR)/observice.Po
+include ./$(DEPDIR)/ObservationService.Po
 
 .cpp.o:
 	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
