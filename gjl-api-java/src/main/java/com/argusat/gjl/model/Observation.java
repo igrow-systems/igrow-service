@@ -21,6 +21,7 @@ import com.argusat.gjl.service.observation.ObservationProtoBuf;
 public abstract class Observation {
 	
 	public enum ObservationType {
+		TYPE_LOCATION_ONLY,
 		TYPE_ROTATION_VECTOR,
 		TYPE_GNSS_CHANNEL
 	}

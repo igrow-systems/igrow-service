@@ -1,7 +1,7 @@
 /* -*- mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
 
 /*
- * @(#)ObService.cpp        
+ * @(#)ObservationService.cpp        
  *
  * Copyright (c) 2013 Argusat Limited
  * 10 Underwood Road, Southampton.  UK
@@ -15,20 +15,21 @@
  */
 
 // include log4cxx header files.
-#include "log4cxx/logger.h"
-#include "log4cxx/basicconfigurator.h"
-#include "log4cxx/helpers/exception.h"
-
+#include <log4cxx/logger.h>
+#include <log4cxx/basicconfigurator.h>
+#include <log4cxx/helpers/exception.h>
 #include <boost/asio.hpp>
 
-#include "tcp_server.h"
+#include "TcpServer.h"
 
 using namespace log4cxx;
 using namespace log4cxx::helpers;
 
 namespace
 {
-  LoggerPtr logger(Logger::getLogger("observice"));
+  static const std::string kClassName("argusat.gjl.observice.ObservationService");
+
+  LoggerPtr logger(Logger::getLogger(kClassName));
 }
 
 int main(int argc, char **argv)
@@ -42,8 +43,8 @@ int main(int argc, char **argv)
     LOG4CXX_INFO(logger, "Entering application.");
 
     boost::asio::io_service io_service;
-    //jsrfilter::tcp_server server(io_service);
-    //io_service.run();
+    argusat::gjl::observice::TcpServer server(io_service);
+    io_service.run();
 
     LOG4CXX_INFO(logger, "Exiting application.");
   }

@@ -67,7 +67,8 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_observice_OBJECTS = ObservationService.$(OBJEXT)
+am_observice_OBJECTS = TcpConnection.$(OBJEXT) TcpServer.$(OBJEXT) \
+	ObservationService.$(OBJEXT)
 observice_OBJECTS = $(am_observice_OBJECTS)
 am__DEPENDENCIES_1 =
 observice_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
@@ -232,7 +233,10 @@ INCLUDES = -I$(top_builddir) -I$(top_builddir)/src \
 		-I$(top_srcdir) -I$(top_srcdir)/src
 
 AM_CPPFLAGS = $(DEPS_CFLAGS) $(BOOST_CPPFLAGS)
-observice_SOURCES = ObservationService.cpp 
+observice_SOURCES = TcpConnection.cpp     	\
+			TcpServer.cpp     	\
+			ObservationService.cpp
+
 observice_LDADD = $(log4cxx_LIBS) $(BOOST_LDFLAGS) $(BOOST_SYSTEM_LIB) $(BOOST_THREAD_LIB) -lSwiften -lpthread
 all: all-am
 
@@ -325,6 +329,8 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ObservationService.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TcpConnection.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TcpServer.Po@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
