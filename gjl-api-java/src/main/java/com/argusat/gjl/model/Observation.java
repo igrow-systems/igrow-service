@@ -26,19 +26,21 @@ public abstract class Observation {
 		TYPE_GNSS_CHANNEL
 	}
 	
-	protected long timestamp;
+	protected long mTimestamp;
 	
-	protected ObservationType type;
+	protected long mDeviceId;
 	
-	protected Location location;
+	protected ObservationType mType;
+	
+	protected Location mLocation;
 
-	protected float values[];
+	protected float mValues[];
 	
-	private ObservationProtoBuf.Observation observationProtoBuf;
+	private ObservationProtoBuf.Observation mObservationProtoBuf;
 	
 	public Observation()
 	{
-		values = null;
+		mValues = null;
 	}
 	
 	public static Observation newObservation(ObservationType type) {
@@ -54,35 +56,43 @@ public abstract class Observation {
 	}
 	
 	public long getTimestamp() {
-		return timestamp;
+		return mTimestamp;
 	}
 
 	public void setTimestamp(long timestamp) {
-		this.timestamp = timestamp;
+		this.mTimestamp = timestamp;
+	}
+
+	public long getDeviceId() {
+		return mDeviceId;
+	}
+
+	public void setDeviceId(long deviceId) {
+		this.mDeviceId = deviceId;
 	}
 
 	public ObservationType getType() {
-		return type;
+		return mType;
 	}
 
 	public void setType(ObservationType type) {
-		this.type = type;
+		this.mType = type;
 	}
 	
 	public Location getLocation() {
-		return location;
+		return mLocation;
 	}
 
 	public void setLocation(Location location) {
-		this.location = location;
+		this.mLocation = location;
 	}
 
 	public float[] getValues() {
-		return values;
+		return mValues;
 	}
 
 	public ObservationProtoBuf.Observation getObservationProtoBuf() {
-		return observationProtoBuf;
+		return mObservationProtoBuf;
 	}
 	
 

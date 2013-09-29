@@ -27,8 +27,8 @@ public class GnssChannelObservation extends Observation {
 	public float c0_n;
 
 	public GnssChannelObservation() {
-		this.type = ObservationType.TYPE_GNSS_CHANNEL;
-		this.values = new float[3];
+		this.mType = ObservationType.TYPE_GNSS_CHANNEL;
+		this.mValues = new float[3];
 	}
 	
 	public int getPrn() {
@@ -45,7 +45,7 @@ public class GnssChannelObservation extends Observation {
 
 	public void setAzimuth(float azimuth) {
 		this.azimuth = azimuth;
-		this.values[0] = azimuth;
+		this.mValues[0] = azimuth;
 	}
 
 	public float getElevation() {
@@ -54,7 +54,7 @@ public class GnssChannelObservation extends Observation {
 
 	public void setElevation(float elevation) {
 		this.elevation = elevation;
-		this.values[2] = elevation;
+		this.mValues[2] = elevation;
 	}
 
 	public float getC0_n() {
@@ -63,7 +63,7 @@ public class GnssChannelObservation extends Observation {
 
 	public void setC0_n(float c0_n) {
 		this.c0_n = c0_n;
-		this.values[2] = c0_n;
+		this.mValues[2] = c0_n;
 	}
 	
 	

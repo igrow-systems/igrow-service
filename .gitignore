@@ -1,6 +1,7 @@
 *~
 *#
 gjl-api-java/target/
+observation-service/target/
 *.o
 autom4te.cache/
 config.log

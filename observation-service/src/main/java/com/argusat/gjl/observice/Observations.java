@@ -22,7 +22,9 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-// The Java class will be hosted at the URI path "/myresource"
+import com.argusat.gjl.service.observation.ObservationProtoBuf;
+
+// The Java class will be hosted at the URI path "/observations"
 @Path("/observations")
 public class Observations {
     
@@ -34,7 +36,7 @@ public class Observations {
     // The Java method will produce content identified by the MIME Media
     // type "application/observation+protobuf"
     @Consumes("application/observation+protobuf")
-    public String postObservation() {
+    public String postObservation(ObservationProtoBuf observationProtoBuf) {
     	
     	
     	

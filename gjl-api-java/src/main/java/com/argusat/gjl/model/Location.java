@@ -20,55 +20,58 @@ import com.argusat.gjl.service.observation.ObservationProtoBuf;
 
 public class Location {
 
-	private float latitude;
-	
-	private float longitude;
-	
-	private float altitude;
-	
-	private float error;
-	
-	private ObservationProtoBuf.Observation.Location locationProtoBuf;
-	
-	public float getLatitude() {
-		return latitude;
-	}
+	private float mLatitude;
 
+	private float mLongitude;
+
+	private float mAltitude;
+
+	private float mHDOP;
+
+	private float mVDOP;
+
+	private ObservationProtoBuf.Observation.Location locationProtoBuf;
+
+	public float getLatitude() {
+		return mLatitude;
+	}
 
 	public void setLatitude(float latitude) {
-		this.latitude = latitude;
+		this.mLatitude = latitude;
 	}
-
 
 	public float getLongitude() {
-		return longitude;
+		return mLongitude;
 	}
-
 
 	public void setLongitude(float longitude) {
-		this.longitude = longitude;
+		this.mLongitude = longitude;
 	}
-
 
 	public float getAltitude() {
-		return altitude;
+		return mAltitude;
 	}
-
 
 	public void setAltitude(float altitude) {
-		this.altitude = altitude;
+		this.mAltitude = altitude;
 	}
 
-
-	public float getError() {
-		return error;
+	public float getHDOP() {
+		return mHDOP;
 	}
 
-
-	public void setError(float error) {
-		this.error = error;
+	public void setHDOP(float hdop) {
+		this.mHDOP = hdop;
 	}
-	
+
+	public float getVDOP() {
+		return mVDOP;
+	}
+
+	public void setVDOP(float hdop) {
+		this.mVDOP = hdop;
+	}
+
 	public ObservationProtoBuf.Observation.Location getProtoBuf() {
 		return locationProtoBuf;
 	}
