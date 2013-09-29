@@ -97,6 +97,8 @@
 	<classpathentry kind="var" path="M2_REPO/org/jruby/jruby-complete/1.6.5/jruby-complete-1.6.5.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/jamon/jamon-runtime/2.3.1/jamon-runtime-2.3.1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/com/google/protobuf/protobuf-java/2.4.0a/protobuf-java-2.4.0a.jar"/>
+	<classpathentry kind="var" path="M2_REPO/com/argusat/gjl/gjl-api-java/1.0-SNAPSHOT/gjl-api-java-1.0-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mockito/mockito-all/1.9.5/mockito-all-1.9.5.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/gjl-api-java"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
