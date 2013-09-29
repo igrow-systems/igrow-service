@@ -71,6 +71,7 @@ public class LocationTest {
 		mLocation.setVDOP(8.0f);
 		
 		assertNotNull(mLocation.getLocationProtoBuf());
+		assertTrue(mLocation.getLocationProtoBuf().isInitialized());
 	}
 
 }

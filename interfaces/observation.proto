@@ -30,7 +30,7 @@ message Observation {
     ROTATION_VECTOR = 3;
   }
 
-  required ObservationType observation = 1;
+  required ObservationType type = 1;
   required uint64 deviceId = 2;
   required uint64 timestamp = 3;        // The timestamp (unique ID in the context of a client)
   required Location location = 4;

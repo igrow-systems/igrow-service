@@ -51,6 +51,11 @@ public class Location {
 		assert(location.isInitialized());
 		mLocationProtoBuf = location;
 		mLocationProtoBufBuilder = LocationProtoBuf.Location.newBuilder(location);
+		mLatitude = location.getLatitude();
+		mLongitude = location.getLongitude();
+		mAltitude = location.getAltitude();
+		mHDOP = location.getHdop();
+		mVDOP = location.getVdop();
 	}
 	
 	public float getLatitude() {

@@ -18,12 +18,17 @@ package com.argusat.gjl.model.test;
 
 import static org.junit.Assert.*;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.argusat.gjl.model.Location;
 import com.argusat.gjl.model.Observation;
 import com.argusat.gjl.model.Observation.ObservationType;
+import com.argusat.gjl.service.observation.ObservationProtoBuf;
 
 public class LocationOnlyObservationTest {
 
@@ -46,8 +51,29 @@ public class LocationOnlyObservationTest {
 	}
 
 	@Test
-	public void testNewObservationObservationType() {
-		fail("Not yet implemented");
+	public void testNewObservationFromProtoBuf() throws IOException {
+		
+		InputStream entityStream = this.getClass().getResourceAsStream("/observation-location-only.bin");
+    	
+		ObservationProtoBuf.Observation observationProtobuf = ObservationProtoBuf.Observation.parseFrom(entityStream);
+		Observation observation = Observation.newObservation(observationProtobuf);
+		
+		assertNotNull(observation);
+		assertEquals(ObservationType.TYPE_LOCATION_ONLY, observation.getType());
+		
+		Location location = observation.getLocation();
+		assertNotNull(location);
+		//assertEquals()
+		//assertEquals(137483L, location.getLatitude());
+    	//location.setLatitude();
+    	//location.setLongitude(1237843L);
+    	//location.setAltitude(120.0f);
+    	//location.setHDOP(5.0f);
+    	//location.setVDOP(12.0f);
+    	
+    	//Observation observation = Observation.newObservation(ObservationType.TYPE_LOCATION_ONLY);
+    	//
+		
 	}
 
 	@Test

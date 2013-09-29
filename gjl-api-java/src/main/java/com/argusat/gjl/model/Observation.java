@@ -56,8 +56,13 @@ public abstract class Observation {
 
 	protected Observation(ObservationProtoBuf.Observation observationProtoBuf) {
 		// mDeviceId = observationProtoBuf.getTimestamp();
+		
 		mObservationProtoBufBuilder = ObservationProtoBuf.Observation
 				.newBuilder(observationProtoBuf);
+		
+		mTimestamp = observationProtoBuf.getTimestamp();
+		mDeviceId = observationProtoBuf.getDeviceId();
+		mLocation = new Location(observationProtoBuf.getLocation());
 	}
 
 	// Consolidate this to use only the protobuf enums for message/object type
@@ -81,7 +86,7 @@ public abstract class Observation {
 		assert (observationProtoBuf.isInitialized());
 
 		ObservationProtoBuf.Observation.ObservationType type = observationProtoBuf
-				.getObservation();
+				.getType();
 		switch (type) {
 		case LOCATION_ONLY:
 			return new LocationOnlyObservation(observationProtoBuf);
@@ -133,13 +138,12 @@ public abstract class Observation {
 		return mValues;
 	}
 
-	protected void validate() {
-
+	protected void validate()
+	{
 		mObservationProtoBuf = mObservationProtoBufBuilder.buildPartial();
 		mProtoBufValid = mObservationProtoBuf.isInitialized();
 		mValid = mProtoBufValid && mLocation != null && mLocation.isValid();
 		mDirty = false;
-
 	}
 
 	public boolean isValid() {
