@@ -24,9 +24,15 @@ public abstract class Observation {
 		TYPE_LOCATION_ONLY, TYPE_ROTATION_VECTOR, TYPE_GNSS_CHANNEL
 	}
 
+	public enum ModeType {
+		PASSIVE, ACTIVE
+	}
+
 	protected long mTimestamp;
 
 	protected long mDeviceId;
+
+	protected ModeType mMode;
 
 	protected ObservationType mType;
 
@@ -42,7 +48,7 @@ public abstract class Observation {
 
 	private ObservationProtoBuf.Observation mObservationProtoBuf;
 
-	private ObservationProtoBuf.Observation.Builder mObservationProtoBufBuilder;
+	protected ObservationProtoBuf.Observation.Builder mObservationProtoBufBuilder;
 
 	public Observation() {
 		mValues = null;
@@ -56,10 +62,10 @@ public abstract class Observation {
 
 	protected Observation(ObservationProtoBuf.Observation observationProtoBuf) {
 		// mDeviceId = observationProtoBuf.getTimestamp();
-		
+
 		mObservationProtoBufBuilder = ObservationProtoBuf.Observation
 				.newBuilder(observationProtoBuf);
-		
+
 		mTimestamp = observationProtoBuf.getTimestamp();
 		mDeviceId = observationProtoBuf.getDeviceId();
 		mLocation = new Location(observationProtoBuf.getLocation());
@@ -124,6 +130,25 @@ public abstract class Observation {
 		return mType;
 	}
 
+	public ModeType getMode() {
+		return mMode;
+	}
+
+	public void setMode(ModeType mMode) {
+		this.mMode = mMode;
+		switch (mMode) {
+		case ACTIVE:
+			mObservationProtoBufBuilder
+					.setMode(ObservationProtoBuf.Observation.ModeType.ACTIVE);
+			break;
+		case PASSIVE:
+			mObservationProtoBufBuilder
+					.setMode(ObservationProtoBuf.Observation.ModeType.PASSIVE);
+			break;
+		}
+		mDirty = true;
+	}
+
 	public Location getLocation() {
 		return mLocation;
 	}
@@ -138,8 +163,7 @@ public abstract class Observation {
 		return mValues;
 	}
 
-	protected void validate()
-	{
+	protected void validate() {
 		mObservationProtoBuf = mObservationProtoBufBuilder.buildPartial();
 		mProtoBufValid = mObservationProtoBuf.isInitialized();
 		mValid = mProtoBufValid && mLocation != null && mLocation.isValid();

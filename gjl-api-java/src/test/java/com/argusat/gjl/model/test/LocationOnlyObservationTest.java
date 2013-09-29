@@ -16,17 +16,25 @@
 
 package com.argusat.gjl.model.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import com.argusat.gjl.model.Location;
+import com.argusat.gjl.model.LocationOnlyObservation;
 import com.argusat.gjl.model.Observation;
+import com.argusat.gjl.model.Observation.ModeType;
 import com.argusat.gjl.model.Observation.ObservationType;
 import com.argusat.gjl.service.observation.ObservationProtoBuf;
 
@@ -47,6 +55,8 @@ public class LocationOnlyObservationTest {
 	public void testObservation() {
 		
 		assertNotNull(mObservation);
+		assertTrue(mObservation.getType() == ObservationType.TYPE_LOCATION_ONLY);
+		assertTrue(LocationOnlyObservation.class == mObservation.getClass());
 		assertNotNull(mObservation.getLocation());
 	}
 
@@ -77,22 +87,51 @@ public class LocationOnlyObservationTest {
 	}
 
 	@Test
-	public void testNewObservationObservation() {
-		fail("Not yet implemented");
-	}
-
-	@Test
 	public void testIsValid() {
-		
-		
 		
 		assertTrue(mObservation.isValid());
 		
 	}
 
 	@Test
-	public void testGetObservationProtoBuf() {
-		fail("Not yet implemented");
+	public void testGetObservationProtoBuf() throws IOException {
+		
+		Observation observation = Observation.newObservation(ObservationType.TYPE_LOCATION_ONLY);
+		
+		observation.setDeviceId(007L);
+		observation.setTimestamp(111889349L);
+		observation.setMode(ModeType.PASSIVE);
+		//assertEquals()
+		//assertEquals(137483L, location.getLatitude());
+    	Location location = observation.getLocation();
+		location.setLatitude(1982384L);
+    	location.setLongitude(1237843L);
+    	location.setAltitude(120.0f);
+    	location.setHDOP(5.0f);
+    	location.setVDOP(12.0f);
+    	observation.setLocation(location);
+    	
+    	assertTrue(observation.isValid());
+    	
+    	ObservationProtoBuf.Observation protoBuf = observation.getObservationProtoBuf();
+    	
+    	assertTrue(protoBuf.getType() == ObservationProtoBuf.Observation.ObservationType.LOCATION_ONLY);
+    	assertTrue(007L == protoBuf.getDeviceId());
+    	assertTrue(111889349L == protoBuf.getTimestamp());
+    	assertTrue(1982384L == protoBuf.getLocation().getLatitude());
+    	assertTrue(1237843L == protoBuf.getLocation().getLongitude());
+    	assertEquals(120.0f, protoBuf.getLocation().getAltitude(), 0.001);
+    	assertEquals(5.0f, protoBuf.getLocation().getHdop(), 0.001);
+    	assertEquals(12.0f, protoBuf.getLocation().getVdop(), 0.001);
+    	
+    	TemporaryFolder tempFolder = new TemporaryFolder();
+    	tempFolder.create();
+    	File entityFile = tempFolder.newFile("observation-location-only.bin");
+    	
+    	OutputStream entityStream = new FileOutputStream(entityFile);
+    	
+    	protoBuf.writeTo(entityStream);
+    	
 	}
 
 }

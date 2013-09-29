@@ -73,6 +73,7 @@ public class ObservationProtobufWriterTest extends TestCase {
     	ObservationProtobufWriter writer = new ObservationProtobufWriter();
     	
     	TemporaryFolder tempFolder = new TemporaryFolder();
+    	tempFolder.create();
     	File entityFile = tempFolder.newFile("observation-location-only.bin");
     	
     	OutputStream entityStream = new FileOutputStream(entityFile);

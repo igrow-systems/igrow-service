@@ -18,21 +18,24 @@ package com.argusat.gjl.model;
 
 import com.argusat.gjl.service.observation.ObservationProtoBuf;
 
-
 public class LocationOnlyObservation extends Observation {
 
-	public LocationOnlyObservation(ObservationProtoBuf.Observation observationProtoBuf) {
+	public LocationOnlyObservation(
+			ObservationProtoBuf.Observation observationProtoBuf) {
 		super(observationProtoBuf);
-		
+
 		this.mType = ObservationType.TYPE_LOCATION_ONLY;
-		
+		mObservationProtoBufBuilder
+				.setType(ObservationProtoBuf.Observation.ObservationType.LOCATION_ONLY);
 	}
-	
+
 	public LocationOnlyObservation() {
 		super();
 		this.mType = ObservationType.TYPE_LOCATION_ONLY;
+		mObservationProtoBufBuilder
+				.setType(ObservationProtoBuf.Observation.ObservationType.LOCATION_ONLY);
 	}
-	
+
 	@Override
 	public boolean isValid() {
 		return super.isValid();
