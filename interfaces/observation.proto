@@ -1,4 +1,4 @@
-/* -*- mode: java; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
+/* -*- mode: protobuf; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
 
 /*
  * @(#)observation.proto        
@@ -22,21 +22,25 @@ option java_outer_classname = "ObservationProtoBuf";
 import "location.proto";
 
 message Observation {
-  required uint32 timestamp = 1;        // The timestamp (unique ID in the context of a client)
-  required Location location = 2;
 
   enum ObservationType {
-    C0N_GNSS = 0;
-    ACCEL = 1;
-    MAG_COMPASS = 2;
+    LOCATION_ONLY = 0;
+    C0N_GNSS = 1;
+    ACCEL = 2;
+    ROTATION_VECTOR = 3;
   }
 
-  required ObservationType observationtype = 3;
+  required ObservationType observation = 1;
+  required uint64 deviceId = 2;
+  required uint64 timestamp = 3;        // The timestamp (unique ID in the context of a client)
+  required Location location = 4;
 
   enum ModeType {
     PASSIVE = 0;
     ACTIVE = 1;
   }
+
+  required ModeType mode = 5;
 
   message C0NObservation {
     
@@ -50,12 +54,12 @@ message Observation {
     repeated ReceiverChannel channels = 1;
   }
 
-  optional C0NObservation c0nobservation = 4;
+  optional C0NObservation c0nobservation = 6;
 
   message AccelerometerObservation {
   }
 
-  optional AccelerometerObservation accelerometerobservation = 5;
+  optional AccelerometerObservation accelerometerobservation = 7;
 
   message MagneticCompassObservation {
     
@@ -67,7 +71,7 @@ message Observation {
     required Direction direction = 1;
   }
 
-  optional MagneticCompassObservation magneticCompassObservation = 6;
+  optional MagneticCompassObservation magneticCompassObservation = 8;
 
   message GeoMagneticObservation {
     
@@ -79,7 +83,7 @@ message Observation {
     required Direction direction = 1;
   }
 
-  optional GeoMagneticObservation geoMagneticObservation = 7;
+  optional GeoMagneticObservation geoMagneticObservation = 9;
  
   
 }

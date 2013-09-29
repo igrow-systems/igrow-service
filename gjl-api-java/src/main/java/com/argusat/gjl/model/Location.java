@@ -30,14 +30,37 @@ public class Location {
 
 	private float mVDOP;
 
-	private LocationProtoBuf.Location locationProtoBuf;
+	private boolean mDirty;
+	
+	private boolean mValid;
 
+	private boolean mProtoBufValid;
+
+	private LocationProtoBuf.Location mLocationProtoBuf;
+	
+	private LocationProtoBuf.Location.Builder mLocationProtoBufBuilder;
+
+	public Location() {
+		mValid = false;
+		mProtoBufValid = false;
+		mDirty = true;
+		mLocationProtoBufBuilder = LocationProtoBuf.Location.newBuilder();
+	}
+	
+	public Location(LocationProtoBuf.Location location) {
+		assert(location.isInitialized());
+		mLocationProtoBuf = location;
+		mLocationProtoBufBuilder = LocationProtoBuf.Location.newBuilder(location);
+	}
+	
 	public float getLatitude() {
 		return mLatitude;
 	}
 
 	public void setLatitude(float latitude) {
 		this.mLatitude = latitude;
+		mLocationProtoBufBuilder.setLatitude((int)latitude);
+		mDirty = true;
 	}
 
 	public float getLongitude() {
@@ -46,6 +69,8 @@ public class Location {
 
 	public void setLongitude(float longitude) {
 		this.mLongitude = longitude;
+		mLocationProtoBufBuilder.setLongitude((int)longitude);
+		mDirty = true;
 	}
 
 	public float getAltitude() {
@@ -54,6 +79,8 @@ public class Location {
 
 	public void setAltitude(float altitude) {
 		this.mAltitude = altitude;
+		mLocationProtoBufBuilder.setAltitude((int)altitude);
+		mDirty = true;
 	}
 
 	public float getHDOP() {
@@ -62,17 +89,41 @@ public class Location {
 
 	public void setHDOP(float hdop) {
 		this.mHDOP = hdop;
+		mLocationProtoBufBuilder.setHdop((int)hdop);
+		mDirty = true;
 	}
 
 	public float getVDOP() {
 		return mVDOP;
 	}
 
-	public void setVDOP(float hdop) {
-		this.mVDOP = hdop;
+	public void setVDOP(float vdop) {
+		this.mVDOP = vdop;
+		mLocationProtoBufBuilder.setVdop((int)vdop);
+		mDirty = true;
+	}
+	
+	protected void validate() {
+
+		mLocationProtoBuf = mLocationProtoBufBuilder.buildPartial();
+		mProtoBufValid = mLocationProtoBuf.isInitialized();
+		mValid =  mProtoBufValid;
+		mDirty = false;
+
 	}
 
-	public LocationProtoBuf.Location getProtoBuf() {
-		return locationProtoBuf;
+	public boolean isValid() {
+		if (mDirty) {
+			validate();
+		}
+		return mValid;
 	}
+
+	public LocationProtoBuf.Location getLocationProtoBuf() {
+		if (mDirty) {
+			validate();
+		}
+		return mLocationProtoBuf;
+	}
+	
 }

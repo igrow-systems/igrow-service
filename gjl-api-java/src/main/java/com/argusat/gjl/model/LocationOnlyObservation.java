@@ -1,7 +1,7 @@
 /* -*- mode: java; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
 
 /*
- * @(#)RotationVectorObservation.java        
+ * @(#)LocationOnlyObservation.java        
  *
  * Copyright (c) 2013 Argusat Limited
  * 10 Underwood Road,  Southampton.  UK
@@ -16,17 +16,26 @@
 
 package com.argusat.gjl.model;
 
+import com.argusat.gjl.service.observation.ObservationProtoBuf;
+
 
 public class LocationOnlyObservation extends Observation {
 
+	public LocationOnlyObservation(ObservationProtoBuf.Observation observationProtoBuf) {
+		super(observationProtoBuf);
+		
+		this.mType = ObservationType.TYPE_LOCATION_ONLY;
+		
+	}
+	
 	public LocationOnlyObservation() {
+		super();
 		this.mType = ObservationType.TYPE_LOCATION_ONLY;
 	}
-
+	
 	@Override
 	public boolean isValid() {
-		// TODO Auto-generated method stub
-		return false;
+		return super.isValid();
 	}
 
 }

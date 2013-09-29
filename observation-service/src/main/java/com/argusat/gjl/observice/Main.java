@@ -46,7 +46,7 @@ public class Main {
 
     public static final URI BASE_URI = getBaseURI();
     
-    protected static HttpServer startServer() throws IOException {
+    public static HttpServer startServer() throws IOException {
         final Map<String, String> initParams = new HashMap<String, String>();
 
         initParams.put("com.sun.jersey.config.property.packages", "com.argusat.gjl.observice");

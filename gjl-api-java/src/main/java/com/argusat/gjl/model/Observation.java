@@ -33,15 +33,34 @@ public abstract class Observation {
 	protected Location mLocation;
 
 	protected float mValues[];
-	
+
+	protected boolean mDirty;
+
 	protected boolean mValid;
+
+	protected boolean mProtoBufValid;
 
 	private ObservationProtoBuf.Observation mObservationProtoBuf;
 
+	private ObservationProtoBuf.Observation.Builder mObservationProtoBufBuilder;
+
 	public Observation() {
 		mValues = null;
+		mDirty = true;
+		mProtoBufValid = false;
+		mValid = false;
+		mLocation = new Location();
+		mObservationProtoBufBuilder = ObservationProtoBuf.Observation
+				.newBuilder();
 	}
 
+	protected Observation(ObservationProtoBuf.Observation observationProtoBuf) {
+		// mDeviceId = observationProtoBuf.getTimestamp();
+		mObservationProtoBufBuilder = ObservationProtoBuf.Observation
+				.newBuilder(observationProtoBuf);
+	}
+
+	// Consolidate this to use only the protobuf enums for message/object type
 	public static Observation newObservation(ObservationType type) {
 		switch (type) {
 		case TYPE_LOCATION_ONLY:
@@ -55,14 +74,25 @@ public abstract class Observation {
 			return null;
 		}
 	}
-	
-	public static Observation newObservation(ObservationProtoBuf.Observation observationProtoBuf) {
-		
-		//mObservationProtoBuf = observationProtoBuf;
-		//Observation observation = newObservation(observationProtoBuf.get);
-		return newObservation(ObservationType.TYPE_LOCATION_ONLY);
-		//setTimeStamp();
-		
+
+	public static Observation newObservation(
+			ObservationProtoBuf.Observation observationProtoBuf) {
+
+		assert (observationProtoBuf.isInitialized());
+
+		ObservationProtoBuf.Observation.ObservationType type = observationProtoBuf
+				.getObservation();
+		switch (type) {
+		case LOCATION_ONLY:
+			return new LocationOnlyObservation(observationProtoBuf);
+		case ROTATION_VECTOR:
+			return new RotationVectorObservation(observationProtoBuf);
+		case C0N_GNSS:
+			return new GnssChannelObservation(observationProtoBuf);
+		default:
+			// TODO: throw exception
+			return null;
+		}
 	}
 
 	public long getTimestamp() {
@@ -71,6 +101,8 @@ public abstract class Observation {
 
 	public void setTimestamp(long timestamp) {
 		this.mTimestamp = timestamp;
+		mObservationProtoBufBuilder.setTimestamp(timestamp);
+		mDirty = true;
 	}
 
 	public long getDeviceId() {
@@ -79,14 +111,12 @@ public abstract class Observation {
 
 	public void setDeviceId(long deviceId) {
 		this.mDeviceId = deviceId;
+		mObservationProtoBufBuilder.setDeviceId(deviceId);
+		mDirty = true;
 	}
 
 	public ObservationType getType() {
 		return mType;
-	}
-
-	public void setType(ObservationType type) {
-		this.mType = type;
 	}
 
 	public Location getLocation() {
@@ -95,15 +125,34 @@ public abstract class Observation {
 
 	public void setLocation(Location location) {
 		this.mLocation = location;
+		mObservationProtoBufBuilder.setLocation(location.getLocationProtoBuf());
+		mDirty = true;
 	}
 
 	public float[] getValues() {
 		return mValues;
 	}
-	
-	public abstract boolean isValid();
+
+	protected void validate() {
+
+		mObservationProtoBuf = mObservationProtoBufBuilder.buildPartial();
+		mProtoBufValid = mObservationProtoBuf.isInitialized();
+		mValid = mProtoBufValid && mLocation != null && mLocation.isValid();
+		mDirty = false;
+
+	}
+
+	public boolean isValid() {
+		if (mDirty) {
+			validate();
+		}
+		return mValid;
+	}
 
 	public ObservationProtoBuf.Observation getObservationProtoBuf() {
+		if (mDirty) {
+			validate();
+		}
 		return mObservationProtoBuf;
 	}
 

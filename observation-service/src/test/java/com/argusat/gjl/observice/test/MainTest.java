@@ -1,8 +1,9 @@
 
-package com.argusat.gjl.observice;
+package com.argusat.gjl.observice.test;
 
 import org.glassfish.grizzly.http.server.HttpServer;
 
+import com.argusat.gjl.observice.Main;
 import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;

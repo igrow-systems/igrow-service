@@ -17,7 +17,6 @@
 package com.argusat.gjl.observice;
 
 import java.io.IOException;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,7 +35,7 @@ public class ObservationRepositoryHBaseImpl implements ObservationRepository {
 	private static final Logger LOGGER = Logger
 			.getLogger(ObservationRepositoryHBaseImpl.class.getSimpleName());
 
-	private ThreadPoolExecutor mExecutor;
+	//private ThreadPoolExecutor mExecutor;
 
 	private HTableInterface mObservationsTable;
 

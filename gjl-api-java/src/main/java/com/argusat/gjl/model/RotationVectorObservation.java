@@ -16,10 +16,22 @@
 
 package com.argusat.gjl.model;
 
+import com.argusat.gjl.service.observation.ObservationProtoBuf;
+
 
 public class RotationVectorObservation extends Observation {
 
 	public RotationVectorObservation() {
+		
+		super();
+		
+		this.mType = ObservationType.TYPE_ROTATION_VECTOR;
+	}
+	
+	protected RotationVectorObservation(ObservationProtoBuf.Observation observationProtoBuf) {
+		
+		super(observationProtoBuf);
+		
 		this.mType = ObservationType.TYPE_ROTATION_VECTOR;
 	}
 
