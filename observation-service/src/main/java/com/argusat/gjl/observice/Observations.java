@@ -38,7 +38,7 @@ public class Observations {
     @Consumes("application/observation+protobuf")
     public String postObservation(ObservationProtoBuf observationProtoBuf) {
     	
-    	
+    	//observationProtoBuf.
     	
         return "OK";
     }

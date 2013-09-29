@@ -19,32 +19,33 @@ package com.argusat.gjl.model;
 import com.argusat.gjl.service.observation.ObservationProtoBuf;
 
 public abstract class Observation {
-	
+
 	public enum ObservationType {
-		TYPE_LOCATION_ONLY,
-		TYPE_ROTATION_VECTOR,
-		TYPE_GNSS_CHANNEL
+		TYPE_LOCATION_ONLY, TYPE_ROTATION_VECTOR, TYPE_GNSS_CHANNEL
 	}
-	
+
 	protected long mTimestamp;
-	
+
 	protected long mDeviceId;
-	
+
 	protected ObservationType mType;
-	
+
 	protected Location mLocation;
 
 	protected float mValues[];
 	
+	protected boolean mValid;
+
 	private ObservationProtoBuf.Observation mObservationProtoBuf;
-	
-	public Observation()
-	{
+
+	public Observation() {
 		mValues = null;
 	}
-	
+
 	public static Observation newObservation(ObservationType type) {
 		switch (type) {
+		case TYPE_LOCATION_ONLY:
+			return new LocationOnlyObservation();
 		case TYPE_ROTATION_VECTOR:
 			return new RotationVectorObservation();
 		case TYPE_GNSS_CHANNEL:
@@ -55,6 +56,15 @@ public abstract class Observation {
 		}
 	}
 	
+	public static Observation newObservation(ObservationProtoBuf.Observation observationProtoBuf) {
+		
+		//mObservationProtoBuf = observationProtoBuf;
+		//Observation observation = newObservation(observationProtoBuf.get);
+		return newObservation(ObservationType.TYPE_LOCATION_ONLY);
+		//setTimeStamp();
+		
+	}
+
 	public long getTimestamp() {
 		return mTimestamp;
 	}
@@ -78,7 +88,7 @@ public abstract class Observation {
 	public void setType(ObservationType type) {
 		this.mType = type;
 	}
-	
+
 	public Location getLocation() {
 		return mLocation;
 	}
@@ -90,10 +100,11 @@ public abstract class Observation {
 	public float[] getValues() {
 		return mValues;
 	}
+	
+	public abstract boolean isValid();
 
 	public ObservationProtoBuf.Observation getObservationProtoBuf() {
 		return mObservationProtoBuf;
 	}
-	
 
 }

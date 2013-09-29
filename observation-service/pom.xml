@@ -46,6 +46,12 @@
 			<artifactId>hbase</artifactId>
 			<version>0.94.11</version>
 		</dependency>
+		<!-- Our local dependency -->
+		<dependency>
+			<groupId>com.argusat.gjl</groupId>
+			<artifactId>gjl-api-java</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>

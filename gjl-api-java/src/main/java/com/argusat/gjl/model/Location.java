@@ -16,7 +16,7 @@
 
 package com.argusat.gjl.model;
 
-import com.argusat.gjl.service.observation.ObservationProtoBuf;
+import com.argusat.gjl.service.observation.LocationProtoBuf;
 
 public class Location {
 
@@ -30,7 +30,7 @@ public class Location {
 
 	private float mVDOP;
 
-	private ObservationProtoBuf.Observation.Location locationProtoBuf;
+	private LocationProtoBuf.Location locationProtoBuf;
 
 	public float getLatitude() {
 		return mLatitude;
@@ -72,7 +72,7 @@ public class Location {
 		this.mVDOP = hdop;
 	}
 
-	public ObservationProtoBuf.Observation.Location getProtoBuf() {
+	public LocationProtoBuf.Location getProtoBuf() {
 		return locationProtoBuf;
 	}
 }

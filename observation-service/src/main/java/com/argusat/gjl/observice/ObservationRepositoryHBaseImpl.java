@@ -93,7 +93,8 @@ public class ObservationRepositoryHBaseImpl implements ObservationRepository {
 				Bytes.toBytes(observation.getLocation().getHDOP()));
 		put.add(LOCATION_COLUMN_FAMILY, LOCATION_VDOP_COLUMN,
 				Bytes.toBytes(observation.getLocation().getVDOP()));
-
+		
+		
 		return put;
 	}
 

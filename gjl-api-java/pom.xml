@@ -56,7 +56,7 @@
 				<version>0.1.10</version>
 				<configuration>
 					<protocExecutable>protoc</protocExecutable>
-					<protoSourceRoot>${project.basedir}/../observation-service/interfaces/</protoSourceRoot>
+					<protoSourceRoot>${project.basedir}/../interfaces/</protoSourceRoot>
 					<languageSpecifications>
 						<LanguageSpecification>
 							<language>JAVA</language>

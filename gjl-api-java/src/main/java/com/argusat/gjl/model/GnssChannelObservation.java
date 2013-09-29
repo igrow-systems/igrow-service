@@ -65,6 +65,12 @@ public class GnssChannelObservation extends Observation {
 		this.c0_n = c0_n;
 		this.mValues[2] = c0_n;
 	}
+
+	@Override
+	public boolean isValid() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 	
 	
 

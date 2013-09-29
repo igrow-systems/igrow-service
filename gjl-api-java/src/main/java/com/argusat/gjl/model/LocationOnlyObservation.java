@@ -17,10 +17,10 @@
 package com.argusat.gjl.model;
 
 
-public class RotationVectorObservation extends Observation {
+public class LocationOnlyObservation extends Observation {
 
-	public RotationVectorObservation() {
-		this.mType = ObservationType.TYPE_ROTATION_VECTOR;
+	public LocationOnlyObservation() {
+		this.mType = ObservationType.TYPE_LOCATION_ONLY;
 	}
 
 	@Override
