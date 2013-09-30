@@ -17,17 +17,22 @@
 
 package com.argusat.gjl.observice;
 
+import java.util.logging.Logger;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-import com.argusat.gjl.service.observation.ObservationProtoBuf;
+import com.argusat.gjl.model.Observation;
 
 // The Java class will be hosted at the URI path "/observations"
 @Path("/observations")
-public class Observations {
-    
+public class Observations {	
+	
+	private static final Logger LOGGER = Logger
+			.getLogger(Observations.class.getSimpleName());
+	
     // The Java method will process HTTP POST requests
     @POST
     // The Java method will produce content identified by the MIME Media
@@ -36,9 +41,9 @@ public class Observations {
     // The Java method will produce content identified by the MIME Media
     // type "application/observation+protobuf"
     @Consumes("application/observation+protobuf")
-    public String postObservation(ObservationProtoBuf observationProtoBuf) {
+    public String postObservation(Observation observation) {
     	
-    	//observationProtoBuf.
+    	LOGGER.finer(observation.getObservationProtoBuf().toString());
     	
         return "OK";
     }
