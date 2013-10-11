@@ -36,9 +36,4 @@ public class LocationOnlyObservation extends Observation {
 				.setType(ObservationProtoBuf.Observation.ObservationType.LOCATION_ONLY);
 	}
 
-	@Override
-	public boolean isValid() {
-		return super.isValid();
-	}
-
 }

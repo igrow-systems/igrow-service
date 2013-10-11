@@ -45,6 +45,19 @@ public class LocationOnlyObservationTest {
 	@Before
 	public void setUp() throws Exception {
 		mObservation = Observation.newObservation(ObservationType.TYPE_LOCATION_ONLY);
+		
+		mObservation.setDeviceId(007L);
+		mObservation.setTimestamp(111889349L);
+		mObservation.setMode(ModeType.PASSIVE);
+		//assertEquals()
+		//assertEquals(137483L, location.getLatitude());
+    	Location location = mObservation.getLocation();
+		location.setLatitude(1982384L);
+    	location.setLongitude(1237843L);
+    	location.setAltitude(120.0f);
+    	location.setHDOP(5.0f);
+    	location.setVDOP(12.0f);
+    	mObservation.setLocation(location);
 	}
 
 	@After
@@ -95,25 +108,10 @@ public class LocationOnlyObservationTest {
 
 	@Test
 	public void testGetObservationProtoBuf() throws IOException {
-		
-		Observation observation = Observation.newObservation(ObservationType.TYPE_LOCATION_ONLY);
-		
-		observation.setDeviceId(007L);
-		observation.setTimestamp(111889349L);
-		observation.setMode(ModeType.PASSIVE);
-		//assertEquals()
-		//assertEquals(137483L, location.getLatitude());
-    	Location location = observation.getLocation();
-		location.setLatitude(1982384L);
-    	location.setLongitude(1237843L);
-    	location.setAltitude(120.0f);
-    	location.setHDOP(5.0f);
-    	location.setVDOP(12.0f);
-    	observation.setLocation(location);
     	
-    	assertTrue(observation.isValid());
+    	assertTrue(mObservation.isValid());
     	
-    	ObservationProtoBuf.Observation protoBuf = observation.getObservationProtoBuf();
+    	ObservationProtoBuf.Observation protoBuf = mObservation.getObservationProtoBuf();
     	
     	assertTrue(protoBuf.getType() == ObservationProtoBuf.Observation.ObservationType.LOCATION_ONLY);
     	assertTrue(007L == protoBuf.getDeviceId());

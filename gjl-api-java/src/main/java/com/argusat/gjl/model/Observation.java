@@ -46,7 +46,7 @@ public abstract class Observation {
 
 	protected boolean mProtoBufValid;
 
-	private ObservationProtoBuf.Observation mObservationProtoBuf;
+	protected ObservationProtoBuf.Observation mObservationProtoBuf;
 
 	protected ObservationProtoBuf.Observation.Builder mObservationProtoBufBuilder;
 
@@ -56,13 +56,14 @@ public abstract class Observation {
 		mProtoBufValid = false;
 		mValid = false;
 		mLocation = new Location();
+		mObservationProtoBuf = null;
 		mObservationProtoBufBuilder = ObservationProtoBuf.Observation
 				.newBuilder();
 	}
 
 	protected Observation(ObservationProtoBuf.Observation observationProtoBuf) {
 		// mDeviceId = observationProtoBuf.getTimestamp();
-
+		mObservationProtoBuf = null;
 		mObservationProtoBufBuilder = ObservationProtoBuf.Observation
 				.newBuilder(observationProtoBuf);
 
@@ -166,11 +167,11 @@ public abstract class Observation {
 	protected void validate() {
 		mObservationProtoBuf = mObservationProtoBufBuilder.buildPartial();
 		mProtoBufValid = mObservationProtoBuf.isInitialized();
-		mValid = mProtoBufValid && mLocation != null && mLocation.isValid();
+		mValid = mProtoBufValid;
 		mDirty = false;
 	}
 
-	public boolean isValid() {
+	public final boolean isValid() {
 		if (mDirty) {
 			validate();
 		}

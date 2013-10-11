@@ -35,10 +35,5 @@ public class RotationVectorObservation extends Observation {
 		this.mType = ObservationType.TYPE_ROTATION_VECTOR;
 	}
 
-	@Override
-	public boolean isValid() {
-		// TODO Auto-generated method stub
-		return false;
-	}
 
 }

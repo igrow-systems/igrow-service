@@ -17,10 +17,11 @@
 package com.argusat.gjl.model;
 
 import com.argusat.gjl.service.observation.ObservationProtoBuf;
+import com.argusat.gjl.service.observation.ObservationProtoBuf.Observation.C0NObservation;
 
 public class GnssChannelObservation extends Observation {
 
-	public int mPrn;
+	private int mPrn;
 
 	private float mAzimuth;
 
@@ -28,24 +29,45 @@ public class GnssChannelObservation extends Observation {
 
 	private float mC0_N;
 
+	private C0NObservation mC0NObservationProtoBuf;
+
+	private C0NObservation.Builder mC0NObservationBuilder;
+
+	private C0NObservation.ReceiverChannel mReceiverChannelProtoBuf;
+
+	private C0NObservation.ReceiverChannel.Builder mReceiverChannelBuilder;
+
 	public GnssChannelObservation() {
 		super();
-		this.mType = ObservationType.TYPE_GNSS_CHANNEL;
-		this.mValues = new float[3];
+		mType = ObservationType.TYPE_GNSS_CHANNEL;
+		mValues = new float[3];
+		mC0NObservationProtoBuf = null;
+		mC0NObservationBuilder = ObservationProtoBuf.Observation.C0NObservation
+				.newBuilder();
+		mReceiverChannelProtoBuf = null;
+		mReceiverChannelBuilder = C0NObservation.ReceiverChannel.newBuilder();
 	}
-	
-	public GnssChannelObservation(ObservationProtoBuf.Observation observationProtoBuf) {
+
+	public GnssChannelObservation(
+			ObservationProtoBuf.Observation observationProtoBuf) {
 		super(observationProtoBuf);
-		this.mType = ObservationType.TYPE_GNSS_CHANNEL;
-		this.mValues = new float[3];
+		mType = ObservationType.TYPE_GNSS_CHANNEL;
+		mValues = new float[3];
+		mC0NObservationProtoBuf = null;
+		mC0NObservationBuilder = ObservationProtoBuf.Observation.C0NObservation
+				.newBuilder();
+		mReceiverChannelProtoBuf = null;
+		mReceiverChannelBuilder = C0NObservation.ReceiverChannel.newBuilder();
 	}
-	
+
 	public int getPrn() {
 		return mPrn;
 	}
 
 	public void setPrn(int prn) {
-		this.mPrn = prn;
+		mPrn = prn;
+		mReceiverChannelBuilder.setPrn(prn);
+		mDirty = true;
 	}
 
 	public double getAzimuth() {
@@ -55,6 +77,8 @@ public class GnssChannelObservation extends Observation {
 	public void setAzimuth(float azimuth) {
 		this.mAzimuth = azimuth;
 		this.mValues[0] = azimuth;
+		mReceiverChannelBuilder.setAzimuth(azimuth);
+		mDirty = true;
 	}
 
 	public float getElevation() {
@@ -63,7 +87,9 @@ public class GnssChannelObservation extends Observation {
 
 	public void setElevation(float elevation) {
 		this.mElevation = elevation;
-		this.mValues[2] = elevation;
+		this.mValues[1] = elevation;
+		mReceiverChannelBuilder.setElevation(elevation);
+		mDirty = true;
 	}
 
 	public float getC0_n() {
@@ -73,14 +99,24 @@ public class GnssChannelObservation extends Observation {
 	public void setC0_n(float c0_n) {
 		this.mC0_N = c0_n;
 		this.mValues[2] = c0_n;
+		mReceiverChannelBuilder.setC0N(c0_n);
+		mDirty = true;
 	}
 
 	@Override
-	public boolean isValid() {
-		// TODO Auto-generated method stub
-		return false;
+	protected void validate() {
+		
+		mReceiverChannelProtoBuf = mReceiverChannelBuilder.buildPartial();
+		mC0NObservationBuilder.addChannels(mReceiverChannelProtoBuf);
+		mC0NObservationProtoBuf = mC0NObservationBuilder.buildPartial();
+		mProtoBufValid = mC0NObservationProtoBuf.isInitialized();
+		mValid = mProtoBufValid;
+		if (mValid) {
+			mObservationProtoBufBuilder.setC0Nobservation(mC0NObservationProtoBuf);
+			// Call the base class to validate the entire structure
+			super.validate();
+		}
+		
 	}
-	
-	
 
 }
