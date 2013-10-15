@@ -14,7 +14,7 @@
  * with Argusat Limited.
  */
 
-package com.argusat.gjl.observice;
+package com.argusat.gjl.observice.repository;
 
 import com.argusat.gjl.model.Observation;
 

@@ -31,6 +31,7 @@ import org.junit.rules.TemporaryFolder;
 
 import com.argusat.gjl.model.Location;
 import com.argusat.gjl.model.Observation;
+import com.argusat.gjl.model.Observation.ModeType;
 import com.argusat.gjl.model.Observation.ObservationType;
 import com.argusat.gjl.observice.Main;
 import com.argusat.gjl.observice.ObservationProtobufReader;
@@ -89,6 +90,7 @@ public class ObservationProtobufWriterTest extends TestCase {
     	observation.setDeviceId(007L);
     	observation.setLocation(location);
     	observation.setTimestamp(11172763L);
+    	observation.setMode(ModeType.PASSIVE);
     	
     	assertTrue(observation.isValid());
     	

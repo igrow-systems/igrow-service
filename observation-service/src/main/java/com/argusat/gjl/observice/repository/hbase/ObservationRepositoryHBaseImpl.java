@@ -14,7 +14,7 @@
  * with Argusat Limited.
  */
 
-package com.argusat.gjl.observice;
+package com.argusat.gjl.observice.repository.hbase;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -29,6 +29,7 @@ import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.util.Bytes;
 
 import com.argusat.gjl.model.Observation;
+import com.argusat.gjl.observice.repository.ObservationRepository;
 
 public class ObservationRepositoryHBaseImpl implements ObservationRepository {
 
