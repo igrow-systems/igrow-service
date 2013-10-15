@@ -83,10 +83,10 @@ public class LocationOnlyObservationTest {
 		
 		assertNotNull(observation);
 		assertEquals(ObservationType.TYPE_LOCATION_ONLY, observation.getType());
-		assertTrue(observation.isValid());
-		
+		assertEquals(ModeType.PASSIVE, observation.getMode());
 		Location location = observation.getLocation();
 		assertNotNull(location);
+		assertTrue(observation.isValid());
 		//assertEquals()
 		//assertEquals(137483L, location.getLatitude());
     	//location.setLatitude();

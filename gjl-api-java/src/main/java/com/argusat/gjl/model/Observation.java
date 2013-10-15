@@ -62,7 +62,7 @@ public abstract class Observation {
 	}
 
 	protected Observation(ObservationProtoBuf.Observation observationProtoBuf) {
-		
+
 		assert (observationProtoBuf.isInitialized());
 		// mDeviceId = observationProtoBuf.getTimestamp();
 		mObservationProtoBuf = null;
@@ -72,6 +72,17 @@ public abstract class Observation {
 		mTimestamp = observationProtoBuf.getTimestamp();
 		mDeviceId = observationProtoBuf.getDeviceId();
 		mLocation = new Location(observationProtoBuf.getLocation());
+		switch (observationProtoBuf.getMode()) {
+		case ACTIVE:
+			mMode = ModeType.ACTIVE;
+			break;
+		case PASSIVE:
+			mMode = ModeType.PASSIVE;
+			break;
+		default:
+			// TODO: throw exeception
+			break;
+		}
 		mDirty = false;
 		mValid = true;
 	}
