@@ -24,14 +24,14 @@ public class LocationOnlyObservation extends Observation {
 			ObservationProtoBuf.Observation observationProtoBuf) {
 		super(observationProtoBuf);
 
-		this.mType = ObservationType.TYPE_LOCATION_ONLY;
+		mType = ObservationType.TYPE_LOCATION_ONLY;
 		mObservationProtoBufBuilder
 				.setType(ObservationProtoBuf.Observation.ObservationType.LOCATION_ONLY);
 	}
 
 	public LocationOnlyObservation() {
 		super();
-		this.mType = ObservationType.TYPE_LOCATION_ONLY;
+		mType = ObservationType.TYPE_LOCATION_ONLY;
 		mObservationProtoBufBuilder
 				.setType(ObservationProtoBuf.Observation.ObservationType.LOCATION_ONLY);
 	}

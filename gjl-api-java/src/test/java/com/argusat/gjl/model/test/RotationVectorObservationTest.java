@@ -31,11 +31,11 @@ import com.argusat.gjl.model.RotationVectorObservation;
 
 public class RotationVectorObservationTest {
 
-	private Observation mObservation;
+	private RotationVectorObservation mObservation;
 
 	@Before
 	public void setUp() throws Exception {
-		mObservation = Observation
+		mObservation = (RotationVectorObservation)Observation
 				.newObservation(ObservationType.TYPE_ROTATION_VECTOR);
 
 		mObservation.setDeviceId(007L);
@@ -52,7 +52,7 @@ public class RotationVectorObservationTest {
 		mObservation.setLocation(location);
 
 		// Add the rotation vector
-
+		
 	}
 
 	@After

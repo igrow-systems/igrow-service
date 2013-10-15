@@ -40,6 +40,8 @@ public class GnssChannelObservation extends Observation {
 	public GnssChannelObservation() {
 		super();
 		mType = ObservationType.TYPE_GNSS_CHANNEL;
+		mObservationProtoBufBuilder
+				.setType(ObservationProtoBuf.Observation.ObservationType.C0N_GNSS);
 		mValues = new float[3];
 		mC0NObservationProtoBuf = null;
 		mC0NObservationBuilder = ObservationProtoBuf.Observation.C0NObservation
@@ -52,12 +54,18 @@ public class GnssChannelObservation extends Observation {
 			ObservationProtoBuf.Observation observationProtoBuf) {
 		super(observationProtoBuf);
 		mType = ObservationType.TYPE_GNSS_CHANNEL;
+		mObservationProtoBufBuilder
+				.setType(ObservationProtoBuf.Observation.ObservationType.C0N_GNSS);
 		mValues = new float[3];
 		mC0NObservationProtoBuf = null;
 		mC0NObservationBuilder = ObservationProtoBuf.Observation.C0NObservation
 				.newBuilder();
 		mReceiverChannelProtoBuf = null;
 		mReceiverChannelBuilder = C0NObservation.ReceiverChannel.newBuilder();
+	}
+
+	private void initialise() {
+
 	}
 
 	public int getPrn() {
@@ -105,18 +113,18 @@ public class GnssChannelObservation extends Observation {
 
 	@Override
 	protected void validate() {
-		
+
 		mReceiverChannelProtoBuf = mReceiverChannelBuilder.buildPartial();
 		mC0NObservationBuilder.addChannels(mReceiverChannelProtoBuf);
+		// mC0NObservationBuilder.
 		mC0NObservationProtoBuf = mC0NObservationBuilder.buildPartial();
-		mProtoBufValid = mC0NObservationProtoBuf.isInitialized();
-		mValid = mProtoBufValid;
-		if (mValid) {
-			mObservationProtoBufBuilder.setC0Nobservation(mC0NObservationProtoBuf);
-			// Call the base class to validate the entire structure
+		mObservationProtoBufBuilder.setC0Nobservation(mC0NObservationProtoBuf);
+		boolean protoBufValid = mC0NObservationProtoBuf.isInitialized();
+
+		if (protoBufValid) {
 			super.validate();
 		}
-		
+
 	}
 
 }

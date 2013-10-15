@@ -83,6 +83,7 @@ public class LocationOnlyObservationTest {
 		
 		assertNotNull(observation);
 		assertEquals(ObservationType.TYPE_LOCATION_ONLY, observation.getType());
+		assertTrue(observation.isValid());
 		
 		Location location = observation.getLocation();
 		assertNotNull(location);

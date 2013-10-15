@@ -62,6 +62,8 @@ public abstract class Observation {
 	}
 
 	protected Observation(ObservationProtoBuf.Observation observationProtoBuf) {
+		
+		assert (observationProtoBuf.isInitialized());
 		// mDeviceId = observationProtoBuf.getTimestamp();
 		mObservationProtoBuf = null;
 		mObservationProtoBufBuilder = ObservationProtoBuf.Observation
@@ -70,6 +72,8 @@ public abstract class Observation {
 		mTimestamp = observationProtoBuf.getTimestamp();
 		mDeviceId = observationProtoBuf.getDeviceId();
 		mLocation = new Location(observationProtoBuf.getLocation());
+		mDirty = false;
+		mValid = true;
 	}
 
 	// Consolidate this to use only the protobuf enums for message/object type
@@ -89,8 +93,6 @@ public abstract class Observation {
 
 	public static Observation newObservation(
 			ObservationProtoBuf.Observation observationProtoBuf) {
-
-		assert (observationProtoBuf.isInitialized());
 
 		ObservationProtoBuf.Observation.ObservationType type = observationProtoBuf
 				.getType();
@@ -179,10 +181,11 @@ public abstract class Observation {
 	}
 
 	public ObservationProtoBuf.Observation getObservationProtoBuf() {
-		if (mDirty) {
-			validate();
+		if (isValid()) {
+			return mObservationProtoBuf;
+		} else {
+			return null;
 		}
-		return mObservationProtoBuf;
 	}
 
 }
