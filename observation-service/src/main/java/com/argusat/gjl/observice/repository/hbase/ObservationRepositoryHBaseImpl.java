@@ -16,6 +16,7 @@
 
 package com.argusat.gjl.observice.repository.hbase;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,12 +32,11 @@ import org.apache.hadoop.hbase.util.Bytes;
 import com.argusat.gjl.model.Observation;
 import com.argusat.gjl.observice.repository.ObservationRepository;
 
-public class ObservationRepositoryHBaseImpl implements ObservationRepository {
+public class ObservationRepositoryHBaseImpl implements ObservationRepository,
+		Closeable {
 
 	private static final Logger LOGGER = Logger
 			.getLogger(ObservationRepositoryHBaseImpl.class.getSimpleName());
-
-	//private ThreadPoolExecutor mExecutor;
 
 	private HTableInterface mObservationsTable;
 
@@ -55,8 +55,12 @@ public class ObservationRepositoryHBaseImpl implements ObservationRepository {
 
 	private static final byte[] LOCATION_VDOP_COLUMN = Bytes.toBytes("vdop");
 
+	private final Index mIndex; 
+	
 	public ObservationRepositoryHBaseImpl() throws IOException {
 
+		mIndex = new Index();
+		
 		Configuration myConf = HBaseConfiguration.create();
 
 		mObservationsTable = new HTable(myConf, TABLE_NAME);
@@ -67,6 +71,10 @@ public class ObservationRepositoryHBaseImpl implements ObservationRepository {
 	public void storeObservation(Observation observation) {
 
 		try {
+			RowKey rowKey = new RowKey(observation);
+			Bucket bucket = mIndex.fetchBucket(rowKey);
+			bucket.insert(rowKey, observation);
+
 			mObservationsTable.put(makePut(observation));
 		} catch (IOException e) {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
@@ -93,8 +101,7 @@ public class ObservationRepositoryHBaseImpl implements ObservationRepository {
 				Bytes.toBytes(observation.getLocation().getHDOP()));
 		put.add(LOCATION_COLUMN_FAMILY, LOCATION_VDOP_COLUMN,
 				Bytes.toBytes(observation.getLocation().getVDOP()));
-		
-		
+
 		return put;
 	}
 
@@ -102,6 +109,12 @@ public class ObservationRepositoryHBaseImpl implements ObservationRepository {
 	private static Get makeGet(Observation observation) {
 		Get get = new Get(Bytes.toBytes(observation.getDeviceId()));
 		return get;
+	}
+
+	@Override
+	public void close() throws IOException {
+		// TODO Auto-generated method stub
+
 	}
 
 }
