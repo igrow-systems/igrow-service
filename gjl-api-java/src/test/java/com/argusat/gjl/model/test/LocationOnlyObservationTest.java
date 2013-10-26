@@ -46,7 +46,6 @@ public class LocationOnlyObservationTest {
 	public void setUp() throws Exception {
 		mObservation = Observation.newObservation(ObservationType.TYPE_LOCATION_ONLY);
 		
-		mObservation.setDeviceId(007L);
 		mObservation.setTimestamp(111889349L);
 		mObservation.setMode(ModeType.PASSIVE);
 		//assertEquals()
@@ -115,7 +114,6 @@ public class LocationOnlyObservationTest {
     	ObservationProtoBuf.Observation protoBuf = mObservation.getObservationProtoBuf();
     	
     	assertTrue(protoBuf.getType() == ObservationProtoBuf.Observation.ObservationType.LOCATION_ONLY);
-    	assertTrue(007L == protoBuf.getDeviceId());
     	assertTrue(111889349L == protoBuf.getTimestamp());
     	assertTrue(1982384L == protoBuf.getLocation().getLatitude());
     	assertTrue(1237843L == protoBuf.getLocation().getLongitude());

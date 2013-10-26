@@ -31,16 +31,15 @@ message Observation {
   }
 
   required ObservationType type = 1;
-  required uint64 deviceId = 2;
-  required uint64 timestamp = 3;        // The timestamp (unique ID in the context of a client)
-  required Location location = 4;
+  required uint64 timestamp = 2;        // The timestamp (unique ID in the context of a client)
+  required Location location = 3;
 
   enum ModeType {
     PASSIVE = 0;
     ACTIVE = 1;
   }
 
-  required ModeType mode = 5;
+  required ModeType mode = 4;
 
   message C0NObservation {
     
@@ -54,12 +53,12 @@ message Observation {
     repeated ReceiverChannel channels = 1;
   }
 
-  optional C0NObservation c0nobservation = 6;
+  optional C0NObservation c0nobservation = 5;
 
   message AccelerometerObservation {
   }
 
-  optional AccelerometerObservation accelerometerobservation = 7;
+  optional AccelerometerObservation accelerometerobservation = 6;
 
   message MagneticCompassObservation {
     
@@ -71,7 +70,7 @@ message Observation {
     required Direction direction = 1;
   }
 
-  optional MagneticCompassObservation magneticCompassObservation = 8;
+  optional MagneticCompassObservation magneticCompassObservation = 7;
 
   message GeoMagneticObservation {
     
@@ -83,7 +82,7 @@ message Observation {
     required Direction direction = 1;
   }
 
-  optional GeoMagneticObservation geoMagneticObservation = 9;
+  optional GeoMagneticObservation geoMagneticObservation = 8;
  
   
 }
@@ -91,7 +90,7 @@ message Observation {
 // Our observation is just one of a collection of observations.
 message Observations {
 
-  required uint32 deviceId = 1;
+  required uint64 deviceId = 1;
 
   repeated Observation observations = 2;
 }

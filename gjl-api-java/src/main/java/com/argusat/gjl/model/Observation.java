@@ -30,13 +30,13 @@ public abstract class Observation {
 
 	protected long mTimestamp;
 
-	protected long mDeviceId;
-
 	protected ModeType mMode;
 
 	protected ObservationType mType;
 
 	protected Location mLocation;
+	
+	protected long mDeviceId;
 
 	protected float mValues[];
 
@@ -50,7 +50,7 @@ public abstract class Observation {
 
 	protected ObservationProtoBuf.Observation.Builder mObservationProtoBufBuilder;
 
-	public Observation() {
+	protected Observation() {
 		mValues = null;
 		mDirty = true;
 		mProtoBufValid = false;
@@ -70,8 +70,8 @@ public abstract class Observation {
 				.newBuilder(observationProtoBuf);
 
 		mTimestamp = observationProtoBuf.getTimestamp();
-		mDeviceId = observationProtoBuf.getDeviceId();
 		mLocation = new Location(observationProtoBuf.getLocation());
+		
 		switch (observationProtoBuf.getMode()) {
 		case ACTIVE:
 			mMode = ModeType.ACTIVE;
@@ -80,7 +80,7 @@ public abstract class Observation {
 			mMode = ModeType.PASSIVE;
 			break;
 		default:
-			// TODO: throw exeception
+			// TODO: throw exception
 			break;
 		}
 		mDirty = false;
@@ -102,8 +102,7 @@ public abstract class Observation {
 		}
 	}
 
-	public static Observation newObservation(
-			ObservationProtoBuf.Observation observationProtoBuf) {
+	public static Observation newObservation(ObservationProtoBuf.Observation observationProtoBuf) {
 
 		ObservationProtoBuf.Observation.ObservationType type = observationProtoBuf
 				.getType();
@@ -127,16 +126,6 @@ public abstract class Observation {
 	public void setTimestamp(long timestamp) {
 		this.mTimestamp = timestamp;
 		mObservationProtoBufBuilder.setTimestamp(timestamp);
-		mDirty = true;
-	}
-
-	public long getDeviceId() {
-		return mDeviceId;
-	}
-
-	public void setDeviceId(long deviceId) {
-		this.mDeviceId = deviceId;
-		mObservationProtoBufBuilder.setDeviceId(deviceId);
 		mDirty = true;
 	}
 
@@ -171,6 +160,16 @@ public abstract class Observation {
 		this.mLocation = location;
 		mObservationProtoBufBuilder.setLocation(location.getLocationProtoBuf());
 		mDirty = true;
+	}
+	
+	// Device Id does not get serialized as all communications
+	// are in the context of a device.
+	public long getDeviceId() {
+		return mDeviceId;
+	}
+
+	public void setDeviceId(long deviceId) {
+		mDeviceId = deviceId;
 	}
 
 	public float[] getValues() {

@@ -38,7 +38,6 @@ public class RotationVectorObservationTest {
 		mObservation = (RotationVectorObservation)Observation
 				.newObservation(ObservationType.TYPE_ROTATION_VECTOR);
 
-		mObservation.setDeviceId(007L);
 		mObservation.setTimestamp(111889349L);
 		mObservation.setMode(ModeType.PASSIVE);
 		// assertEquals()

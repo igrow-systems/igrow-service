@@ -37,7 +37,6 @@ public class GnssChannelObservationTest {
 		mObservation = (GnssChannelObservation)Observation
 				.newObservation(ObservationType.TYPE_GNSS_CHANNEL);
 
-		mObservation.setDeviceId(007L);
 		mObservation.setTimestamp(111889349L);
 		mObservation.setMode(ModeType.PASSIVE);
 		// assertEquals()

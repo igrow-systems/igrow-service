@@ -64,10 +64,6 @@ public class GnssChannelObservation extends Observation {
 		mReceiverChannelBuilder = C0NObservation.ReceiverChannel.newBuilder();
 	}
 
-	private void initialise() {
-
-	}
-
 	public int getPrn() {
 		return mPrn;
 	}

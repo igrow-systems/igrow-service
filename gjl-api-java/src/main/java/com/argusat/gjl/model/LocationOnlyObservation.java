@@ -20,8 +20,7 @@ import com.argusat.gjl.service.observation.ObservationProtoBuf;
 
 public class LocationOnlyObservation extends Observation {
 
-	public LocationOnlyObservation(
-			ObservationProtoBuf.Observation observationProtoBuf) {
+	public LocationOnlyObservation(ObservationProtoBuf.Observation observationProtoBuf) {
 		super(observationProtoBuf);
 
 		mType = ObservationType.TYPE_LOCATION_ONLY;
