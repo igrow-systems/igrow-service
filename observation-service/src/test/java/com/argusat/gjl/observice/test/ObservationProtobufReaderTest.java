@@ -14,7 +14,6 @@
  * with Argusat Limited.
  */
 
-
 package com.argusat.gjl.observice.test;
 
 import java.io.IOException;
@@ -27,58 +26,61 @@ import junit.framework.TestCase;
 import org.glassfish.grizzly.http.server.HttpServer;
 
 import com.argusat.gjl.model.Observation;
+import com.argusat.gjl.model.ObservationCollection;
 import com.argusat.gjl.observice.Main;
 import com.argusat.gjl.observice.ObservationProtobufReader;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 
-
 public class ObservationProtobufReaderTest extends TestCase {
 
-    private HttpServer httpServer;
-    
-    private WebResource r;
+	private HttpServer httpServer;
 
-    public ObservationProtobufReaderTest(String testName) {
-        super(testName);
-    }
+	private WebResource r;
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        
-        //start the Grizzly2 web container 
-        httpServer = Main.startServer();
+	public ObservationProtobufReaderTest(String testName) {
+		super(testName);
+	}
 
-        // create the client
-        Client c = Client.create();
-        r = c.resource(Main.BASE_URI);
-    }
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
 
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
+		// start the Grizzly2 web container
+		httpServer = Main.startServer();
 
-        httpServer.stop();
-    }
+		// create the client
+		Client c = Client.create();
+		r = c.resource(Main.BASE_URI);
+	}
 
-    public void testReadFrom() throws WebApplicationException, IOException {
-    	
-    	ObservationProtobufReader reader = new ObservationProtobufReader();
-    	
-    	InputStream entityStream = this.getClass().getResourceAsStream("/observation-location-only.bin");
-    	
-    	Observation observation = reader.readFrom(null, null, null, null, null, entityStream);
-    	
-    	assertTrue(observation.isValid());
-    }
-    
-    public void testIsReadable() {
-    	ObservationProtobufReader reader = new ObservationProtobufReader();
-    	
-    	boolean result = reader.isReadable(Observation.class, null, null, null);
-    	assertTrue(result);
-    }
+	@Override
+	protected void tearDown() throws Exception {
+		super.tearDown();
 
+		httpServer.stop();
+	}
+
+	public void testReadFrom() throws WebApplicationException, IOException {
+
+		ObservationProtobufReader reader = new ObservationProtobufReader();
+
+		InputStream entityStream = this.getClass().getResourceAsStream(
+				"/observation-location-only.bin");
+
+		ObservationCollection observations = reader.readFrom(null, null, null,
+				null, null, entityStream);
+
+		for (Observation observation : observations.getObservations()) {
+			assertTrue(observation.isValid());
+		}
+	}
+
+	public void testIsReadable() {
+		ObservationProtobufReader reader = new ObservationProtobufReader();
+
+		boolean result = reader.isReadable(Observation.class, null, null, null);
+		assertTrue(result);
+	}
 
 }

@@ -33,6 +33,7 @@ import com.argusat.gjl.model.Location;
 import com.argusat.gjl.model.Observation;
 import com.argusat.gjl.model.Observation.ModeType;
 import com.argusat.gjl.model.Observation.ObservationType;
+import com.argusat.gjl.model.ObservationCollection;
 import com.argusat.gjl.observice.Main;
 import com.argusat.gjl.observice.ObservationProtobufReader;
 import com.argusat.gjl.observice.ObservationProtobufWriter;
@@ -94,7 +95,11 @@ public class ObservationProtobufWriterTest extends TestCase {
     	
     	assertTrue(observation.isValid());
     	
-    	writer.writeTo(observation, null, null, null, null, null, entityStream);
+    	ObservationCollection observations = new ObservationCollection();
+    	observations.setDeviceId(007L);
+    	observations.add(observation);
+    	
+    	writer.writeTo(observations, null, null, null, null, null, entityStream);
     	
     	
     }

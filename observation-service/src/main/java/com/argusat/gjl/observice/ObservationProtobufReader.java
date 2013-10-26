@@ -29,12 +29,13 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
 
 import com.argusat.gjl.model.Observation;
+import com.argusat.gjl.model.ObservationCollection;
 import com.argusat.gjl.service.observation.ObservationProtoBuf;
 
 @Provider
 @Consumes("application/observation-protobuf")
 public class ObservationProtobufReader implements
-		MessageBodyReader<Observation> {
+		MessageBodyReader<ObservationCollection> {
 
 	@Override
 	public boolean isReadable(Class<?> type, Type genericType,
@@ -42,14 +43,22 @@ public class ObservationProtobufReader implements
 		return Observation.class.isAssignableFrom(type);
 	}
 
-	public Observation readFrom(Class<Observation> type, Type genericType,
-			Annotation[] annotations, MediaType mediaType,
+	public ObservationCollection readFrom(Class<ObservationCollection> type,
+			Type genericType, Annotation[] annotations, MediaType mediaType,
 			MultivaluedMap<String, String> httpHeaders, InputStream entityStream)
 			throws IOException, WebApplicationException {
+
+		ObservationCollection observations = new ObservationCollection();
 		try {
-			ObservationProtoBuf.Observation observationProtobuf = ObservationProtoBuf.Observation.parseFrom(entityStream);
-			Observation observation = Observation.newObservation(observationProtobuf);
-			return observation; 
+			ObservationProtoBuf.Observations observationsProtobuf = ObservationProtoBuf.Observations
+					.parseFrom(entityStream);
+			for (ObservationProtoBuf.Observation observationProtoBuf : observationsProtobuf
+					.getObservationsList()) {
+				Observation observation = Observation
+						.newObservation(observationProtoBuf);
+				observations.add(observation);
+			}
+			return observations;
 		} catch (Exception e) {
 			throw new WebApplicationException(e);
 		}

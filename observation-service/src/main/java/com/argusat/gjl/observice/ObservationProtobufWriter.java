@@ -29,21 +29,32 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 
 import com.argusat.gjl.model.Observation;
+import com.argusat.gjl.model.ObservationCollection;
 import com.argusat.gjl.service.observation.ObservationProtoBuf;
 
 @Provider
 @Consumes("application/observation-protobuf")
 public class ObservationProtobufWriter implements
-		MessageBodyWriter<Observation> {
-
+		MessageBodyWriter<ObservationCollection> {
+	
 	@Override
-	public void writeTo(Observation observation, Class<?> type, Type genericType,
-			Annotation[] annotations, MediaType mediaType,
-			MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream)
-			throws IOException, WebApplicationException {
+	public void writeTo(ObservationCollection observations, Class<?> type,
+			Type genericType, Annotation[] annotations, MediaType mediaType,
+			MultivaluedMap<String, Object> httpHeaders,
+			OutputStream entityStream) throws IOException,
+			WebApplicationException {
 		try {
-			ObservationProtoBuf.Observation observationProtobuf = observation.getObservationProtoBuf();
-			observationProtobuf.writeTo(entityStream);
+			ObservationProtoBuf.Observations.Builder observationsProtoBufBuilder = ObservationProtoBuf.Observations
+					.newBuilder();
+			
+			observationsProtoBufBuilder.setDeviceId(observations.getDeviceId());
+			
+			for (Observation observation : observations.getObservations()) {
+				ObservationProtoBuf.Observation observationProtobuf = observation
+						.getObservationProtoBuf();
+				observationsProtoBufBuilder.addObservations(observationProtobuf);
+			}
+			observationsProtoBufBuilder.build().writeTo(entityStream);
 			return;
 		} catch (Exception e) {
 			throw new WebApplicationException(e);
@@ -51,16 +62,17 @@ public class ObservationProtobufWriter implements
 	}
 
 	@Override
-	public long getSize(Observation observation, Class<?> type, Type typeParam,
-			Annotation[] annotations, MediaType mediaType) {
-		return observation.getObservationProtoBuf().getSerializedSize();
+	public long getSize(ObservationCollection observations, Class<?> type,
+			Type typeParam, Annotation[] annotations, MediaType mediaType) {
+		
+		return 0;
+		
 	}
 
 	@Override
 	public boolean isWriteable(Class<?> type, Type typeParam, Annotation[] annotations,
 			MediaType mediaType) {
 		
-		return Observation.class.isAssignableFrom(type);
+		return ObservationCollection.class.isAssignableFrom(type);
 	}
-
 }

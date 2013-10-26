@@ -90,7 +90,7 @@ public class ObservationRepositoryHBaseImpl implements ObservationRepository,
 	}
 
 	private static Put makePut(Observation observation) {
-		Put put = new Put(Bytes.toBytes(observation.getDeviceId()));
+		Put put = new Put(Bytes.toBytes(4));
 		put.add(LOCATION_COLUMN_FAMILY, LOCATION_LATITUDE_COLUMN,
 				Bytes.toBytes(observation.getLocation().getLatitude()));
 		put.add(LOCATION_COLUMN_FAMILY, LOCATION_LONGITUDE_COLUMN,
@@ -107,8 +107,8 @@ public class ObservationRepositoryHBaseImpl implements ObservationRepository,
 
 	@SuppressWarnings("unused")
 	private static Get makeGet(Observation observation) {
-		Get get = new Get(Bytes.toBytes(observation.getDeviceId()));
-		return get;
+		//Get get = new Get(Bytes.toBytes(observation.getDeviceId()));
+		return null;
 	}
 
 	@Override
