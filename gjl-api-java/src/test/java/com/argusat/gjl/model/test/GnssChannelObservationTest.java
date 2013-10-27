@@ -18,18 +18,28 @@ package com.argusat.gjl.model.test;
 
 import static org.junit.Assert.*;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import com.argusat.gjl.model.GnssChannelObservation;
 import com.argusat.gjl.model.Location;
 import com.argusat.gjl.model.Observation;
 import com.argusat.gjl.model.Observation.ModeType;
 import com.argusat.gjl.model.Observation.ObservationType;
+import com.argusat.gjl.service.observation.ObservationProtoBuf;
 
 public class GnssChannelObservationTest {
 
+	private static final String TEST_FILENAME = "observation-c0n-gnss.bin"; 
+	
 	private GnssChannelObservation mObservation;
 
 	@Before
@@ -82,6 +92,23 @@ public class GnssChannelObservationTest {
 		assertTrue(GnssChannelObservation.class == mObservation.getClass());
 		assertNotNull(mObservation.getLocation());
 	}
+	
+	@Test
+	public void testNewObservationFromProtoBuf() throws IOException {
+
+		InputStream entityStream = this.getClass().getResourceAsStream("/" + TEST_FILENAME);
+    	
+		ObservationProtoBuf.Observation observationProtobuf = ObservationProtoBuf.Observation.parseFrom(entityStream);
+		Observation observation = Observation.newObservation(observationProtobuf);
+		
+		assertNotNull(observation);
+		assertEquals(ObservationType.TYPE_GNSS_CHANNEL, observation.getType());
+		assertEquals(ModeType.PASSIVE, observation.getMode());
+		Location location = observation.getLocation();
+		assertNotNull(location);
+		assertTrue(observation.isValid());
+		
+	}
 
 	@Test
 	public void testIsValid() {
@@ -90,8 +117,27 @@ public class GnssChannelObservationTest {
 	}
 
 	@Test
-	public void testGetObservationProtoBuf() {
-		assertNotNull(mObservation.getObservationProtoBuf());
+	public void testGetObservationProtoBuf() throws IOException {
+
+		assertTrue(mObservation.isValid());
+    	
+    	ObservationProtoBuf.Observation protoBuf = mObservation.getObservationProtoBuf();
+    	
+    	assertTrue(protoBuf.getType() == ObservationProtoBuf.Observation.ObservationType.C0N_GNSS);
+    	assertTrue(111889349L == protoBuf.getTimestamp());
+    	assertTrue(1982384L == protoBuf.getLocation().getLatitude());
+    	assertTrue(1237843L == protoBuf.getLocation().getLongitude());
+    	assertEquals(120.0f, protoBuf.getLocation().getAltitude(), 0.001);
+    	assertEquals(5.0f, protoBuf.getLocation().getHdop(), 0.001);
+    	assertEquals(12.0f, protoBuf.getLocation().getVdop(), 0.001);
+    	
+    	TemporaryFolder tempFolder = new TemporaryFolder();
+    	tempFolder.create();
+    	File entityFile = tempFolder.newFile(TEST_FILENAME);
+    	
+    	OutputStream entityStream = new FileOutputStream(entityFile);
+    	
+    	protoBuf.writeTo(entityStream);
 	}
 
 }

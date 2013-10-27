@@ -40,6 +40,8 @@ import com.argusat.gjl.service.observation.ObservationProtoBuf;
 
 public class LocationOnlyObservationTest {
 
+	private static final String TEST_FILENAME = "observation-location-only.bin";
+	
 	private Observation mObservation;
 	
 	@Before
@@ -75,7 +77,7 @@ public class LocationOnlyObservationTest {
 	@Test
 	public void testNewObservationFromProtoBuf() throws IOException {
 		
-		InputStream entityStream = this.getClass().getResourceAsStream("/observation-location-only.bin");
+		InputStream entityStream = this.getClass().getResourceAsStream("/" + TEST_FILENAME);
     	
 		ObservationProtoBuf.Observation observationProtobuf = ObservationProtoBuf.Observation.parseFrom(entityStream);
 		Observation observation = Observation.newObservation(observationProtobuf);
@@ -123,7 +125,7 @@ public class LocationOnlyObservationTest {
     	
     	TemporaryFolder tempFolder = new TemporaryFolder();
     	tempFolder.create();
-    	File entityFile = tempFolder.newFile("observation-location-only.bin");
+    	File entityFile = tempFolder.newFile(TEST_FILENAME);
     	
     	OutputStream entityStream = new FileOutputStream(entityFile);
     	

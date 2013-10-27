@@ -16,21 +16,32 @@
 
 package com.argusat.gjl.model.test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import com.argusat.gjl.model.Location;
 import com.argusat.gjl.model.Observation;
 import com.argusat.gjl.model.Observation.ModeType;
 import com.argusat.gjl.model.Observation.ObservationType;
 import com.argusat.gjl.model.RotationVectorObservation;
+import com.argusat.gjl.service.observation.ObservationProtoBuf;
 
 public class RotationVectorObservationTest {
 
+	private static final String TEST_FILENAME = "observation-rotation-vector.bin"; 
+	
 	private RotationVectorObservation mObservation;
 
 	@Before
@@ -51,7 +62,7 @@ public class RotationVectorObservationTest {
 		mObservation.setLocation(location);
 
 		// Add the rotation vector
-		
+		//mObservation.
 	}
 
 	@After
@@ -83,6 +94,23 @@ public class RotationVectorObservationTest {
 	}
 
 	@Test
+	public void testNewObservationFromProtoBuf() throws IOException {
+
+		InputStream entityStream = this.getClass().getResourceAsStream("/" + TEST_FILENAME);
+    	
+		ObservationProtoBuf.Observation observationProtobuf = ObservationProtoBuf.Observation.parseFrom(entityStream);
+		Observation observation = Observation.newObservation(observationProtobuf);
+		
+		assertNotNull(observation);
+		assertEquals(ObservationType.TYPE_GNSS_CHANNEL, observation.getType());
+		assertEquals(ModeType.PASSIVE, observation.getMode());
+		Location location = observation.getLocation();
+		assertNotNull(location);
+		assertTrue(observation.isValid());
+		
+	}
+	
+	@Test
 	public void testIsValid() {
 
 		assertTrue(mObservation.isValid());
@@ -90,9 +118,27 @@ public class RotationVectorObservationTest {
 	}
 
 	@Test
-	public void testGetObservationProtoBuf() {
+	public void testGetObservationProtoBuf() throws IOException {
 		
-		assertNotNull(mObservation.getObservationProtoBuf());
+		assertTrue(mObservation.isValid());
+    	
+    	ObservationProtoBuf.Observation protoBuf = mObservation.getObservationProtoBuf();
+    	
+    	assertTrue(protoBuf.getType() == ObservationProtoBuf.Observation.ObservationType.ROTATION_VECTOR);
+    	assertTrue(111889349L == protoBuf.getTimestamp());
+    	assertTrue(1982384L == protoBuf.getLocation().getLatitude());
+    	assertTrue(1237843L == protoBuf.getLocation().getLongitude());
+    	assertEquals(120.0f, protoBuf.getLocation().getAltitude(), 0.001);
+    	assertEquals(5.0f, protoBuf.getLocation().getHdop(), 0.001);
+    	assertEquals(12.0f, protoBuf.getLocation().getVdop(), 0.001);
+    	
+    	TemporaryFolder tempFolder = new TemporaryFolder();
+    	tempFolder.create();
+    	File entityFile = tempFolder.newFile(TEST_FILENAME);
+    	
+    	OutputStream entityStream = new FileOutputStream(entityFile);
+    	
+    	protoBuf.writeTo(entityStream);
 	}
 
 }
