@@ -42,12 +42,13 @@ public class Observations {
 	// type "application/octet-stream"
 	@Consumes("application/octet-stream")
 	public String postObservations(ObservationCollection observations) {
-
+		
 		for (Observation observation : observations.getObservations()) {
-			LOGGER.finer(observation.getObservationProtoBuf().toString());
+			//LOGGER.finer(observation.getObservationProtoBuf().toString());
 			System.out.println(observation.getTimestamp());
 		}
-
+		
 		return "OK";
+
 	}
 }

@@ -55,13 +55,13 @@ public class MainTest extends TestCase {
 
 		// start the Grizzly2 web container
 		httpServer = Main.startServer();
-		
+
 		ClientConfig cc = new DefaultClientConfig();
-        cc.getClasses().add(ObservationProtobufReader.class);
-        cc.getClasses().add(ObservationProtobufWriter.class);
-        
-        Client c = Client.create(cc);
-		
+		cc.getClasses().add(ObservationProtobufReader.class);
+		cc.getClasses().add(ObservationProtobufWriter.class);
+
+		Client c = Client.create(cc);
+
 		r = c.resource(Main.BASE_URI);
 
 		mObservationCollection = new ObservationCollection();
@@ -106,10 +106,10 @@ public class MainTest extends TestCase {
 	public void testObservations() {
 
 		WebResource wr = r.path("observations");
-		ObservationCollection response = wr.type("application/octet-stream").accept(MediaType.TEXT_PLAIN)
-				.post(ObservationCollection.class, mObservationCollection);
+		String response = wr.type("application/octet-stream").post(String.class,
+				mObservationCollection);
 
-		// assertEquals("OK", response);
+		assertEquals("OK", response);
 	}
 
 	/**
