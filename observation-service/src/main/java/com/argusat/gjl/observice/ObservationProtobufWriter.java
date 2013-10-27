@@ -22,6 +22,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -33,7 +34,7 @@ import com.argusat.gjl.model.ObservationCollection;
 import com.argusat.gjl.service.observation.ObservationProtoBuf;
 
 @Provider
-@Consumes("application/octet-stream")
+@Produces("application/octet-stream")
 public class ObservationProtobufWriter implements
 		MessageBodyWriter<ObservationCollection> {
 	
@@ -65,8 +66,23 @@ public class ObservationProtobufWriter implements
 	public long getSize(ObservationCollection observations, Class<?> type,
 			Type typeParam, Annotation[] annotations, MediaType mediaType) {
 		
-		return 0;
-		
+		try {
+			ObservationProtoBuf.Observations.Builder observationsProtoBufBuilder = ObservationProtoBuf.Observations
+					.newBuilder();
+			
+			observationsProtoBufBuilder.setDeviceId(observations.getDeviceId());
+			
+			for (Observation observation : observations.getObservations()) {
+				ObservationProtoBuf.Observation observationProtobuf = observation
+						.getObservationProtoBuf();
+				observationsProtoBufBuilder.addObservations(observationProtobuf);
+			}
+			
+			return observationsProtoBufBuilder.build().getSerializedSize();
+			
+		} catch (Exception e) {
+			throw new WebApplicationException(e);
+		}
 	}
 
 	@Override

@@ -51,7 +51,7 @@ public class ObservationProtobufReader implements
 		ObservationCollection observations = new ObservationCollection();
 		try {
 			ObservationProtoBuf.Observations observationsProtobuf = ObservationProtoBuf.Observations
-					.parseFrom(entityStream);
+					.newBuilder().mergeFrom(entityStream).build();
 			observations.setDeviceId(observationsProtobuf.getDeviceId());
 			for (ObservationProtoBuf.Observation observationProtoBuf : observationsProtobuf
 					.getObservationsList()) {
