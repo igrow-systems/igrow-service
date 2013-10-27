@@ -107,7 +107,7 @@ public class ObservationProtobufWriterTest extends TestCase {
     public void testIsReadable() {
     	ObservationProtobufReader reader = new ObservationProtobufReader();
     	
-    	boolean result = reader.isReadable(Observation.class, null, null, null);
+    	boolean result = reader.isReadable(ObservationCollection.class, null, null, null);
     	assertTrue(result);
     }
 

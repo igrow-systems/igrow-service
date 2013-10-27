@@ -14,7 +14,6 @@
  * with Argusat Limited.
  */
 
-
 package com.argusat.gjl.observice;
 
 import java.util.logging.Logger;
@@ -25,26 +24,30 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 import com.argusat.gjl.model.Observation;
+import com.argusat.gjl.model.ObservationCollection;
 
 // The Java class will be hosted at the URI path "/observations"
 @Path("/observations")
-public class Observations {	
-	
-	private static final Logger LOGGER = Logger
-			.getLogger(Observations.class.getSimpleName());
-	
-    // The Java method will process HTTP POST requests
-    @POST
-    // The Java method will produce content identified by the MIME Media
-    // type "text/plain"
-    @Produces("text/plain")
-    // The Java method will produce content identified by the MIME Media
-    // type "application/observation+protobuf"
-    @Consumes("application/observation+protobuf")
-    public String postObservation(Observation observation) {
-    	
-    	LOGGER.finer(observation.getObservationProtoBuf().toString());
-    	
-        return "OK";
-    }
+public class Observations {
+
+	private static final Logger LOGGER = Logger.getLogger(Observations.class
+			.getSimpleName());
+
+	// The Java method will process HTTP POST requests
+	@POST
+	// The Java method will produce content identified by the MIME Media
+	// type "text/plain"
+	@Produces("text/plain")
+	// The Java method will produce content identified by the MIME Media
+	// type "application/octet-stream"
+	@Consumes("application/octet-stream")
+	public String postObservations(ObservationCollection observations) {
+
+		for (Observation observation : observations.getObservations()) {
+			LOGGER.finer(observation.getObservationProtoBuf().toString());
+			System.out.println(observation.getTimestamp());
+		}
+
+		return "OK";
+	}
 }

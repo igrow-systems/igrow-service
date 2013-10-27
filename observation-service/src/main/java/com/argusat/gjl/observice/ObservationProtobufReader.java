@@ -33,14 +33,14 @@ import com.argusat.gjl.model.ObservationCollection;
 import com.argusat.gjl.service.observation.ObservationProtoBuf;
 
 @Provider
-@Consumes("application/observation-protobuf")
+@Consumes("application/octet-stream")
 public class ObservationProtobufReader implements
 		MessageBodyReader<ObservationCollection> {
 
 	@Override
 	public boolean isReadable(Class<?> type, Type genericType,
 			Annotation[] annotations, MediaType mediaType) {
-		return Observation.class.isAssignableFrom(type);
+		return ObservationCollection.class.isAssignableFrom(type);
 	}
 
 	public ObservationCollection readFrom(Class<ObservationCollection> type,
@@ -52,6 +52,7 @@ public class ObservationProtobufReader implements
 		try {
 			ObservationProtoBuf.Observations observationsProtobuf = ObservationProtoBuf.Observations
 					.parseFrom(entityStream);
+			observations.setDeviceId(observationsProtobuf.getDeviceId());
 			for (ObservationProtoBuf.Observation observationProtoBuf : observationsProtobuf
 					.getObservationsList()) {
 				Observation observation = Observation

@@ -33,7 +33,7 @@ import com.argusat.gjl.model.ObservationCollection;
 import com.argusat.gjl.service.observation.ObservationProtoBuf;
 
 @Provider
-@Consumes("application/observation-protobuf")
+@Consumes("application/octet-stream")
 public class ObservationProtobufWriter implements
 		MessageBodyWriter<ObservationCollection> {
 	
