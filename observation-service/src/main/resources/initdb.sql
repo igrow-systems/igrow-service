@@ -1,10 +1,18 @@
 
+DROP TABLE observations;
 
 CREATE TABLE observations (
-    device_id bigserial primary key,
+    location geography(POINTZ,4326),
     obs_timestamp timestamp NOT NULL,
-    article_desc text NOT NULL,
-    date_added timestamp default NULL
+    hdop real,
+    vdop real,
+    device_id bigint,
+    obs_type int,
+    value0 real,
+    value1 real,
+    value2 real,
+    value3 real,
+    value4 real
 );
 
 
