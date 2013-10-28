@@ -16,11 +16,14 @@
 
 package com.argusat.gjl.observice.repository;
 
+import java.util.List;
+
 import com.argusat.gjl.model.Observation;
 
 public interface ObservationRepository {
 
 	void storeObservation(Observation observation);
-	void storeObservations(Observation[] observations);
-	
+
+	void storeObservations(List<Observation> observations);
+
 }

@@ -18,6 +18,7 @@ package com.argusat.gjl.observice.repository.hbase;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -83,7 +84,7 @@ public class ObservationRepositoryHBaseImpl implements ObservationRepository,
 	}
 
 	@Override
-	public void storeObservations(Observation[] observations) {
+	public void storeObservations(List<Observation> observations) {
 
 		// ObservationsTable.put(arg0);
 

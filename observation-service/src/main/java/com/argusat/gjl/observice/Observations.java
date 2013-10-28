@@ -16,6 +16,8 @@
 
 package com.argusat.gjl.observice;
 
+import java.sql.SQLException;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.ws.rs.Consumes;
@@ -25,6 +27,8 @@ import javax.ws.rs.Produces;
 
 import com.argusat.gjl.model.Observation;
 import com.argusat.gjl.model.ObservationCollection;
+import com.argusat.gjl.observice.repository.ObservationRepository;
+import com.argusat.gjl.observice.repository.postgis.ObservationRepositoryPostGISImpl;
 
 // The Java class will be hosted at the URI path "/observations"
 @Path("/observations")
@@ -32,6 +36,12 @@ public class Observations {
 
 	private static final Logger LOGGER = Logger.getLogger(Observations.class
 			.getSimpleName());
+
+	private final ObservationRepository mObservationRepository;
+
+	public Observations() throws ClassNotFoundException, SQLException {
+		mObservationRepository = new ObservationRepositoryPostGISImpl();
+	}
 
 	// The Java method will process HTTP POST requests
 	@POST
@@ -42,12 +52,14 @@ public class Observations {
 	// type "application/octet-stream"
 	@Consumes("application/octet-stream")
 	public String postObservations(ObservationCollection observations) {
-		
-		for (Observation observation : observations.getObservations()) {
-			//LOGGER.finer(observation.getObservationProtoBuf().toString());
+
+		List<Observation> obsList = observations.getObservations();
+		for (Observation observation : obsList) {
+			// LOGGER.finer(observation.getObservationProtoBuf().toString());
 			System.out.println(observation.getTimestamp());
 		}
-		
+		mObservationRepository.storeObservations(obsList);
+
 		return "OK";
 
 	}
