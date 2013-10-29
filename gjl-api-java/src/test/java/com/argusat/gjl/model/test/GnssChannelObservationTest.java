@@ -52,8 +52,8 @@ public class GnssChannelObservationTest {
 		// assertEquals()
 		// assertEquals(137483L, location.getLatitude());
 		Location location = mObservation.getLocation();
-		location.setLatitude(1982384L);
-		location.setLongitude(1237843L);
+		location.setLatitude(19.843892f);
+		location.setLongitude(-40.78372f);
 		location.setAltitude(120.0f);
 		location.setHDOP(5.0f);
 		location.setVDOP(12.0f);
@@ -125,11 +125,11 @@ public class GnssChannelObservationTest {
     	
     	assertTrue(protoBuf.getType() == ObservationProtoBuf.Observation.ObservationType.C0N_GNSS);
     	assertTrue(111889349L == protoBuf.getTimestamp());
-    	assertTrue(1982384L == protoBuf.getLocation().getLatitude());
-    	assertTrue(1237843L == protoBuf.getLocation().getLongitude());
-    	assertEquals(120.0f, protoBuf.getLocation().getAltitude(), 0.001);
-    	assertEquals(5.0f, protoBuf.getLocation().getHdop(), 0.001);
-    	assertEquals(12.0f, protoBuf.getLocation().getVdop(), 0.001);
+    	assertEquals(19843891L, protoBuf.getLocation().getLatitude());
+    	assertEquals(-40783718L, protoBuf.getLocation().getLongitude());
+    	assertEquals(120000000L, protoBuf.getLocation().getAltitude());
+    	assertEquals(5.0f, protoBuf.getLocation().getHdop(), 1e-6);
+    	assertEquals(12.0f, protoBuf.getLocation().getVdop(), 1e-6);
     	
     	TemporaryFolder tempFolder = new TemporaryFolder();
     	tempFolder.create();

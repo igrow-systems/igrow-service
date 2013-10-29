@@ -53,9 +53,9 @@ public class LocationOnlyObservationTest {
 		//assertEquals()
 		//assertEquals(137483L, location.getLatitude());
     	Location location = mObservation.getLocation();
-		location.setLatitude(1982384L);
-    	location.setLongitude(1237843L);
-    	location.setAltitude(120.0f);
+		location.setLatitude(19.843892f);
+		location.setLongitude(-40.78372f);
+		location.setAltitude(120.0f);
     	location.setHDOP(5.0f);
     	location.setVDOP(12.0f);
     	mObservation.setLocation(location);
@@ -71,7 +71,14 @@ public class LocationOnlyObservationTest {
 		assertNotNull(mObservation);
 		assertTrue(mObservation.getType() == ObservationType.TYPE_LOCATION_ONLY);
 		assertTrue(LocationOnlyObservation.class == mObservation.getClass());
-		assertNotNull(mObservation.getLocation());
+
+		Location location = mObservation.getLocation();
+		assertNotNull(location);
+		assertEquals(19.843892f, location.getLatitude(), 1e-6);
+		assertEquals(-40.78372f, location.getLongitude(), 1e-6);
+		assertEquals(120.0f, location.getAltitude(), 1e-6);
+		assertEquals(5.0f, location.getHDOP(), 1e-6);
+		assertEquals(12.0f, location.getVDOP(), 1e-6);
 	}
 
 	@Test
@@ -88,16 +95,12 @@ public class LocationOnlyObservationTest {
 		Location location = observation.getLocation();
 		assertNotNull(location);
 		assertTrue(observation.isValid());
-		//assertEquals()
-		//assertEquals(137483L, location.getLatitude());
-    	//location.setLatitude();
-    	//location.setLongitude(1237843L);
-    	//location.setAltitude(120.0f);
-    	//location.setHDOP(5.0f);
-    	//location.setVDOP(12.0f);
-    	
-    	//Observation observation = Observation.newObservation(ObservationType.TYPE_LOCATION_ONLY);
-    	//
+		assertNotNull(location);
+		assertEquals(19.843892f, location.getLatitude(), 1e-6);
+		assertEquals(-40.78372f, location.getLongitude(), 1e-6);
+		assertEquals(120.0f, location.getAltitude(), 1e-6);
+		assertEquals(5.0f, location.getHDOP(), 1e-6);
+		assertEquals(12.0f, location.getVDOP(), 1e-6);
 		
 	}
 
@@ -117,9 +120,9 @@ public class LocationOnlyObservationTest {
     	
     	assertTrue(protoBuf.getType() == ObservationProtoBuf.Observation.ObservationType.LOCATION_ONLY);
     	assertTrue(111889349L == protoBuf.getTimestamp());
-    	assertTrue(1982384L == protoBuf.getLocation().getLatitude());
-    	assertTrue(1237843L == protoBuf.getLocation().getLongitude());
-    	assertEquals(120.0f, protoBuf.getLocation().getAltitude(), 0.001);
+    	assertEquals(19843891L, protoBuf.getLocation().getLatitude());
+    	assertEquals(-40783718L, protoBuf.getLocation().getLongitude());
+    	assertEquals(120000000L, protoBuf.getLocation().getAltitude());
     	assertEquals(5.0f, protoBuf.getLocation().getHdop(), 0.001);
     	assertEquals(12.0f, protoBuf.getLocation().getVdop(), 0.001);
     	

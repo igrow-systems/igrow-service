@@ -51,9 +51,9 @@ public class Location {
 		assert(location.isInitialized());
 		mLocationProtoBuf = location;
 		mLocationProtoBufBuilder = LocationProtoBuf.Location.newBuilder(location);
-		mLatitude = location.getLatitude();
-		mLongitude = location.getLongitude();
-		mAltitude = location.getAltitude();
+		mLatitude = (float)location.getLatitude() / (float)1e6;
+		mLongitude = (float)location.getLongitude() / (float)1e6;
+		mAltitude = (float)location.getAltitude() / (float)1e6;
 		mHDOP = location.getHdop();
 		mVDOP = location.getVdop();
 	}
@@ -64,7 +64,7 @@ public class Location {
 
 	public void setLatitude(float latitude) {
 		this.mLatitude = latitude;
-		mLocationProtoBufBuilder.setLatitude((int)latitude);
+		mLocationProtoBufBuilder.setLatitude((int)(latitude * 1e6));
 		mDirty = true;
 	}
 
@@ -74,7 +74,7 @@ public class Location {
 
 	public void setLongitude(float longitude) {
 		this.mLongitude = longitude;
-		mLocationProtoBufBuilder.setLongitude((int)longitude);
+		mLocationProtoBufBuilder.setLongitude((int)(longitude * 1e6));
 		mDirty = true;
 	}
 
@@ -84,7 +84,7 @@ public class Location {
 
 	public void setAltitude(float altitude) {
 		this.mAltitude = altitude;
-		mLocationProtoBufBuilder.setAltitude((int)altitude);
+		mLocationProtoBufBuilder.setAltitude((int)(altitude * 1e6));
 		mDirty = true;
 	}
 

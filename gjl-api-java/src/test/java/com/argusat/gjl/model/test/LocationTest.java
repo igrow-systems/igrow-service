@@ -27,7 +27,7 @@ import com.argusat.gjl.model.Location;
 public class LocationTest {
 
 	private Location mLocation;
-	
+
 	@Before
 	public void setUp() throws Exception {
 		mLocation = new Location();
@@ -39,39 +39,43 @@ public class LocationTest {
 
 	@Test
 	public void testLocation() {
-		
+
 	}
 
 	@Test
 	public void testLocationLocation() {
-		
+
 	}
 
 	@Test
 	public void testIsValid() {
-		
+
 		assertFalse(mLocation.isValid());
-		
+
 		mLocation.setLatitude(12.32783f);
 		mLocation.setLongitude(0.088762f);
 		mLocation.setAltitude(126.4f);
 		mLocation.setHDOP(32.0f);
 		mLocation.setVDOP(8.0f);
-		
+
 		assertTrue(mLocation.isValid());
 	}
 
 	@Test
 	public void testGetProtoBuf() {
-		
+
 		mLocation.setLatitude(12.32783f);
 		mLocation.setLongitude(0.088762f);
 		mLocation.setAltitude(126.4f);
 		mLocation.setHDOP(32.0f);
 		mLocation.setVDOP(8.0f);
-		
+
 		assertNotNull(mLocation.getLocationProtoBuf());
 		assertTrue(mLocation.getLocationProtoBuf().isInitialized());
+
+		assertEquals(12327830L, mLocation.getLocationProtoBuf().getLatitude());
+		assertEquals(88762L, mLocation.getLocationProtoBuf().getLongitude());
+		assertEquals(126400001L, mLocation.getLocationProtoBuf().getAltitude());
 	}
 
 }
