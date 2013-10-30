@@ -137,9 +137,11 @@ public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 			for (Observation observation : observations) {
 
 				Point point = new Point();
+				point.dimension = 3;
 				point.x = observation.getLocation().getLatitude();
 				point.y = observation.getLocation().getLongitude();
 				point.z = observation.getLocation().getAltitude();
+				point.srid = 4326;
 
 				PGgeometry geometry = new PGgeometry(point);
 
