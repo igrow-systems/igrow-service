@@ -91,7 +91,7 @@ public class ObservationCollectionTest {
 
 		ObservationProtoBuf.Observations observationsProtobuf = ObservationProtoBuf.Observations
 				.parseFrom(entityStream);
-		ObservationCollection observations = new ObservationCollection();
+		//ObservationCollection observations = new ObservationCollection();
 
 		assertNotNull(observationsProtobuf);
 		assertTrue(observationsProtobuf.isInitialized());

@@ -45,6 +45,11 @@ public class Location {
 		mProtoBufValid = false;
 		mDirty = true;
 		mLocationProtoBufBuilder = LocationProtoBuf.Location.newBuilder();
+		mLatitude = 0.0f;
+		mLongitude = 0.0f;
+		mAltitude = 0.0f;
+		mHDOP = 0.0f;
+		mVDOP = 0.0f;
 	}
 	
 	public Location(LocationProtoBuf.Location location) {
