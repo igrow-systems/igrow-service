@@ -26,9 +26,12 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.postgis.PGgeometry;
+import org.postgis.PGgeometryLW;
+import org.postgis.Point;
 
 import com.argusat.gjl.model.Observation;
 import com.argusat.gjl.model.Observation.ObservationType;
@@ -37,8 +40,8 @@ import com.argusat.gjl.observice.repository.ObservationRepository;
 public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 		Closeable {
 
-	private static final Logger LOGGER = Logger
-			.getLogger(ObservationRepositoryPostGISImpl.class.getSimpleName());
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(ObservationRepositoryPostGISImpl.class);
 
 	private static final String URL = "jdbc:postgresql://localhost:5432/argusat-gjl-dev";
 
@@ -53,7 +56,8 @@ public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 	private static final String INSERT_OBSERVATION_SQL = "insert into observations "
 			+ "(location, obs_timestamp, device_id, hdop, vdop, obs_type, value0, "
 			+ "value1, value2, value3, value4 ) VALUES"
-			+ "(ST_SetSRID(ST_MakePoint(?,?,?), 4326) ,?,?,?,?,?,?,?,?,?,?)";
+			// + "(ST_SetSRID(ST_MakePoint(?,?,?), 4326) ,?,?,?,?,?,?,?,?,?,?)";
+			+ "(ST_GeomFromEWKB(?),?,?,?,?,?,?,?,?,?,?)";
 
 	private PreparedStatement mPreparedStatementInsertObservation;
 
@@ -70,12 +74,15 @@ public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 		 * connection to the pgsql-specific connection implementation before
 		 * calling the addDataType() method.PostGIS 2.1.1dev Manual 75 / 672
 		 */
-		// Currently the jar ships with a configuration file,
-		// driverconfig.properties , which apparently registers
-		// the types we're interested in so no need to do the
-		// following.
-		// ((org.postgresql.PGConnection) conn).addDataType("geometry",
-		// Class.forName("org.postgis.PGgeometry"));
+		// included from driverconfig.properties :
+		// datatype.geometry=org.postgis.PGgeometry
+		// datatype.box3d=org.postgis.PGbox3d
+		// datatype.box2d=org.postgis.PGbox2d
+		//
+		// ((org.postgresql.PGConnection) mConnection).addDataType("geometry",
+		// Class.forName("org.postgis.PGgeometryLW"));
+		((org.postgresql.PGConnection) mConnection).addDataType("geometry",
+				org.postgis.PGgeometry.class);
 		// ((org.postgresql.PGConnection) conn).addDataType("box3d",
 		// Class.forName("org.postgis.PGbox3d"));
 		mPreparedStatementInsertObservation = mConnection
@@ -129,44 +136,50 @@ public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 
 			for (Observation observation : observations) {
 
-				mPreparedStatementInsertObservation.setInt(1,
-						(int) (observation.getLocation().getLatitude() * 1e6));
+				Point point = new Point();
+				point.x = observation.getLocation().getLatitude();
+				point.y = observation.getLocation().getLongitude();
+				point.z = observation.getLocation().getAltitude();
 
-				mPreparedStatementInsertObservation.setInt(2,
-						(int) (observation.getLocation().getLongitude() * 1e6));
+				PGgeometry geometry = new PGgeometry(point);
 
-				mPreparedStatementInsertObservation.setInt(3,
-						(int) (observation.getLocation().getAltitude() * 1e6));
-				
-				mPreparedStatementInsertObservation.setTimestamp(4,
+				mPreparedStatementInsertObservation.setObject(1, geometry);
+
+				// mPreparedStatementInsertObservation.setFloat(2, observation
+				// .getLocation().getLongitude());
+
+				// mPreparedStatementInsertObservation.setFloat(3, observation
+				// .getLocation().getAltitude());
+
+				mPreparedStatementInsertObservation.setTimestamp(2,
 						new Timestamp(observation.getTimestamp()));
 
-				mPreparedStatementInsertObservation.setLong(5,
+				mPreparedStatementInsertObservation.setLong(3,
 						observation.getDeviceId());
 
-				mPreparedStatementInsertObservation.setFloat(6, observation
+				mPreparedStatementInsertObservation.setFloat(4, observation
 						.getLocation().getHDOP());
 
-				mPreparedStatementInsertObservation.setFloat(7, observation
+				mPreparedStatementInsertObservation.setFloat(5, observation
 						.getLocation().getVDOP());
 
 				ObservationType observationType = observation.getType();
-				mPreparedStatementInsertObservation.setShort(8,
+				mPreparedStatementInsertObservation.setShort(6,
 						(short) observationType.ordinal());
 
 				float[] values = observation.getValues();
 				if (values != null) {
-					mPreparedStatementInsertObservation.setFloat(9, values[0]);
-					mPreparedStatementInsertObservation.setFloat(10, values[1]);
-					mPreparedStatementInsertObservation.setFloat(11, values[2]);
-					mPreparedStatementInsertObservation.setFloat(12, values[3]);
-					mPreparedStatementInsertObservation.setFloat(13, values[4]);
+					mPreparedStatementInsertObservation.setFloat(7, values[0]);
+					mPreparedStatementInsertObservation.setFloat(8, values[1]);
+					mPreparedStatementInsertObservation.setFloat(9, values[2]);
+					mPreparedStatementInsertObservation.setFloat(10, values[3]);
+					mPreparedStatementInsertObservation.setFloat(11, values[4]);
 				} else {
+					mPreparedStatementInsertObservation.setFloat(7, 0.0f);
+					mPreparedStatementInsertObservation.setFloat(8, 0.0f);
 					mPreparedStatementInsertObservation.setFloat(9, 0.0f);
 					mPreparedStatementInsertObservation.setFloat(10, 0.0f);
 					mPreparedStatementInsertObservation.setFloat(11, 0.0f);
-					mPreparedStatementInsertObservation.setFloat(12, 0.0f);
-					mPreparedStatementInsertObservation.setFloat(13, 0.0f);
 				}
 
 				int rowsAffected = mPreparedStatementInsertObservation
@@ -177,16 +190,13 @@ public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 			}
 
 		} catch (SQLException e) {
-			LOGGER.throwing(
-					ObservationRepositoryPostGISImpl.class.getSimpleName(),
-					"storeObservations", e);
+			LOGGER.error("storeObservations", e);
 		} finally {
 			if (mConnection != null) {
 				try {
 					mConnection.setAutoCommit(true);
 				} catch (SQLException e) {
-					LOGGER.throwing(ObservationRepositoryPostGISImpl.class
-							.getSimpleName(), "storeObservations", e);
+					LOGGER.error("storeObservations", e);
 				}
 			}
 		}
@@ -200,9 +210,7 @@ public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 			try {
 				mConnection.close();
 			} catch (SQLException e) {
-				LOGGER.throwing(
-						ObservationRepositoryPostGISImpl.class.getSimpleName(),
-						"close", e);
+				LOGGER.error("close", e);
 			}
 		}
 
@@ -210,9 +218,7 @@ public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 			try {
 				mPreparedStatementInsertObservation.close();
 			} catch (SQLException e) {
-				LOGGER.throwing(
-						ObservationRepositoryPostGISImpl.class.getSimpleName(),
-						"close", e);
+				LOGGER.error("close", e);
 			}
 		}
 

@@ -19,8 +19,6 @@ package com.argusat.gjl.observice.repository.hbase;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
@@ -29,6 +27,8 @@ import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.HTableInterface;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.argusat.gjl.model.Observation;
 import com.argusat.gjl.observice.repository.ObservationRepository;
@@ -36,8 +36,8 @@ import com.argusat.gjl.observice.repository.ObservationRepository;
 public class ObservationRepositoryHBaseImpl implements ObservationRepository,
 		Closeable {
 
-	private static final Logger LOGGER = Logger
-			.getLogger(ObservationRepositoryHBaseImpl.class.getSimpleName());
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(ObservationRepositoryHBaseImpl.class);
 
 	private HTableInterface mObservationsTable;
 
@@ -78,7 +78,7 @@ public class ObservationRepositoryHBaseImpl implements ObservationRepository,
 
 			mObservationsTable.put(makePut(observation));
 		} catch (IOException e) {
-			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			LOGGER.error(e.getMessage(), e);
 		}
 
 	}

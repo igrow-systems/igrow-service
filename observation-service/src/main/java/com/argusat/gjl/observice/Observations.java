@@ -18,12 +18,14 @@ package com.argusat.gjl.observice;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.argusat.gjl.model.Observation;
 import com.argusat.gjl.model.ObservationCollection;
@@ -34,13 +36,22 @@ import com.argusat.gjl.observice.repository.postgis.ObservationRepositoryPostGIS
 @Path("/observations")
 public class Observations {
 
-	private static final Logger LOGGER = Logger.getLogger(Observations.class
-			.getSimpleName());
+	private static final Logger LOGGER = LoggerFactory.getLogger(Observations.class);
 
-	private final ObservationRepository mObservationRepository;
+	private static ObservationRepository mObservationRepository = null;
 
+	static {
+		try {
+			mObservationRepository = new ObservationRepositoryPostGISImpl();
+		} catch (ClassNotFoundException e) {
+			LOGGER.error("Couldn't construct PostGIS repository", e);
+		} catch (SQLException e) {
+			LOGGER.error("Couldn't construct PostGIS repository", e);
+		}
+	}
+	
 	public Observations() throws ClassNotFoundException, SQLException {
-		mObservationRepository = new ObservationRepositoryPostGISImpl();
+		
 	}
 
 	// The Java method will process HTTP POST requests

@@ -16,8 +16,6 @@
 
 package com.argusat.gjl.observice.test;
 
-import javax.ws.rs.core.MediaType;
-
 import junit.framework.TestCase;
 
 import org.glassfish.grizzly.http.server.HttpServer;
