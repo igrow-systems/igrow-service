@@ -6,9 +6,9 @@ option java_outer_classname = "LocationProtoBuf";
 
 
 message Location {
-  required uint32 latitude = 1;
-  required uint32 longitude = 2;
-  required uint32 altitude = 3;
+  required sint32 latitude = 1;
+  required sint32 longitude = 2;
+  required sint32 altitude = 3;
   required uint32 hdop = 4;
   required uint32 vdop = 5;
 }
