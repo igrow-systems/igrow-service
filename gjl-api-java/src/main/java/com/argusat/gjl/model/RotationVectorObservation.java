@@ -17,23 +17,84 @@
 package com.argusat.gjl.model;
 
 import com.argusat.gjl.service.observation.ObservationProtoBuf;
+import com.argusat.gjl.service.observation.ObservationProtoBuf.Observation.GeoMagneticObservation;
 
 
 public class RotationVectorObservation extends Observation {
 
+	protected GeoMagneticObservation mGeoMagneticObservationProtoBuf;
+
+	protected GeoMagneticObservation.Builder mGeoMagneticObservationProtoBufBuilder;
+	
 	public RotationVectorObservation() {
 		
 		super();
 		
-		this.mType = ObservationType.TYPE_ROTATION_VECTOR;
+		mType = ObservationType.TYPE_ROTATION_VECTOR;
+		mValues = new float[5];
+		
+		mGeoMagneticObservationProtoBuf = null;
+		mGeoMagneticObservationProtoBufBuilder = GeoMagneticObservation.newBuilder();
 	}
 	
 	protected RotationVectorObservation(ObservationProtoBuf.Observation observationProtoBuf) {
 		
 		super(observationProtoBuf);
 		
-		this.mType = ObservationType.TYPE_ROTATION_VECTOR;
+		mType = ObservationType.TYPE_ROTATION_VECTOR;
+		mValues = new float[5];
+		
+		assert(observationProtoBuf.hasGeoMagneticObservation());
+		GeoMagneticObservation geoMagneticObservationProtoBuf = observationProtoBuf.getGeoMagneticObservation();
+		
+		mValues[0] = geoMagneticObservationProtoBuf.getX();
+		mValues[1] = geoMagneticObservationProtoBuf.getY();
+		mValues[2] = geoMagneticObservationProtoBuf.getZ();
+		mValues[3] = geoMagneticObservationProtoBuf.getSigma();
+		mValues[4] = geoMagneticObservationProtoBuf.getError();
+		
 	}
 
+	public void setX(float x) {
+		mValues[0] = x;
+		mGeoMagneticObservationProtoBufBuilder.setX(x);
+		mDirty = true;
+	}
+	
+	public void setY(float y) {
+		mValues[1] = y;
+		mGeoMagneticObservationProtoBufBuilder.setY(y);
+		mDirty = true;
+	}
+	
+	public void setZ(float z) {
+		mValues[2] = z;
+		mGeoMagneticObservationProtoBufBuilder.setZ(z);
+		mDirty = true;
+	}
+	
+	public void setSigma(float sigma) {
+		mValues[3] = sigma;
+		mGeoMagneticObservationProtoBufBuilder.setSigma(sigma);
+		mDirty = true;
+	}
+	
+	public void setAccuracy(float accuracy) {
+		mValues[4] = accuracy;
+		mGeoMagneticObservationProtoBufBuilder.setError(accuracy);
+		mDirty = true;
+	}
 
+	@Override
+	protected void validate() {
+
+		mGeoMagneticObservationProtoBuf = mGeoMagneticObservationProtoBufBuilder.buildPartial();
+		mObservationProtoBufBuilder.setGeoMagneticObservation(mGeoMagneticObservationProtoBuf);
+		boolean protoBufValid = mGeoMagneticObservationProtoBuf.isInitialized();
+
+		if (protoBufValid) {
+			super.validate();
+		}
+
+	}
 }

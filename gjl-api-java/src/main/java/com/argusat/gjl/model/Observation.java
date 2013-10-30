@@ -124,7 +124,7 @@ public abstract class Observation {
 	}
 
 	public void setTimestamp(long timestamp) {
-		this.mTimestamp = timestamp;
+		mTimestamp = timestamp;
 		mObservationProtoBufBuilder.setTimestamp(timestamp);
 		mDirty = true;
 	}
@@ -163,7 +163,7 @@ public abstract class Observation {
 	}
 	
 	// Device Id does not get serialized as all communications
-	// are in the context of a device.
+	// are in the context of a device (collection of observations has device Id).
 	public long getDeviceId() {
 		return mDeviceId;
 	}

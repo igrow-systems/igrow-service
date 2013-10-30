@@ -79,8 +79,8 @@ public class GnssChannelObservation extends Observation {
 	}
 
 	public void setAzimuth(float azimuth) {
-		this.mAzimuth = azimuth;
-		this.mValues[0] = azimuth;
+		mAzimuth = azimuth;
+		mValues[0] = azimuth;
 		mReceiverChannelBuilder.setAzimuth(azimuth);
 		mDirty = true;
 	}
@@ -90,8 +90,8 @@ public class GnssChannelObservation extends Observation {
 	}
 
 	public void setElevation(float elevation) {
-		this.mElevation = elevation;
-		this.mValues[1] = elevation;
+		mElevation = elevation;
+		mValues[1] = elevation;
 		mReceiverChannelBuilder.setElevation(elevation);
 		mDirty = true;
 	}
@@ -101,8 +101,8 @@ public class GnssChannelObservation extends Observation {
 	}
 
 	public void setC0_n(float c0_n) {
-		this.mC0_N = c0_n;
-		this.mValues[2] = c0_n;
+		mC0_N = c0_n;
+		mValues[2] = c0_n;
 		mReceiverChannelBuilder.setC0N(c0_n);
 		mDirty = true;
 	}
