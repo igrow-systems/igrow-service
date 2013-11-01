@@ -25,6 +25,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
@@ -41,7 +42,7 @@ import com.argusat.gjl.service.observation.ObservationProtoBuf;
 public class ObservationCollectionTest {
 
 	private static final String TEST_FILENAME = "observations.bin";
-	
+
 	private ObservationCollection mObservationCollection;
 
 	@Before
@@ -59,12 +60,16 @@ public class ObservationCollectionTest {
 			// assertEquals()
 			// assertEquals(137483L, location.getLatitude());
 			Location location = observation.getLocation();
-			location.setLatitude(1982384L);
-			location.setLongitude(1237843L);
+			location.setLatitude(19.82384f);
+			location.setLongitude(12.37843f);
 			location.setAltitude(120.0f);
 			location.setHDOP(5.0f);
 			location.setVDOP(12.0f);
 			observation.setLocation(location);
+
+			observation.isValid();
+			List<String> errors = observation.getObservationProtoBuf()
+					.findInitializationErrors();
 
 			mObservationCollection.add(observation);
 		}
@@ -91,7 +96,7 @@ public class ObservationCollectionTest {
 
 		ObservationProtoBuf.Observations observationsProtobuf = ObservationProtoBuf.Observations
 				.parseFrom(entityStream);
-		//ObservationCollection observations = new ObservationCollection();
+		// ObservationCollection observations = new ObservationCollection();
 
 		assertNotNull(observationsProtobuf);
 		assertTrue(observationsProtobuf.isInitialized());
@@ -111,31 +116,35 @@ public class ObservationCollectionTest {
 
 	@Test
 	public void testIsValid() {
-		//assertTrue(mObservationCollection.isValid());
+		// assertTrue(mObservationCollection.isValid());
+		// mObservationCollection.isValid();
 	}
-	
+
 	@Test
 	public void testGetObservationsProtoBuf() throws IOException {
-    	
-    	ObservationProtoBuf.Observations.Builder protoBufBuilder = ObservationProtoBuf.Observations.newBuilder();
-    	protoBufBuilder.setDeviceId(007L);
-    	for (Observation observation : mObservationCollection.getObservations()) {
-    		
-    		protoBufBuilder.addObservations(observation.getObservationProtoBuf());
-    		
-    	}
-    	
-    	assertTrue(protoBufBuilder.isInitialized());
-    	ObservationProtoBuf.Observations observationsProtoBuf = protoBufBuilder.build();
-    	
-    	TemporaryFolder tempFolder = new TemporaryFolder();
-    	tempFolder.create();
-    	File entityFile = tempFolder.newFile(TEST_FILENAME);
-    	
-    	OutputStream entityStream = new FileOutputStream(entityFile);
-    	
-    	observationsProtoBuf.writeTo(entityStream);
-    	
+
+		ObservationProtoBuf.Observations.Builder protoBufBuilder = ObservationProtoBuf.Observations
+				.newBuilder();
+		protoBufBuilder.setDeviceId(007L);
+		for (Observation observation : mObservationCollection.getObservations()) {
+
+			protoBufBuilder.addObservations(observation
+					.getObservationProtoBuf());
+
+		}
+
+		assertTrue(protoBufBuilder.isInitialized());
+		ObservationProtoBuf.Observations observationsProtoBuf = protoBufBuilder
+				.build();
+
+		TemporaryFolder tempFolder = new TemporaryFolder();
+		tempFolder.create();
+		File entityFile = tempFolder.newFile(TEST_FILENAME);
+
+		OutputStream entityStream = new FileOutputStream(entityFile);
+
+		observationsProtoBuf.writeTo(entityStream);
+
 	}
 
 }

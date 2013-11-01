@@ -88,7 +88,7 @@ public abstract class Observation {
 	}
 
 	// Consolidate this to use only the protobuf enums for message/object type
-	public static Observation newObservation(ObservationType type) {
+	public static Observation newObservation(final ObservationType type) {
 		switch (type) {
 		case TYPE_LOCATION_ONLY:
 			return new LocationOnlyObservation();
@@ -97,8 +97,7 @@ public abstract class Observation {
 		case TYPE_GNSS_CHANNEL:
 			return new GnssChannelObservation();
 		default:
-			// TODO: throw exception
-			return null;
+			throw new IllegalArgumentException("Unknown Observation type!");
 		}
 	}
 
@@ -191,11 +190,7 @@ public abstract class Observation {
 	}
 
 	public ObservationProtoBuf.Observation getObservationProtoBuf() {
-		if (isValid()) {
-			return mObservationProtoBuf;
-		} else {
-			return null;
-		}
+		return mObservationProtoBuf;
 	}
 
 }

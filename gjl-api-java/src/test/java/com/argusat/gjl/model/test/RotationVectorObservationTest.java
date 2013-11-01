@@ -25,6 +25,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
@@ -40,29 +41,35 @@ import com.argusat.gjl.service.observation.ObservationProtoBuf;
 
 public class RotationVectorObservationTest {
 
-	private static final String TEST_FILENAME = "observation-rotation-vector.bin"; 
-	
+	private static final String TEST_FILENAME = "observation-rotation-vector.bin";
+
 	private RotationVectorObservation mObservation;
 
 	@Before
 	public void setUp() throws Exception {
-		mObservation = (RotationVectorObservation)Observation
+		mObservation = (RotationVectorObservation) Observation
 				.newObservation(ObservationType.TYPE_ROTATION_VECTOR);
 
+		mObservation.setDeviceId(007L);
 		mObservation.setTimestamp(111889349L);
 		mObservation.setMode(ModeType.PASSIVE);
 		// assertEquals()
 		// assertEquals(137483L, location.getLatitude());
 		Location location = mObservation.getLocation();
-		location.setLatitude(1982384L);
-		location.setLongitude(1237843L);
+		location.setLatitude(19.82384f);
+		location.setLongitude(12.37843f);
 		location.setAltitude(120.0f);
 		location.setHDOP(5.0f);
 		location.setVDOP(12.0f);
 		mObservation.setLocation(location);
 
 		// Add the rotation vector
-		//mObservation.
+		mObservation.setX(3.0f);
+		mObservation.setY(4.0f);
+		mObservation.setZ(5.0f);
+		mObservation.setSigma(12.0f);
+		mObservation.setAccuracy(0.1f);
+
 	}
 
 	@After
@@ -96,49 +103,56 @@ public class RotationVectorObservationTest {
 	@Test
 	public void testNewObservationFromProtoBuf() throws IOException {
 
-		InputStream entityStream = this.getClass().getResourceAsStream("/" + TEST_FILENAME);
-    	
-		ObservationProtoBuf.Observation observationProtobuf = ObservationProtoBuf.Observation.parseFrom(entityStream);
-		Observation observation = Observation.newObservation(observationProtobuf);
-		
+		InputStream entityStream = this.getClass().getResourceAsStream(
+				"/" + TEST_FILENAME);
+
+		ObservationProtoBuf.Observation observationProtobuf = ObservationProtoBuf.Observation
+				.parseFrom(entityStream);
+		Observation observation = Observation
+				.newObservation(observationProtobuf);
+
 		assertNotNull(observation);
-		assertEquals(ObservationType.TYPE_GNSS_CHANNEL, observation.getType());
+		assertEquals(ObservationType.TYPE_ROTATION_VECTOR, observation.getType());
 		assertEquals(ModeType.PASSIVE, observation.getMode());
 		Location location = observation.getLocation();
 		assertNotNull(location);
 		assertTrue(observation.isValid());
-		
+
 	}
-	
+
 	@Test
 	public void testIsValid() {
 
+		mObservation.isValid();
+		List<String> errors = mObservation.getObservationProtoBuf()
+				.findInitializationErrors();
 		assertTrue(mObservation.isValid());
 
 	}
 
 	@Test
 	public void testGetObservationProtoBuf() throws IOException {
-		
+
 		assertTrue(mObservation.isValid());
-    	
-    	ObservationProtoBuf.Observation protoBuf = mObservation.getObservationProtoBuf();
-    	
-    	assertTrue(protoBuf.getType() == ObservationProtoBuf.Observation.ObservationType.ROTATION_VECTOR);
-    	assertTrue(111889349L == protoBuf.getTimestamp());
-    	assertTrue(1982384L == protoBuf.getLocation().getLatitude());
-    	assertTrue(1237843L == protoBuf.getLocation().getLongitude());
-    	assertEquals(120.0f, protoBuf.getLocation().getAltitude(), 0.001);
-    	assertEquals(5.0f, protoBuf.getLocation().getHdop(), 0.001);
-    	assertEquals(12.0f, protoBuf.getLocation().getVdop(), 0.001);
-    	
-    	TemporaryFolder tempFolder = new TemporaryFolder();
-    	tempFolder.create();
-    	File entityFile = tempFolder.newFile(TEST_FILENAME);
-    	
-    	OutputStream entityStream = new FileOutputStream(entityFile);
-    	
-    	protoBuf.writeTo(entityStream);
+
+		ObservationProtoBuf.Observation protoBuf = mObservation
+				.getObservationProtoBuf();
+
+		assertTrue(protoBuf.getType() == ObservationProtoBuf.Observation.ObservationType.ROTATION_VECTOR);
+		assertTrue(111889349L == protoBuf.getTimestamp());
+		assertEquals(19823839L, protoBuf.getLocation().getLatitude());
+    	assertEquals(12378430L, protoBuf.getLocation().getLongitude());
+    	assertEquals(120000000L, protoBuf.getLocation().getAltitude());
+		assertEquals(5, protoBuf.getLocation().getHdop());
+		assertEquals(12, protoBuf.getLocation().getVdop());
+
+		TemporaryFolder tempFolder = new TemporaryFolder();
+		tempFolder.create();
+		File entityFile = tempFolder.newFile(TEST_FILENAME);
+
+		OutputStream entityStream = new FileOutputStream(entityFile);
+
+		protoBuf.writeTo(entityStream);
 	}
 
 }
