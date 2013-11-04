@@ -25,6 +25,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.sql.Types;
 import java.util.List;
 
 import org.postgis.PGgeometry;
@@ -32,6 +33,7 @@ import org.postgis.Point;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.argusat.gjl.model.GnssChannelObservation;
 import com.argusat.gjl.model.Observation;
 import com.argusat.gjl.model.Observation.ObservationType;
 import com.argusat.gjl.observice.repository.ObservationRepository;
@@ -53,10 +55,10 @@ public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 	private static final String GEOMETRY_TYPE = "POINTZ";
 
 	private static final String INSERT_OBSERVATION_SQL = "insert into observations "
-			+ "(location, obs_timestamp, device_id, hdop, vdop, obs_type, value0, "
+			+ "(location, obs_timestamp, device_id, sensor_id, hdop, vdop, obs_type, value0, "
 			+ "value1, value2, value3, value4 ) VALUES"
 			// + "(ST_SetSRID(ST_MakePoint(?,?,?), 4326) ,?,?,?,?,?,?,?,?,?,?)";
-			+ "(ST_GeomFromEWKB(?),?,?,?,?,?,?,?,?,?,?)";
+			+ "(ST_GeomFromEWKB(?),?,?,?,?,?,?,?,?,?,?,?)";
 
 	private PreparedStatement mPreparedStatementInsertObservation;
 
@@ -157,34 +159,41 @@ public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 
 				mPreparedStatementInsertObservation.setLong(3,
 						observation.getDeviceId());
-
-				mPreparedStatementInsertObservation.setFloat(4, observation
-						.getLocation().getHDOP());
+				
+				if (observation.getType() == ObservationType.TYPE_GNSS_CHANNEL) {
+					mPreparedStatementInsertObservation.setLong(4,
+							((GnssChannelObservation)observation).getPrn());
+				} else {
+					mPreparedStatementInsertObservation.setNull(4, Types.NULL);
+				}
 
 				mPreparedStatementInsertObservation.setFloat(5, observation
+						.getLocation().getHDOP());
+
+				mPreparedStatementInsertObservation.setFloat(6, observation
 						.getLocation().getVDOP());
 
 				ObservationType observationType = observation.getType();
-				mPreparedStatementInsertObservation.setShort(6,
+				mPreparedStatementInsertObservation.setShort(7,
 						(short) observationType.ordinal());
 
 				float[] values = observation.getValues();
 				if (values != null) {
 					for (int i = 0; i < 5; ++i) {
 						if (i < values.length) {
-							mPreparedStatementInsertObservation.setFloat(i + 7,
+							mPreparedStatementInsertObservation.setFloat(i + 8,
 									values[i]);
 						} else {
-							mPreparedStatementInsertObservation.setFloat(i + 7,
-									0.0f);
+							mPreparedStatementInsertObservation.setNull(i + 8,
+									Types.NULL);
 						}
 					}
 				} else {
-					mPreparedStatementInsertObservation.setFloat(7, 0.0f);
-					mPreparedStatementInsertObservation.setFloat(8, 0.0f);
-					mPreparedStatementInsertObservation.setFloat(9, 0.0f);
-					mPreparedStatementInsertObservation.setFloat(10, 0.0f);
-					mPreparedStatementInsertObservation.setFloat(11, 0.0f);
+					mPreparedStatementInsertObservation.setNull(8, Types.NULL);
+					mPreparedStatementInsertObservation.setNull(9, Types.NULL);
+					mPreparedStatementInsertObservation.setNull(10, Types.NULL);
+					mPreparedStatementInsertObservation.setNull(11, Types.NULL);
+					mPreparedStatementInsertObservation.setNull(12, Types.NULL);
 				}
 
 				int rowsAffected = mPreparedStatementInsertObservation
