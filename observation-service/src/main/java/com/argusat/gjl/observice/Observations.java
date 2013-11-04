@@ -36,7 +36,8 @@ import com.argusat.gjl.observice.repository.postgis.ObservationRepositoryPostGIS
 @Path("/observations")
 public class Observations {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(Observations.class);
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(Observations.class);
 
 	private static ObservationRepository mObservationRepository = null;
 
@@ -49,9 +50,9 @@ public class Observations {
 			LOGGER.error("Couldn't construct PostGIS repository", e);
 		}
 	}
-	
+
 	public Observations() throws ClassNotFoundException, SQLException {
-		
+
 	}
 
 	// The Java method will process HTTP POST requests
@@ -65,11 +66,14 @@ public class Observations {
 	public String postObservations(ObservationCollection observations) {
 
 		List<Observation> obsList = observations.getObservations();
-		for (Observation observation : obsList) {
-			// LOGGER.finer(observation.getObservationProtoBuf().toString());
-			System.out.println(observation.getTimestamp());
+		if (obsList != null && obsList.size() > 0) {
+			for (Observation observation : obsList) {
+				LOGGER.debug(observation.getType() + " - "
+						+ observation.getTimestamp());
+				// System.out.println(observation.getTimestamp());
+			}
+			mObservationRepository.storeObservations(obsList);
 		}
-		mObservationRepository.storeObservations(obsList);
 
 		return "OK";
 

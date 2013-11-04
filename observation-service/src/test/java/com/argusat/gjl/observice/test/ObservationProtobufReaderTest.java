@@ -66,7 +66,7 @@ public class ObservationProtobufReaderTest extends TestCase {
 		ObservationProtobufReader reader = new ObservationProtobufReader();
 
 		InputStream entityStream = this.getClass().getResourceAsStream(
-				"/observation-location-only.bin");
+				"/observations.bin");
 
 		ObservationCollection observations = reader.readFrom(null, null, null,
 				null, null, entityStream);

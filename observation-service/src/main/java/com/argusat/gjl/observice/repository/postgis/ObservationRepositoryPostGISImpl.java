@@ -170,11 +170,15 @@ public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 
 				float[] values = observation.getValues();
 				if (values != null) {
-					mPreparedStatementInsertObservation.setFloat(7, values[0]);
-					mPreparedStatementInsertObservation.setFloat(8, values[1]);
-					mPreparedStatementInsertObservation.setFloat(9, values[2]);
-					mPreparedStatementInsertObservation.setFloat(10, values[3]);
-					mPreparedStatementInsertObservation.setFloat(11, values[4]);
+					for (int i = 0; i < 5; ++i) {
+						if (i < values.length) {
+							mPreparedStatementInsertObservation.setFloat(i + 7,
+									values[i]);
+						} else {
+							mPreparedStatementInsertObservation.setFloat(i + 7,
+									0.0f);
+						}
+					}
 				} else {
 					mPreparedStatementInsertObservation.setFloat(7, 0.0f);
 					mPreparedStatementInsertObservation.setFloat(8, 0.0f);
