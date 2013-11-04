@@ -64,7 +64,7 @@ public abstract class Observation {
 	protected Observation(ObservationProtoBuf.Observation observationProtoBuf) {
 
 		assert (observationProtoBuf.isInitialized());
-		// mDeviceId = observationProtoBuf.getTimestamp();
+		mDeviceId = 0;
 		mObservationProtoBuf = null;
 		mObservationProtoBufBuilder = ObservationProtoBuf.Observation
 				.newBuilder(observationProtoBuf);

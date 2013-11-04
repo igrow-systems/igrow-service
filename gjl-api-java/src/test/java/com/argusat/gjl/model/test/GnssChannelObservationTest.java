@@ -38,13 +38,13 @@ import com.argusat.gjl.service.observation.ObservationProtoBuf;
 
 public class GnssChannelObservationTest {
 
-	private static final String TEST_FILENAME = "observation-c0n-gnss.bin"; 
-	
+	private static final String TEST_FILENAME = "observation-c0n-gnss.bin";
+
 	private GnssChannelObservation mObservation;
 
 	@Before
 	public void setUp() throws Exception {
-		mObservation = (GnssChannelObservation)Observation
+		mObservation = (GnssChannelObservation) Observation
 				.newObservation(ObservationType.TYPE_GNSS_CHANNEL);
 
 		mObservation.setTimestamp(111889349L);
@@ -92,22 +92,33 @@ public class GnssChannelObservationTest {
 		assertTrue(GnssChannelObservation.class == mObservation.getClass());
 		assertNotNull(mObservation.getLocation());
 	}
-	
+
 	@Test
 	public void testNewObservationFromProtoBuf() throws IOException {
 
-		InputStream entityStream = this.getClass().getResourceAsStream("/" + TEST_FILENAME);
-    	
-		ObservationProtoBuf.Observation observationProtobuf = ObservationProtoBuf.Observation.parseFrom(entityStream);
-		Observation observation = Observation.newObservation(observationProtobuf);
-		
+		InputStream entityStream = this.getClass().getResourceAsStream(
+				"/" + TEST_FILENAME);
+
+		ObservationProtoBuf.Observation observationProtobuf = ObservationProtoBuf.Observation
+				.parseFrom(entityStream);
+		Observation observation = Observation
+				.newObservation(observationProtobuf);
+
 		assertNotNull(observation);
 		assertEquals(ObservationType.TYPE_GNSS_CHANNEL, observation.getType());
 		assertEquals(ModeType.PASSIVE, observation.getMode());
 		Location location = observation.getLocation();
 		assertNotNull(location);
 		assertTrue(observation.isValid());
+
+		// Test the GNSS channel information
+		assertEquals(25, mObservation.getPrn());
+		assertEquals(27.0f, mObservation.getAzimuth(), 1e-6);
+		assertEquals(43.1f, mObservation.getElevation(), 1e-6);
+		assertEquals(14.7f, mObservation.getC0_n(), 1e-6);
 		
+		assertTrue(mObservation.getValues() != null);
+		assertEquals(3, mObservation.getValues().length);
 	}
 
 	@Test
@@ -120,24 +131,25 @@ public class GnssChannelObservationTest {
 	public void testGetObservationProtoBuf() throws IOException {
 
 		assertTrue(mObservation.isValid());
-    	
-    	ObservationProtoBuf.Observation protoBuf = mObservation.getObservationProtoBuf();
-    	
-    	assertTrue(protoBuf.getType() == ObservationProtoBuf.Observation.ObservationType.C0N_GNSS);
-    	assertTrue(111889349L == protoBuf.getTimestamp());
-    	assertEquals(19843891L, protoBuf.getLocation().getLatitude());
-    	assertEquals(-40783718L, protoBuf.getLocation().getLongitude());
-    	assertEquals(120000000L, protoBuf.getLocation().getAltitude());
-    	assertEquals(5.0f, protoBuf.getLocation().getHdop(), 1e-6);
-    	assertEquals(12.0f, protoBuf.getLocation().getVdop(), 1e-6);
-    	
-    	TemporaryFolder tempFolder = new TemporaryFolder();
-    	tempFolder.create();
-    	File entityFile = tempFolder.newFile(TEST_FILENAME);
-    	
-    	OutputStream entityStream = new FileOutputStream(entityFile);
-    	
-    	protoBuf.writeTo(entityStream);
+
+		ObservationProtoBuf.Observation protoBuf = mObservation
+				.getObservationProtoBuf();
+
+		assertTrue(protoBuf.getType() == ObservationProtoBuf.Observation.ObservationType.C0N_GNSS);
+		assertTrue(111889349L == protoBuf.getTimestamp());
+		assertEquals(19843891L, protoBuf.getLocation().getLatitude());
+		assertEquals(-40783718L, protoBuf.getLocation().getLongitude());
+		assertEquals(120000000L, protoBuf.getLocation().getAltitude());
+		assertEquals(5.0f, protoBuf.getLocation().getHdop(), 1e-6);
+		assertEquals(12.0f, protoBuf.getLocation().getVdop(), 1e-6);
+
+		TemporaryFolder tempFolder = new TemporaryFolder();
+		tempFolder.create();
+		File entityFile = tempFolder.newFile(TEST_FILENAME);
+
+		OutputStream entityStream = new FileOutputStream(entityFile);
+
+		protoBuf.writeTo(entityStream);
 	}
 
 }

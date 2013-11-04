@@ -57,6 +57,13 @@ public class GnssChannelObservation extends Observation {
 		mObservationProtoBufBuilder
 				.setType(ObservationProtoBuf.Observation.ObservationType.C0N_GNSS);
 		mValues = new float[3];
+		mAzimuth = observationProtoBuf.getC0Nobservation().getChannels(0).getAzimuth();
+		mValues[0] = mAzimuth;
+		mElevation = observationProtoBuf.getC0Nobservation().getChannels(0).getElevation();
+		mValues[1] = mElevation;
+		mC0_N = observationProtoBuf.getC0Nobservation().getChannels(0).getC0N();
+		mValues[2] = mC0_N;
+		
 		mC0NObservationProtoBuf = null;
 		mC0NObservationBuilder = ObservationProtoBuf.Observation.C0NObservation
 				.newBuilder();
