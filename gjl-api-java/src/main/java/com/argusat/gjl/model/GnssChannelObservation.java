@@ -56,6 +56,9 @@ public class GnssChannelObservation extends Observation {
 		mType = ObservationType.TYPE_GNSS_CHANNEL;
 		mObservationProtoBufBuilder
 				.setType(ObservationProtoBuf.Observation.ObservationType.C0N_GNSS);
+		
+		mPrn = observationProtoBuf.getC0Nobservation().getChannels(0).getPrn();
+		
 		mValues = new float[3];
 		mAzimuth = observationProtoBuf.getC0Nobservation().getChannels(0).getAzimuth();
 		mValues[0] = mAzimuth;
