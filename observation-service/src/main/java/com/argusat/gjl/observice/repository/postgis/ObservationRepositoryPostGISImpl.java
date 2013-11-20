@@ -91,12 +91,8 @@ public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 			// Class.forName("org.postgis.PGbox3d"));
 			mPreparedStatementInsertObservation = mConnection
 					.prepareStatement(INSERT_OBSERVATION_SQL);
-		} catch (ClassNotFoundException e) {
-			LOGGER.error("Unable to construct ObservationRepositoryPostGISImpl", e);
-			throw e;
-		} catch (SQLException e) {
-			LOGGER.error("Unable to construct ObservationRepositoryPostGISImpl", e);
-			throw e;
+		} catch (Throwable t) {
+			LOGGER.error("Unable to construct ObservationRepositoryPostGISImpl", t);
 		}
 	}
 

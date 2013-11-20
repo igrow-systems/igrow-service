@@ -51,7 +51,7 @@ public class Observations {
 		}
 	}
 
-	public Observations() throws ClassNotFoundException, SQLException {
+	public Observations() {
 
 	}
 
