@@ -67,27 +67,37 @@ public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 	public ObservationRepositoryPostGISImpl() throws ClassNotFoundException,
 			SQLException {
 
-		Class.forName("org.postgresql.Driver");
-		mConnection = DriverManager.getConnection(URL, USER, PASSWORD);
+		try {
+			Class.forName("org.postgresql.Driver");
+			mConnection = DriverManager.getConnection(URL, USER, PASSWORD);
 
-		/*
-		 * Add the geometry types to the connection. Note that you must cast the
-		 * connection to the pgsql-specific connection implementation before
-		 * calling the addDataType() method.PostGIS 2.1.1dev Manual 75 / 672
-		 */
-		// included from driverconfig.properties :
-		// datatype.geometry=org.postgis.PGgeometry
-		// datatype.box3d=org.postgis.PGbox3d
-		// datatype.box2d=org.postgis.PGbox2d
-		//
-		// ((org.postgresql.PGConnection) mConnection).addDataType("geometry",
-		// Class.forName("org.postgis.PGgeometryLW"));
-		((org.postgresql.PGConnection) mConnection).addDataType("geometry",
-				org.postgis.PGgeometry.class);
-		// ((org.postgresql.PGConnection) conn).addDataType("box3d",
-		// Class.forName("org.postgis.PGbox3d"));
-		mPreparedStatementInsertObservation = mConnection
-				.prepareStatement(INSERT_OBSERVATION_SQL);
+			/*
+			 * Add the geometry types to the connection. Note that you must cast
+			 * the connection to the pgsql-specific connection implementation
+			 * before calling the addDataType() method.PostGIS 2.1.1dev Manual
+			 * 75 / 672
+			 */
+			// included from driverconfig.properties :
+			// datatype.geometry=org.postgis.PGgeometry
+			// datatype.box3d=org.postgis.PGbox3d
+			// datatype.box2d=org.postgis.PGbox2d
+			//
+			// ((org.postgresql.PGConnection)
+			// mConnection).addDataType("geometry",
+			// Class.forName("org.postgis.PGgeometryLW"));
+			((org.postgresql.PGConnection) mConnection).addDataType("geometry",
+					org.postgis.PGgeometry.class);
+			// ((org.postgresql.PGConnection) conn).addDataType("box3d",
+			// Class.forName("org.postgis.PGbox3d"));
+			mPreparedStatementInsertObservation = mConnection
+					.prepareStatement(INSERT_OBSERVATION_SQL);
+		} catch (ClassNotFoundException e) {
+			LOGGER.error("Unable to construct ObservationRepositoryPostGISImpl", e);
+			throw e;
+		} catch (SQLException e) {
+			LOGGER.error("Unable to construct ObservationRepositoryPostGISImpl", e);
+			throw e;
+		}
 	}
 
 	@Override
@@ -159,10 +169,10 @@ public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 
 				mPreparedStatementInsertObservation.setLong(3,
 						observation.getDeviceId());
-				
+
 				if (observation.getType() == ObservationType.TYPE_GNSS_CHANNEL) {
 					mPreparedStatementInsertObservation.setLong(4,
-							((GnssChannelObservation)observation).getPrn());
+							((GnssChannelObservation) observation).getPrn());
 				} else {
 					mPreparedStatementInsertObservation.setNull(4, Types.NULL);
 				}
