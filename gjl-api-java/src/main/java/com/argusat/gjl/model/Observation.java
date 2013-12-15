@@ -36,7 +36,7 @@ public abstract class Observation {
 
 	protected Location mLocation;
 	
-	protected long mDeviceId;
+	protected String mDeviceId;
 
 	protected float mValues[];
 
@@ -64,7 +64,7 @@ public abstract class Observation {
 	protected Observation(ObservationProtoBuf.Observation observationProtoBuf) {
 
 		assert (observationProtoBuf.isInitialized());
-		mDeviceId = 0;
+		mDeviceId = null;
 		mObservationProtoBuf = null;
 		mObservationProtoBufBuilder = ObservationProtoBuf.Observation
 				.newBuilder(observationProtoBuf);
@@ -163,11 +163,11 @@ public abstract class Observation {
 	
 	// Device Id does not get serialized as all communications
 	// are in the context of a device (collection of observations has device Id).
-	public long getDeviceId() {
+	public String getDeviceId() {
 		return mDeviceId;
 	}
 
-	public void setDeviceId(long deviceId) {
+	public void setDeviceId(String deviceId) {
 		mDeviceId = deviceId;
 	}
 
