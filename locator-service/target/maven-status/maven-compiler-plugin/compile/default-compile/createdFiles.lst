@@ -1,0 +1,12 @@
+com/argusat/gjl/observice/ObservationProtobufReader.class
+com/argusat/gjl/observice/Observations.class
+com/argusat/gjl/observice/repository/inmemory/ObservationRepositoryInMemoryImpl.class
+com/argusat/gjl/observice/repository/hbase/Index.class
+com/argusat/gjl/observice/repository/hbase/RowKey.class
+com/argusat/gjl/observice/repository/ObservationRepository.class
+com/argusat/gjl/observice/repository/hbase/Subspace.class
+com/argusat/gjl/observice/Main.class
+com/argusat/gjl/observice/repository/hbase/ObservationRepositoryHBaseImpl.class
+com/argusat/gjl/observice/repository/hbase/Bucket.class
+com/argusat/gjl/observice/repository/postgis/ObservationRepositoryPostGISImpl.class
+com/argusat/gjl/observice/ObservationProtobufWriter.class

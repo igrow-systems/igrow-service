@@ -1,0 +1,56 @@
+/* -*- mode: protobuf; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
+
+/*
+ * @(#)registration.proto        
+ *
+ * Copyright (c) 2013 Argusat Limited
+ * 10 Underwood Road,  Southampton.  UK
+ * All rights reserved.
+ *
+ * This software is the confidential and proprietary information of 
+ * Argusat Limited. ("Confidential Information").  You shall not
+ * disclose such Confidential Information and shall use it only in
+ * accordance with the terms of the license agreement you entered into
+ * with Argusat Limited.
+ */
+
+package com.argusat.gjl.locator;
+
+option java_package = "com.argusat.gjl.service.registration";
+option java_outer_classname = "RegistrationProtoBuf";
+
+message RegistrationRequest {
+
+  required string deviceId = 1;
+
+}
+
+message RegistrationResponse {
+
+  enum ErrorCode {
+    NONE = 0;
+    ALREADY_REGISTERED = 1;
+  }
+
+  required ErrorCode responseCode = 1;
+  required string responseMessage = 2;
+  
+}
+
+message UpdateGCMTokenRequest {
+
+  required string deviceId = 1;
+
+  
+}
+
+message UpdateGCMTokenResponse {
+
+  enum ErrorCode {
+    NONE = 0;
+  }
+
+  required ErrorCode responseCode = 1;
+  required string responseMessage = 2;
+  
+}

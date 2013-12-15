@@ -31,7 +31,7 @@ message Observation {
   }
 
   required ObservationType type = 1;
-  required uint64 timestamp = 2;        // The timestamp (unique ID in the context of a client)
+  required uint64 timestamp = 2;        // The type and timestamp form a unique ID in the context of a device/client
   required Location location = 3;
 
   enum ModeType {
@@ -89,7 +89,7 @@ message Observation {
 // Our observation is just one of a collection of observations.
 message Observations {
 
-  required uint64 deviceId = 1;
+  required string deviceId = 1;
 
   repeated Observation observations = 2;
 }

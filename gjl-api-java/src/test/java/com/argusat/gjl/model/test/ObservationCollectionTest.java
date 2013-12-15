@@ -49,7 +49,7 @@ public class ObservationCollectionTest {
 	public void setUp() throws Exception {
 
 		mObservationCollection = new ObservationCollection();
-		mObservationCollection.setDeviceId(007L);
+		mObservationCollection.setDeviceId("test-id-007");
 
 		for (int i = 0; i < 4; ++i) {
 			Observation observation = Observation
@@ -83,7 +83,7 @@ public class ObservationCollectionTest {
 	public void testObservationCollection() {
 
 		assertNotNull(mObservationCollection);
-		assertEquals(007L, mObservationCollection.getDeviceId());
+		assertEquals("test-id-007", mObservationCollection.getDeviceId());
 		assertEquals(4, mObservationCollection.getObservations().size());
 
 	}
@@ -125,7 +125,7 @@ public class ObservationCollectionTest {
 
 		ObservationProtoBuf.Observations.Builder protoBufBuilder = ObservationProtoBuf.Observations
 				.newBuilder();
-		protoBufBuilder.setDeviceId(007L);
+		protoBufBuilder.setDeviceId("test-id-007");
 		for (Observation observation : mObservationCollection.getObservations()) {
 
 			protoBufBuilder.addObservations(observation

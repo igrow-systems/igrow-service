@@ -23,17 +23,17 @@ public class ObservationCollection {
 
 	protected List<Observation> mObservations;
 
-	protected long mDeviceId;
+	protected String mDeviceId;
 
 	public ObservationCollection() {
 		mObservations = new ArrayList<Observation>();
 	}
 
-	public long getDeviceId() {
+	public String getDeviceId() {
 		return mDeviceId;
 	}
 
-	public void setDeviceId(long deviceId) {
+	public void setDeviceId(String deviceId) {
 		mDeviceId = deviceId;
 	}
 
