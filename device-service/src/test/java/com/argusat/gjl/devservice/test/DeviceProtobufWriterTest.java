@@ -1,7 +1,7 @@
 /* -*- mode: java; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
 
 /*
- * @(#)ObservationProtobufReaderTest.java        
+ * @(#)DeviceProtobufWriterTest.java        
  *
  * Copyright (c) 2013 Argusat Limited
  * 10 Underwood Road,  Southampton.  UK
@@ -15,7 +15,7 @@
  */
 
 
-package com.argusat.gjl.observice.test;
+package com.argusat.gjl.devservice.test;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -29,25 +29,25 @@ import junit.framework.TestCase;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.junit.rules.TemporaryFolder;
 
+import com.argusat.gjl.devservice.Main;
+import com.argusat.gjl.devservice.RegisterDeviceRequestProtobufReader;
+import com.argusat.gjl.devservice.DeviceProtobufWriter;
 import com.argusat.gjl.model.Location;
 import com.argusat.gjl.model.Observation;
 import com.argusat.gjl.model.Observation.ModeType;
 import com.argusat.gjl.model.Observation.ObservationType;
 import com.argusat.gjl.model.ObservationCollection;
-import com.argusat.gjl.observice.Main;
-import com.argusat.gjl.observice.ObservationProtobufReader;
-import com.argusat.gjl.observice.ObservationProtobufWriter;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 
 
-public class ObservationProtobufWriterTest extends TestCase {
+public class DeviceProtobufWriterTest extends TestCase {
 
     private HttpServer httpServer;
     
     private WebResource r;
 
-    public ObservationProtobufWriterTest(String testName) {
+    public DeviceProtobufWriterTest(String testName) {
         super(testName);
     }
 
@@ -72,11 +72,11 @@ public class ObservationProtobufWriterTest extends TestCase {
 
     public void testWriteTo() throws WebApplicationException, IOException {
     	
-    	ObservationProtobufWriter writer = new ObservationProtobufWriter();
+    	DeviceProtobufWriter writer = new DeviceProtobufWriter();
     	
     	TemporaryFolder tempFolder = new TemporaryFolder();
     	tempFolder.create();
-    	File entityFile = tempFolder.newFile("observation-location-only.bin");
+    	File entityFile = tempFolder.newFile("registerdevicerequest.bin");
     	
     	OutputStream entityStream = new FileOutputStream(entityFile);
     	
@@ -105,7 +105,7 @@ public class ObservationProtobufWriterTest extends TestCase {
     }
     
     public void testIsReadable() {
-    	ObservationProtobufReader reader = new ObservationProtobufReader();
+    	RegisterDeviceRequestProtobufReader reader = new RegisterDeviceRequestProtobufReader();
     	
     	boolean result = reader.isReadable(ObservationCollection.class, null, null, null);
     	assertTrue(result);

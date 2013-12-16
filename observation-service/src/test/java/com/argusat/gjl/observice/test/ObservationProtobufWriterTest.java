@@ -88,7 +88,7 @@ public class ObservationProtobufWriterTest extends TestCase {
     	location.setVDOP(12.0f);
     	
     	Observation observation = Observation.newObservation(ObservationType.TYPE_LOCATION_ONLY);
-    	observation.setDeviceId(007L);
+    	observation.setDeviceId("test-id-007");
     	observation.setLocation(location);
     	observation.setTimestamp(11172763L);
     	observation.setMode(ModeType.PASSIVE);

@@ -14,24 +14,22 @@
  * with Argusat Limited.
  */
 
-package com.argusat.gjl.observice.repository.hbase;
+package com.argusat.gjl.devservice.repository.hbase;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertArrayEquals;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.argusat.gjl.model.Device;
 import com.argusat.gjl.model.Location;
-import com.argusat.gjl.model.Observation;
-import com.argusat.gjl.model.Observation.ModeType;
-import com.argusat.gjl.model.Observation.ObservationType;
 
 public class RowKeyTest {
 
-	private Observation mObservation;
+	private Device mDevice;
 
 	@Before
 	public void setUp() throws Exception {
@@ -43,14 +41,12 @@ public class RowKeyTest {
 		location.setHDOP(5.0f);
 		location.setVDOP(12.0f);
 
-		mObservation = Observation
-				.newObservation(ObservationType.TYPE_LOCATION_ONLY);
-		mObservation.setDeviceId("test-id-007");
-		mObservation.setLocation(location);
-		mObservation.setTimestamp(11172763L);
-		mObservation.setMode(ModeType.PASSIVE);
-
-		assertTrue(mObservation.isValid());
+		mDevice = new Device();
+		mDevice.setDeviceId("test-id-007");
+		
+		
+		
+		assertTrue(mDevice.isValid());
 
 	}
 
@@ -61,7 +57,7 @@ public class RowKeyTest {
 	@Test
 	public void testRowKey() {
 
-		RowKey rowKey = new RowKey(mObservation);
+		RowKey rowKey = new RowKey(mDevice);
 		byte[] rowKeyBytes = rowKey.getByteArray();
 
 		assertNotNull(rowKeyBytes);

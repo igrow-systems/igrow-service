@@ -2,6 +2,8 @@
 *#
 gjl-api-java/target/
 observation-service/target/
+device-service/target/
+locator-service/target/
 *.o
 autom4te.cache/
 config.log

@@ -145,8 +145,8 @@ public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 
 				Point point = new Point();
 				point.dimension = 3;
-				point.x = observation.getLocation().getLatitude();
-				point.y = observation.getLocation().getLongitude();
+				point.x = observation.getLocation().getLongitude();
+				point.y = observation.getLocation().getLatitude();
 				point.z = observation.getLocation().getAltitude();
 				point.srid = 4326;
 
@@ -163,7 +163,7 @@ public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 				mPreparedStatementInsertObservation.setTimestamp(2,
 						new Timestamp(observation.getTimestamp()));
 
-				mPreparedStatementInsertObservation.setLong(3,
+				mPreparedStatementInsertObservation.setString(3,
 						observation.getDeviceId());
 
 				if (observation.getType() == ObservationType.TYPE_GNSS_CHANNEL) {

@@ -163,7 +163,7 @@ public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 				mPreparedStatementInsertObservation.setTimestamp(2,
 						new Timestamp(observation.getTimestamp()));
 
-				mPreparedStatementInsertObservation.setLong(3,
+				mPreparedStatementInsertObservation.setString(3,
 						observation.getDeviceId());
 
 				if (observation.getType() == ObservationType.TYPE_GNSS_CHANNEL) {

@@ -45,7 +45,7 @@ public class RowKeyTest {
 
 		mObservation = Observation
 				.newObservation(ObservationType.TYPE_LOCATION_ONLY);
-		mObservation.setDeviceId(007L);
+		mObservation.setDeviceId("test-id-007");
 		mObservation.setLocation(location);
 		mObservation.setTimestamp(11172763L);
 		mObservation.setMode(ModeType.PASSIVE);
