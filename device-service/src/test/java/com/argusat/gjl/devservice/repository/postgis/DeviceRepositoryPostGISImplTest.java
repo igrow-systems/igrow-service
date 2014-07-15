@@ -3,7 +3,7 @@
 /*
  * @(#)DeviceRepositoryPostGISImplTest.java        
  *
- * Copyright (c) 2013 Argusat Limited
+ * Copyright (c) 2013 - 2014 Argusat Limited
  * 10 Underwood Road,  Southampton.  UK
  * All rights reserved.
  *
@@ -34,7 +34,7 @@ public class DeviceRepositoryPostGISImplTest {
 	public void setUp() throws Exception {
 
 		mDevice = new Device();
-		mDevice.setDeviceId("test-id-007");
+		mDevice.setDeviceId("test-id-009");
 		mDevice.setOsType(OSType.GOOGLE_ANDROID);
 		mDevice.setOsVersion("4.1.1_r99");
 		mDevice.setPushToken("test_push_token");
@@ -46,15 +46,15 @@ public class DeviceRepositoryPostGISImplTest {
 	}
 
 	@Test
-	public void testStoreObservations() {
+	public void testStoreDevice() {
 
 		mDeviceRepository.storeDevice(mDevice);
 		Device device = mDeviceRepository.findDevice(mDevice.getDeviceId());
 		
-		assertEquals(device.getDeviceId(), mDevice.getDeviceId());
-		assertEquals(device.getOsType(), mDevice.getOsType());
-		assertEquals(device.getOsVersion(), mDevice.getOsVersion());
-		assertEquals(device.getPushToken(), mDevice.getPushToken());
+		assertEquals(mDevice.getDeviceId(), device.getDeviceId());
+		assertEquals(mDevice.getOsType(), device.getOsType());
+		assertEquals(mDevice.getOsVersion(), device.getOsVersion());
+		assertEquals(mDevice.getPushToken(), device.getPushToken());
 	}
 
 }

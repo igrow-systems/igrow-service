@@ -111,4 +111,10 @@ public class ObservationRepositoryHBaseImpl implements DeviceRepository,
 
 	}
 
+	@Override
+	public Device findDevice(String deviceId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

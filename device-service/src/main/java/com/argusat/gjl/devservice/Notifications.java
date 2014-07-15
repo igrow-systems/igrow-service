@@ -1,7 +1,7 @@
 /* -*- mode: java; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
 
 /*
- * @(#)Devices.java        
+ * @(#)Notifications.java        
  *
  * Copyright (c) 2014 Argusat Limited
  * 10 Underwood Road,  Southampton.  UK
@@ -28,15 +28,14 @@ import org.slf4j.LoggerFactory;
 
 import com.argusat.gjl.devservice.repository.DeviceRepository;
 import com.argusat.gjl.devservice.repository.postgis.DeviceRepositoryPostGISImpl;
-import com.argusat.gjl.model.Device;
 import com.argusat.gjl.service.device.DeviceProtoBuf;
-import com.argusat.gjl.service.device.DeviceProtoBuf.RegisterDeviceResponse;
+import com.argusat.gjl.service.device.DeviceProtoBuf.NotifyDeviceResponse;
 
-// The Java class will be hosted at the URI path "/devices"
-@Path("/devices")
-public class Devices {
+// The Java class will be hosted at the URI path "/notifications"
+@Path("/notifications")
+public class Notifications {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(Devices.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(Notifications.class);
 
 	private static DeviceRepository mDeviceRepository = null;
 
@@ -50,7 +49,7 @@ public class Devices {
 		}
 	}
 
-	public Devices() {
+	public Notifications() {
 
 	}
 
@@ -62,19 +61,16 @@ public class Devices {
 	// The Java method will produce content identified by the MIME Media
 	// type "application/octet-stream"
 	@Consumes("application/octet-stream")
-	public DeviceProtoBuf.RegisterDeviceResponse registerDevice(
-			DeviceProtoBuf.RegisterDeviceRequest registerDeviceRequest) {
+	public DeviceProtoBuf.NotifyDeviceResponse notifyDevice(
+			DeviceProtoBuf.NotifyDeviceRequest notifyDeviceRequest) {
 
-		Device device = Device.newDevice(registerDeviceRequest
-				.getDevice());
-		mDeviceRepository.storeDevice(device);
+		mDeviceRepository.findDevice(notifyDeviceRequest.getDeviceId());
 
-		DeviceProtoBuf.RegisterDeviceResponse.Builder builder = DeviceProtoBuf.RegisterDeviceResponse
+		DeviceProtoBuf.NotifyDeviceResponse.Builder builder = DeviceProtoBuf.NotifyDeviceResponse
 				.newBuilder();
-		builder.setResponseCode(RegisterDeviceResponse.ErrorCode.NONE);
+		builder.setResponseCode(NotifyDeviceResponse.ErrorCode.INTERNAL_ERROR);
 
 		return builder.build();
 
 	}
-
 }
