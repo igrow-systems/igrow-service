@@ -38,14 +38,13 @@ import com.argusat.gjl.observice.Main;
 import com.argusat.gjl.observice.ObservationProtobufReader;
 import com.argusat.gjl.observice.ObservationProtobufWriter;
 import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.WebResource;
 
 
 public class ObservationProtobufWriterTest extends TestCase {
 
     private HttpServer httpServer;
     
-    private WebResource r;
+    //private WebResource r;
 
     public ObservationProtobufWriterTest(String testName) {
         super(testName);
@@ -59,8 +58,8 @@ public class ObservationProtobufWriterTest extends TestCase {
         httpServer = Main.startServer();
 
         // create the client
-        Client c = Client.create();
-        r = c.resource(Main.BASE_URI);
+        //Client c = Client.create();
+        //r = c.resource(Main.BASE_URI);
     }
 
     @Override

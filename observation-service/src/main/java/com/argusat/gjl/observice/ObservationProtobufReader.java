@@ -57,6 +57,7 @@ public class ObservationProtobufReader implements
 					.getObservationsList()) {
 				Observation observation = Observation
 						.newObservation(observationProtoBuf);
+				observation.setDeviceId(observationsProtobuf.getDeviceId());
 				observations.add(observation);
 			}
 			return observations;

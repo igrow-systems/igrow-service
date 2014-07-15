@@ -60,7 +60,7 @@ public class Observations {
 	// The Java method will produce content identified by the MIME Media
 	// type "text/plain"
 	@Produces("text/plain")
-	// The Java method will produce content identified by the MIME Media
+	// The Java method will consume content identified by the MIME Media
 	// type "application/octet-stream"
 	@Consumes("application/octet-stream")
 	public String postObservations(ObservationCollection observations) {

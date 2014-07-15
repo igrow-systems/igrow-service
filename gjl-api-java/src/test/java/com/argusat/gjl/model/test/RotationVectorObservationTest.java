@@ -124,8 +124,8 @@ public class RotationVectorObservationTest {
 	public void testIsValid() {
 
 		mObservation.isValid();
-		List<String> errors = mObservation.getObservationProtoBuf()
-				.findInitializationErrors();
+		//List<String> errors = mObservation.getObservationProtoBuf()
+		//		.findInitializationErrors();
 		assertTrue(mObservation.isValid());
 
 	}

@@ -68,8 +68,8 @@ public class ObservationCollectionTest {
 			observation.setLocation(location);
 
 			observation.isValid();
-			List<String> errors = observation.getObservationProtoBuf()
-					.findInitializationErrors();
+			//List<String> errors = observation.getObservationProtoBuf()
+			//		.findInitializationErrors();
 
 			mObservationCollection.add(observation);
 		}

@@ -44,15 +44,13 @@ public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(ObservationRepositoryPostGISImpl.class);
 
-	private static final String URL = "jdbc:postgresql://localhost:5432/argusat-gjl-dev";
-
 	private static final String USER = "argusat-gjl-dev";
 
 	private static final String PASSWORD = "argusat-gjl-dev";
 
 	private static final String DATABASE = "argusat-gjl-dev";
-
-	private static final String GEOMETRY_TYPE = "POINTZ";
+	
+	private static final String URL = "jdbc:postgresql://localhost:5432/" + DATABASE;
 
 	private static final String INSERT_OBSERVATION_SQL = "insert into observations "
 			+ "(location, obs_timestamp, device_id, sensor_id, hdop, vdop, obs_type, value0, "

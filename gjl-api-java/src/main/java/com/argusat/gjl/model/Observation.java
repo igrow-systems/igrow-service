@@ -169,6 +169,7 @@ public abstract class Observation {
 
 	public void setDeviceId(String deviceId) {
 		mDeviceId = deviceId;
+		mDirty = true;
 	}
 
 	public float[] getValues() {

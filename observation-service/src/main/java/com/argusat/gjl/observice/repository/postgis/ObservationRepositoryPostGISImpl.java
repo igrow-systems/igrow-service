@@ -44,15 +44,14 @@ public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(ObservationRepositoryPostGISImpl.class);
 
-	private static final String URL = "jdbc:postgresql://localhost:5432/argusat-gjl-dev";
-
 	private static final String USER = "argusat-gjl-dev";
 
 	private static final String PASSWORD = "argusat-gjl-dev";
 
 	private static final String DATABASE = "argusat-gjl-dev";
 
-	private static final String GEOMETRY_TYPE = "POINTZ";
+	private static final String URL = "jdbc:postgresql://localhost:5432/"
+			+ DATABASE;
 
 	private static final String INSERT_OBSERVATION_SQL = "insert into observations "
 			+ "(location, obs_timestamp, device_id, sensor_id, hdop, vdop, obs_type, value0, "
@@ -92,7 +91,8 @@ public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 			mPreparedStatementInsertObservation = mConnection
 					.prepareStatement(INSERT_OBSERVATION_SQL);
 		} catch (Throwable t) {
-			LOGGER.error("Unable to construct ObservationRepositoryPostGISImpl", t);
+			LOGGER.error(
+					"Unable to construct ObservationRepositoryPostGISImpl", t);
 		}
 	}
 
@@ -211,6 +211,8 @@ public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 
 		} catch (SQLException e) {
 			LOGGER.error("storeObservations", e);
+		} catch (Throwable t) {
+			LOGGER.error("storeObservations", t);
 		} finally {
 			if (mConnection != null) {
 				try {

@@ -28,7 +28,6 @@ import com.argusat.gjl.model.ObservationCollection;
 import com.argusat.gjl.observice.Main;
 import com.argusat.gjl.observice.ObservationProtobufReader;
 import com.argusat.gjl.observice.ObservationProtobufWriter;
-import com.argusat.gjl.service.observation.ObservationProtoBuf;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
@@ -64,14 +63,12 @@ public class MainTest extends TestCase {
 
 		mObservationCollection = new ObservationCollection();
 		mObservationCollection.setDeviceId("test-id-007");
-		ObservationProtoBuf.Observations.Builder builder = ObservationProtoBuf.Observations
-				.newBuilder();
-		builder.setDeviceId("test-id-007");
 
 		for (int i = 0; i < 4; ++i) {
 			Observation observation = Observation
 					.newObservation(ObservationType.TYPE_LOCATION_ONLY);
 
+			observation.setDeviceId("test-id-007");
 			observation.setTimestamp(111889349L);
 			observation.setMode(ModeType.PASSIVE);
 			// assertEquals()
@@ -84,8 +81,9 @@ public class MainTest extends TestCase {
 			location.setVDOP(12.0f);
 			observation.setLocation(location);
 
+			assertTrue(observation.isValid());
+
 			mObservationCollection.add(observation);
-			builder.addObservations(observation.getObservationProtoBuf());
 		}
 
 		// mObservationsProtoBuf = builder.build();
@@ -104,8 +102,8 @@ public class MainTest extends TestCase {
 	public void testObservations() {
 
 		WebResource wr = r.path("observations");
-		String response = wr.type("application/octet-stream").post(String.class,
-				mObservationCollection);
+		String response = wr.type("application/octet-stream").post(
+				String.class, mObservationCollection);
 
 		assertEquals("OK", response);
 	}

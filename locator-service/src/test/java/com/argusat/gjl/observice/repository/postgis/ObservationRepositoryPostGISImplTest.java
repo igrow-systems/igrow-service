@@ -16,17 +16,15 @@
 
 package com.argusat.gjl.observice.repository.postgis;
 
-import static org.junit.Assert.*;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.argusat.gjl.model.Location;
 import com.argusat.gjl.model.Observation;
-import com.argusat.gjl.model.ObservationCollection;
 import com.argusat.gjl.model.Observation.ModeType;
 import com.argusat.gjl.model.Observation.ObservationType;
+import com.argusat.gjl.model.ObservationCollection;
 
 public class ObservationRepositoryPostGISImplTest {
 

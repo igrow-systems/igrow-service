@@ -3,7 +3,7 @@
 /*
  * @(#)device.proto        
  *
- * Copyright (c) 2013 Argusat Limited
+ * Copyright (c) 2014 Argusat Limited
  * 10 Underwood Road,  Southampton.  UK
  * All rights reserved.
  *
@@ -44,7 +44,24 @@ message RegisterDeviceResponse {
   }
 
   required ErrorCode responseCode = 1;
-  required string responseMessage = 2;
+  optional string responseMessage = 2;
+  
+}
+
+message NotifyDeviceRequest {
+  required string deviceId = 1;
+  required string message = 2;
+}
+
+message NotifyDeviceResponse {
+
+  enum ErrorCode {
+    NONE = 0;
+    INTERNAL_ERROR = 1;
+  }
+
+  required ErrorCode responseCode = 1;
+  optional string responseMessage = 2;
   
 }
 
