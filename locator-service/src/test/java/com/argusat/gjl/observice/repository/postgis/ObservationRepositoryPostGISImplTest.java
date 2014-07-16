@@ -36,7 +36,6 @@ public class ObservationRepositoryPostGISImplTest {
 	public void setUp() throws Exception {
 
 		mObservationCollection = new ObservationCollection();
-		mObservationCollection.setDeviceId("test-id-007");
 
 		for (int i = 0; i < 4; ++i) {
 			Observation observation = Observation

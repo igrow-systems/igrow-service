@@ -3,7 +3,7 @@
 /*
  * @(#)ObservationRepository.java        
  *
- * Copyright (c) 2013 Argusat Limited
+ * Copyright (c) 2013 -2014 Argusat Limited
  * 10 Underwood Road,  Southampton.  UK
  * All rights reserved.
  *
@@ -25,5 +25,8 @@ public interface ObservationRepository {
 	void storeObservation(Observation observation);
 
 	void storeObservations(List<Observation> observations);
+
+	List<Observation> findObservations(float latitude, float longitude,
+			int radius);
 
 }

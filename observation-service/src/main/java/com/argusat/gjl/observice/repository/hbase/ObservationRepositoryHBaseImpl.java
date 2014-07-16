@@ -118,4 +118,11 @@ public class ObservationRepositoryHBaseImpl implements ObservationRepository,
 
 	}
 
+	@Override
+	public List<Observation> findObservations(float latitude, float longitude,
+			int radius) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

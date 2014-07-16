@@ -29,7 +29,6 @@ import com.argusat.gjl.model.Observation;
 import com.argusat.gjl.model.ObservationCollection;
 import com.argusat.gjl.observice.Main;
 import com.argusat.gjl.observice.ObservationProtobufReader;
-import com.sun.jersey.api.client.Client;
 
 public class ObservationProtobufReaderTest extends TestCase {
 

@@ -63,10 +63,9 @@ public class MainTest extends TestCase {
 		r = c.resource(Main.BASE_URI);
 
 		mObservationCollection = new ObservationCollection();
-		mObservationCollection.setDeviceId("test-id-007");
+		
 		ObservationProtoBuf.Observations.Builder builder = ObservationProtoBuf.Observations
 				.newBuilder();
-		builder.setDeviceId("test-id-007");
 
 		for (int i = 0; i < 4; ++i) {
 			Observation observation = Observation

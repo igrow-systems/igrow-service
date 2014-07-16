@@ -3,7 +3,7 @@
 /*
  * @(#)ObservationCollection.java        
  *
- * Copyright (c) 2013 Argusat Limited
+ * Copyright (c) 2013 - 2014 Argusat Limited
  * 10 Underwood Road,  Southampton.  UK
  * All rights reserved.
  *
@@ -23,18 +23,8 @@ public class ObservationCollection {
 
 	protected List<Observation> mObservations;
 
-	protected String mDeviceId;
-
 	public ObservationCollection() {
 		mObservations = new ArrayList<Observation>();
-	}
-
-	public String getDeviceId() {
-		return mDeviceId;
-	}
-
-	public void setDeviceId(String deviceId) {
-		mDeviceId = deviceId;
 	}
 
 	public void add(Observation observation) {
@@ -43,6 +33,10 @@ public class ObservationCollection {
 
 	public List<Observation> getObservations() {
 		return mObservations;
+	}
+	
+	public void setObservations(List<Observation> obs) {
+		mObservations = obs;
 	}
 
 }

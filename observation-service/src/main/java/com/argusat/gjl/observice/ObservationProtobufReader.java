@@ -52,12 +52,11 @@ public class ObservationProtobufReader implements
 		try {
 			ObservationProtoBuf.Observations observationsProtobuf = ObservationProtoBuf.Observations
 					.newBuilder().mergeFrom(entityStream).build();
-			observations.setDeviceId(observationsProtobuf.getDeviceId());
+			
 			for (ObservationProtoBuf.Observation observationProtoBuf : observationsProtobuf
 					.getObservationsList()) {
 				Observation observation = Observation
 						.newObservation(observationProtoBuf);
-				observation.setDeviceId(observationsProtobuf.getDeviceId());
 				observations.add(observation);
 			}
 			return observations;

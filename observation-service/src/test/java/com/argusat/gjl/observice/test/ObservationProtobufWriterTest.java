@@ -37,7 +37,6 @@ import com.argusat.gjl.model.ObservationCollection;
 import com.argusat.gjl.observice.Main;
 import com.argusat.gjl.observice.ObservationProtobufReader;
 import com.argusat.gjl.observice.ObservationProtobufWriter;
-import com.sun.jersey.api.client.Client;
 
 
 public class ObservationProtobufWriterTest extends TestCase {
@@ -95,7 +94,6 @@ public class ObservationProtobufWriterTest extends TestCase {
     	assertTrue(observation.isValid());
     	
     	ObservationCollection observations = new ObservationCollection();
-    	observations.setDeviceId("test-id-007");
     	observations.add(observation);
     	
     	writer.writeTo(observations, null, null, null, null, null, entityStream);

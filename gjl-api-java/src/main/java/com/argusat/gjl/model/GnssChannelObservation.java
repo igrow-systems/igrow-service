@@ -118,6 +118,16 @@ public class GnssChannelObservation extends Observation {
 	}
 
 	@Override
+	public void setValues(float[] values) {
+		for (int i = 0; i < 3; ++i) {
+			mValues[i] = values[i];
+		}
+		setAzimuth(mValues[0]);
+		setElevation(mValues[1]);
+		setC0_n(mValues[2]);
+	}
+	
+	@Override
 	protected void validate() {
 
 		mReceiverChannelProtoBuf = mReceiverChannelBuilder.buildPartial();

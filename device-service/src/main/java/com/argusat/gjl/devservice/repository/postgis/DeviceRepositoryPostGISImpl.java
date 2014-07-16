@@ -45,15 +45,15 @@ public class DeviceRepositoryPostGISImpl implements DeviceRepository, Closeable 
 			+ DATABASE;
 
 	private static final String SELECT_DEVICE_SQL = "select "
-			+ "device_id, os_type, os_version, push_token "
-			+ "from devices WHERE " + "device_id = ?";
+			+ "d.device_id, d.os_type, d.os_version, d.push_token "
+			+ "from devices d WHERE d.device_id = ?";
 
 	private static final String INSERT_DEVICE_SQL = "insert into devices "
 			+ "(device_id, os_type, os_version, push_token) VALUES"
 			+ "(?,?,?,?)";
 
 	private static final String UPDATE_DEVICE_SQL = "update devices "
-			+ " SET (os_version = ?, push_token = ?) " + " WHERE device_id = ?";
+			+ " SET os_version = ?, push_token = ? WHERE device_id = ?";
 
 	private PreparedStatement mPreparedStatementSelectDevice;
 
@@ -101,9 +101,12 @@ public class DeviceRepositoryPostGISImpl implements DeviceRepository, Closeable 
 				// update
 				mPreparedStatementUpdateDevice.setString(1,
 						device.getOsVersion());
-				mPreparedStatementUpdateDevice.setString(1,
+				mPreparedStatementUpdateDevice.setString(2,
 						device.getPushToken());
-
+				// where clause
+				mPreparedStatementUpdateDevice.setString(3,
+						device.getDeviceId());
+				
 				rowsAffected = mPreparedStatementUpdateDevice.executeUpdate();
 			} else {
 				// insert
@@ -158,7 +161,7 @@ public class DeviceRepositoryPostGISImpl implements DeviceRepository, Closeable 
 				LOGGER.error("close", e);
 			}
 		}
-		
+
 		if (mPreparedStatementInsertDevice != null) {
 			try {
 				mPreparedStatementInsertDevice.close();

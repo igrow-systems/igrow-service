@@ -47,6 +47,7 @@ public class GnssChannelObservationTest {
 		mObservation = (GnssChannelObservation) Observation
 				.newObservation(ObservationType.TYPE_GNSS_CHANNEL);
 
+		mObservation.setDeviceId("test-id-007");
 		mObservation.setTimestamp(111889349L);
 		mObservation.setMode(ModeType.PASSIVE);
 		// assertEquals()
@@ -136,6 +137,7 @@ public class GnssChannelObservationTest {
 				.getObservationProtoBuf();
 
 		assertTrue(protoBuf.getType() == ObservationProtoBuf.Observation.ObservationType.C0N_GNSS);
+		assertEquals("test-id-007", protoBuf.getDeviceId());
 		assertTrue(111889349L == protoBuf.getTimestamp());
 		assertEquals(19843891L, protoBuf.getLocation().getLatitude());
 		assertEquals(-40783718L, protoBuf.getLocation().getLongitude());

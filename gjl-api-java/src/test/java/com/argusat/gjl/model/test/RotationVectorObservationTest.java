@@ -3,7 +3,7 @@
 /*
  * @(#)ObservationTest.java        
  *
- * Copyright (c) 2013 Argusat Limited
+ * Copyright (c) 2013 -2014 Argusat Limited
  * 10 Underwood Road,  Southampton.  UK
  * All rights reserved.
  *
@@ -25,7 +25,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
@@ -50,7 +49,7 @@ public class RotationVectorObservationTest {
 		mObservation = (RotationVectorObservation) Observation
 				.newObservation(ObservationType.TYPE_ROTATION_VECTOR);
 
-		mObservation.setDeviceId("test-id-7");
+		mObservation.setDeviceId("test-id-007");
 		mObservation.setTimestamp(111889349L);
 		mObservation.setMode(ModeType.PASSIVE);
 		// assertEquals()
@@ -112,7 +111,8 @@ public class RotationVectorObservationTest {
 				.newObservation(observationProtobuf);
 
 		assertNotNull(observation);
-		assertEquals(ObservationType.TYPE_ROTATION_VECTOR, observation.getType());
+		assertEquals(ObservationType.TYPE_ROTATION_VECTOR,
+				observation.getType());
 		assertEquals(ModeType.PASSIVE, observation.getMode());
 		Location location = observation.getLocation();
 		assertNotNull(location);
@@ -124,8 +124,8 @@ public class RotationVectorObservationTest {
 	public void testIsValid() {
 
 		mObservation.isValid();
-		//List<String> errors = mObservation.getObservationProtoBuf()
-		//		.findInitializationErrors();
+		// List<String> errors = mObservation.getObservationProtoBuf()
+		// .findInitializationErrors();
 		assertTrue(mObservation.isValid());
 
 	}
@@ -139,10 +139,11 @@ public class RotationVectorObservationTest {
 				.getObservationProtoBuf();
 
 		assertTrue(protoBuf.getType() == ObservationProtoBuf.Observation.ObservationType.ROTATION_VECTOR);
+		assertEquals("test-id-007", protoBuf.getDeviceId());
 		assertTrue(111889349L == protoBuf.getTimestamp());
 		assertEquals(19823839L, protoBuf.getLocation().getLatitude());
-    	assertEquals(12378430L, protoBuf.getLocation().getLongitude());
-    	assertEquals(120000000L, protoBuf.getLocation().getAltitude());
+		assertEquals(12378430L, protoBuf.getLocation().getLongitude());
+		assertEquals(120000000L, protoBuf.getLocation().getAltitude());
 		assertEquals(5, protoBuf.getLocation().getHdop());
 		assertEquals(12, protoBuf.getLocation().getVdop());
 

@@ -95,7 +95,6 @@ public class ObservationProtobufWriterTest extends TestCase {
     	assertTrue(observation.isValid());
     	
     	ObservationCollection observations = new ObservationCollection();
-    	observations.setDeviceId("test-id-007");
     	observations.add(observation);
     	
     	writer.writeTo(observations, null, null, null, null, null, entityStream);

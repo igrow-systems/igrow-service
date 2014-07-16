@@ -3,7 +3,7 @@
 /*
  * @(#)observation.proto        
  *
- * Copyright (c) 2013 Argusat Limited
+ * Copyright (c) 2013 - 2014 Argusat Limited
  * 10 Underwood Road,  Southampton.  UK
  * All rights reserved.
  *
@@ -31,15 +31,16 @@ message Observation {
   }
 
   required ObservationType type = 1;
-  required uint64 timestamp = 2;        // The type and timestamp form a unique ID in the context of a device/client
-  required Location location = 3;
+  required string deviceId = 2;
+  required uint64 timestamp = 3;        // The type and timestamp form a unique ID in the context of a device/client
+  required Location location = 4;
 
   enum ModeType {
     PASSIVE = 0;
     ACTIVE = 1;
   }
 
-  required ModeType mode = 4;
+  required ModeType mode = 5;
 
   message C0NObservation {
     
@@ -53,12 +54,12 @@ message Observation {
     repeated ReceiverChannel channels = 1;
   }
 
-  optional C0NObservation c0nobservation = 5;
+  optional C0NObservation c0nobservation = 6;
 
   message AccelerometerObservation {
   }
 
-  optional AccelerometerObservation accelerometerobservation = 6;
+  optional AccelerometerObservation accelerometerobservation = 7;
 
   message MagneticCompassObservation {
     
@@ -70,7 +71,7 @@ message Observation {
     required Direction direction = 1;
   }
 
-  optional MagneticCompassObservation magneticCompassObservation = 7;
+  optional MagneticCompassObservation magneticCompassObservation = 8;
 
   message GeoMagneticObservation {
 
@@ -81,7 +82,7 @@ message Observation {
       required float error = 6;
   }
 
-  optional GeoMagneticObservation geoMagneticObservation = 8;
+  optional GeoMagneticObservation geoMagneticObservation = 9;
  
   
 }
@@ -89,7 +90,5 @@ message Observation {
 // Our observation is just one of a collection of observations.
 message Observations {
 
-  required string deviceId = 1;
-
-  repeated Observation observations = 2;
+  repeated Observation observations = 1;
 }

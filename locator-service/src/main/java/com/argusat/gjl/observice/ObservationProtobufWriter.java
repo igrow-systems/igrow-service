@@ -47,8 +47,6 @@ public class ObservationProtobufWriter implements
 			ObservationProtoBuf.Observations.Builder observationsProtoBufBuilder = ObservationProtoBuf.Observations
 					.newBuilder();
 			
-			observationsProtoBufBuilder.setDeviceId(observations.getDeviceId());
-			
 			for (Observation observation : observations.getObservations()) {
 				ObservationProtoBuf.Observation observationProtobuf = observation
 						.getObservationProtoBuf();
@@ -68,8 +66,6 @@ public class ObservationProtobufWriter implements
 		try {
 			ObservationProtoBuf.Observations.Builder observationsProtoBufBuilder = ObservationProtoBuf.Observations
 					.newBuilder();
-			
-			observationsProtoBufBuilder.setDeviceId(observations.getDeviceId());
 			
 			for (Observation observation : observations.getObservations()) {
 				ObservationProtoBuf.Observation observationProtobuf = observation

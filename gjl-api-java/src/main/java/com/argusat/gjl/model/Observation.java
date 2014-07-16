@@ -3,7 +3,7 @@
 /*
  * @(#)Observation.java        
  *
- * Copyright (c) 2013 Argusat Limited
+ * Copyright (c) 2013 - 2014 Argusat Limited
  * 10 Underwood Road,  Southampton.  UK
  * All rights reserved.
  *
@@ -51,6 +51,7 @@ public abstract class Observation {
 	protected ObservationProtoBuf.Observation.Builder mObservationProtoBufBuilder;
 
 	protected Observation() {
+		mDeviceId = null;
 		mValues = null;
 		mDirty = true;
 		mProtoBufValid = false;
@@ -64,11 +65,12 @@ public abstract class Observation {
 	protected Observation(ObservationProtoBuf.Observation observationProtoBuf) {
 
 		assert (observationProtoBuf.isInitialized());
-		mDeviceId = null;
+		
 		mObservationProtoBuf = null;
 		mObservationProtoBufBuilder = ObservationProtoBuf.Observation
 				.newBuilder(observationProtoBuf);
-
+		
+		mDeviceId = observationProtoBuf.getDeviceId();
 		mTimestamp = observationProtoBuf.getTimestamp();
 		mLocation = new Location(observationProtoBuf.getLocation());
 		
@@ -161,19 +163,22 @@ public abstract class Observation {
 		mDirty = true;
 	}
 	
-	// Device Id does not get serialized as all communications
-	// are in the context of a device (collection of observations has device Id).
 	public String getDeviceId() {
 		return mDeviceId;
 	}
 
 	public void setDeviceId(String deviceId) {
 		mDeviceId = deviceId;
+		mObservationProtoBufBuilder.setDeviceId(deviceId);
 		mDirty = true;
 	}
 
 	public float[] getValues() {
 		return mValues;
+	}
+	
+	public void setValues(float[] values) {
+		
 	}
 
 	protected void validate() {

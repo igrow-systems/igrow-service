@@ -25,7 +25,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
@@ -49,12 +48,12 @@ public class ObservationCollectionTest {
 	public void setUp() throws Exception {
 
 		mObservationCollection = new ObservationCollection();
-		mObservationCollection.setDeviceId("test-id-007");
 
 		for (int i = 0; i < 4; ++i) {
 			Observation observation = Observation
 					.newObservation(ObservationType.TYPE_LOCATION_ONLY);
 
+			observation.setDeviceId("test-id-007");
 			observation.setTimestamp(111889349L);
 			observation.setMode(ModeType.PASSIVE);
 			// assertEquals()
@@ -83,7 +82,6 @@ public class ObservationCollectionTest {
 	public void testObservationCollection() {
 
 		assertNotNull(mObservationCollection);
-		assertEquals("test-id-007", mObservationCollection.getDeviceId());
 		assertEquals(4, mObservationCollection.getObservations().size());
 
 	}
@@ -125,7 +123,7 @@ public class ObservationCollectionTest {
 
 		ObservationProtoBuf.Observations.Builder protoBufBuilder = ObservationProtoBuf.Observations
 				.newBuilder();
-		protoBufBuilder.setDeviceId("test-id-007");
+		
 		for (Observation observation : mObservationCollection.getObservations()) {
 
 			protoBufBuilder.addObservations(observation

@@ -1,9 +1,9 @@
 /* -*- mode: java; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
 
 /*
- * @(#)ObservationProtobufReader.java        
+ * @(#)ObservationProtobufWriter.java        
  *
- * Copyright (c) 2013 Argusat Limited
+ * Copyright (c) 2013 - 2014 Argusat Limited
  * 10 Underwood Road,  Southampton.  UK
  * All rights reserved.
  *
@@ -36,7 +36,7 @@ import com.argusat.gjl.service.observation.ObservationProtoBuf;
 @Produces("application/octet-stream")
 public class ObservationProtobufWriter implements
 		MessageBodyWriter<ObservationCollection> {
-	
+
 	@Override
 	public void writeTo(ObservationCollection observations, Class<?> type,
 			Type genericType, Annotation[] annotations, MediaType mediaType,
@@ -46,13 +46,14 @@ public class ObservationProtobufWriter implements
 		try {
 			ObservationProtoBuf.Observations.Builder observationsProtoBufBuilder = ObservationProtoBuf.Observations
 					.newBuilder();
-			
-			observationsProtoBufBuilder.setDeviceId(observations.getDeviceId());
-			
-			for (Observation observation : observations.getObservations()) {
-				ObservationProtoBuf.Observation observationProtobuf = observation
-						.getObservationProtoBuf();
-				observationsProtoBufBuilder.addObservations(observationProtobuf);
+
+			if (observations.getObservations() != null) {
+				for (Observation observation : observations.getObservations()) {
+					ObservationProtoBuf.Observation observationProtobuf = observation
+							.getObservationProtoBuf();
+					observationsProtoBufBuilder
+							.addObservations(observationProtobuf);
+				}
 			}
 			observationsProtoBufBuilder.build().writeTo(entityStream);
 			return;
@@ -64,30 +65,31 @@ public class ObservationProtobufWriter implements
 	@Override
 	public long getSize(ObservationCollection observations, Class<?> type,
 			Type typeParam, Annotation[] annotations, MediaType mediaType) {
-		
+
 		try {
 			ObservationProtoBuf.Observations.Builder observationsProtoBufBuilder = ObservationProtoBuf.Observations
 					.newBuilder();
-			
-			observationsProtoBufBuilder.setDeviceId(observations.getDeviceId());
-			
-			for (Observation observation : observations.getObservations()) {
-				ObservationProtoBuf.Observation observationProtobuf = observation
-						.getObservationProtoBuf();
-				observationsProtoBufBuilder.addObservations(observationProtobuf);
+
+			if (observations.getObservations() != null) {
+				for (Observation observation : observations.getObservations()) {
+					ObservationProtoBuf.Observation observationProtobuf = observation
+							.getObservationProtoBuf();
+					observationsProtoBufBuilder
+							.addObservations(observationProtobuf);
+				}
 			}
-			
+
 			return observationsProtoBufBuilder.build().getSerializedSize();
-			
+
 		} catch (Exception e) {
 			throw new WebApplicationException(e);
 		}
 	}
 
 	@Override
-	public boolean isWriteable(Class<?> type, Type typeParam, Annotation[] annotations,
-			MediaType mediaType) {
-		
+	public boolean isWriteable(Class<?> type, Type typeParam,
+			Annotation[] annotations, MediaType mediaType) {
+
 		return ObservationCollection.class.isAssignableFrom(type);
 	}
 }

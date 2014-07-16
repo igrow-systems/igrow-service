@@ -93,6 +93,18 @@ public class RotationVectorObservation extends Observation {
 	}
 
 	@Override
+	public void setValues(float[] values) {
+		for (int i = 0; i < 5; ++i) {
+			mValues[i] = values[i];
+		}
+		setX(mValues[0]);
+		setY(mValues[1]);
+		setZ(mValues[2]);
+		setSigma(mValues[3]);
+		setAccuracy(mValues[4]);
+	}
+	
+	@Override
 	protected void validate() {
 
 		mGeoMagneticObservationProtoBuf = mGeoMagneticObservationProtoBufBuilder
