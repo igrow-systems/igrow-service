@@ -142,5 +142,12 @@ public class GnssChannelObservation extends Observation {
 		}
 
 	}
+	
+	@Override
+	public String toString() {
+
+		return super.toString();
+
+	}
 
 }

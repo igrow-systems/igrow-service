@@ -118,4 +118,11 @@ public class RotationVectorObservation extends Observation {
 		}
 
 	}
+	
+	@Override
+	public String toString() {
+
+		return super.toString();
+
+	}
 }

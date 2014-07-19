@@ -94,7 +94,7 @@ public class MainTest extends TestCase {
 		{
 			NotifyDeviceRequest.Builder builder = DeviceProtoBuf.NotifyDeviceRequest
 					.newBuilder();
-			builder.setDeviceId("test-id-007");
+			builder.setDeviceId("b024ac7008bb0b69");
 			builder.setMessage("{\"msg_type\":\"begin_locator_session_request\" }");
 
 			mNotifyDeviceRequest = builder.build();
@@ -132,7 +132,7 @@ public class MainTest extends TestCase {
 				.post(DeviceProtoBuf.NotifyDeviceResponse.class,
 						mNotifyDeviceRequest);
 
-		assertEquals(NotifyDeviceResponse.ErrorCode.INTERNAL_ERROR,
+		assertEquals(NotifyDeviceResponse.ErrorCode.NONE,
 				response.getResponseCode());
 	}
 

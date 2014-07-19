@@ -47629,3 +47629,38 @@ org.postgresql.util.PSQLException: ERROR: syntax error at or near "="
 	at org.glassfish.grizzly.threadpool.AbstractThreadPool$Worker.doWork(AbstractThreadPool.java:508)
 	at org.glassfish.grizzly.threadpool.AbstractThreadPool$Worker.run(AbstractThreadPool.java:488)
 	at java.lang.Thread.run(Thread.java:744)
+2014-07-17 11:16:09 INFO  SmackCcsClient:409 - Sent: {0}
+2014-07-17 11:16:09 INFO  SmackCcsClient:364 - Received: <message><gcm xmlns="google:mobile:data">{"message_id":"m-6763258190603113369","message_type":"ack","from":"APA91bHhv2UhyO0rAadJIkJ0MYW4t-fIzPCM2G9QM-IfG2BH5LLWPwlIo5MoqPaYP2peSvqhOiUR-bGFzxtWVDayI0o6WXtqO2GiwOfbVL-kMn9AbfDM6P9mLJ60WQrmvxz2aUCm9R3_FF-ItXndAgs1ycNV0ZrztVJ9ltb6WnObX3q2YQA4QCY"}</gcm></message>
+2014-07-17 11:16:10 INFO  SmackCcsClient:231 - handleAckReceipt() from: APA91bHhv2UhyO0rAadJIkJ0MYW4t-fIzPCM2G9QM-IfG2BH5LLWPwlIo5MoqPaYP2peSvqhOiUR-bGFzxtWVDayI0o6WXtqO2GiwOfbVL-kMn9AbfDM6P9mLJ60WQrmvxz2aUCm9R3_FF-ItXndAgs1ycNV0ZrztVJ9ltb6WnObX3q2YQA4QCY, messageId: m-6763258190603113369
+2014-07-17 11:17:52 INFO  SmackCcsClient:409 - Sent: {0}
+2014-07-17 11:17:52 INFO  SmackCcsClient:364 - Received: <message><gcm xmlns="google:mobile:data">{"message_id":"m-7373076650000981861","message_type":"ack","from":"APA91bHhv2UhyO0rAadJIkJ0MYW4t-fIzPCM2G9QM-IfG2BH5LLWPwlIo5MoqPaYP2peSvqhOiUR-bGFzxtWVDayI0o6WXtqO2GiwOfbVL-kMn9AbfDM6P9mLJ60WQrmvxz2aUCm9R3_FF-ItXndAgs1ycNV0ZrztVJ9ltb6WnObX3q2YQA4QCY"}</gcm></message>
+2014-07-17 11:17:52 INFO  SmackCcsClient:231 - handleAckReceipt() from: APA91bHhv2UhyO0rAadJIkJ0MYW4t-fIzPCM2G9QM-IfG2BH5LLWPwlIo5MoqPaYP2peSvqhOiUR-bGFzxtWVDayI0o6WXtqO2GiwOfbVL-kMn9AbfDM6P9mLJ60WQrmvxz2aUCm9R3_FF-ItXndAgs1ycNV0ZrztVJ9ltb6WnObX3q2YQA4QCY, messageId: m-7373076650000981861
+2014-07-17 11:28:31 INFO  SmackCcsClient:409 - Sent: {0}
+2014-07-17 11:28:31 INFO  SmackCcsClient:364 - Received: <message><gcm xmlns="google:mobile:data">{"message_id":"m--3426846129699049029","message_type":"ack","from":"APA91bHhv2UhyO0rAadJIkJ0MYW4t-fIzPCM2G9QM-IfG2BH5LLWPwlIo5MoqPaYP2peSvqhOiUR-bGFzxtWVDayI0o6WXtqO2GiwOfbVL-kMn9AbfDM6P9mLJ60WQrmvxz2aUCm9R3_FF-ItXndAgs1ycNV0ZrztVJ9ltb6WnObX3q2YQA4QCY"}</gcm></message>
+2014-07-17 11:28:31 INFO  SmackCcsClient:231 - handleAckReceipt() from: APA91bHhv2UhyO0rAadJIkJ0MYW4t-fIzPCM2G9QM-IfG2BH5LLWPwlIo5MoqPaYP2peSvqhOiUR-bGFzxtWVDayI0o6WXtqO2GiwOfbVL-kMn9AbfDM6P9mLJ60WQrmvxz2aUCm9R3_FF-ItXndAgs1ycNV0ZrztVJ9ltb6WnObX3q2YQA4QCY, messageId: m--3426846129699049029
+2014-07-17 12:47:46 INFO  SmackCcsClient:409 - Sent: {0}
+2014-07-17 12:50:27 INFO  SmackCcsClient:409 - Sent: {0}
+2014-07-17 12:56:29 INFO  SmackCcsClient:409 - Sent: {0}
+2014-07-17 14:54:43 INFO  SmackCcsClient:409 - Sent: {0}
+2014-07-17 14:57:49 INFO  SmackCcsClient:409 - Sent: {0}
+2014-07-17 15:08:39 INFO  SmackCcsClient:409 - Sent: {0}
+2014-07-17 15:08:39 INFO  SmackCcsClient:364 - Received: <message><gcm xmlns="google:mobile:data">{"message_id":"m-3098296507830582600","message_type":"ack","from":"APA91bHhv2UhyO0rAadJIkJ0MYW4t-fIzPCM2G9QM-IfG2BH5LLWPwlIo5MoqPaYP2peSvqhOiUR-bGFzxtWVDayI0o6WXtqO2GiwOfbVL-kMn9AbfDM6P9mLJ60WQrmvxz2aUCm9R3_FF-ItXndAgs1ycNV0ZrztVJ9ltb6WnObX3q2YQA4QCY"}</gcm></message>
+2014-07-17 15:08:39 INFO  SmackCcsClient:231 - handleAckReceipt() from: APA91bHhv2UhyO0rAadJIkJ0MYW4t-fIzPCM2G9QM-IfG2BH5LLWPwlIo5MoqPaYP2peSvqhOiUR-bGFzxtWVDayI0o6WXtqO2GiwOfbVL-kMn9AbfDM6P9mLJ60WQrmvxz2aUCm9R3_FF-ItXndAgs1ycNV0ZrztVJ9ltb6WnObX3q2YQA4QCY, messageId: m-3098296507830582600
+2014-07-17 15:27:13 INFO  SmackCcsClient:409 - Sent: {0}
+2014-07-17 15:28:07 INFO  SmackCcsClient:409 - Sent: {0}
+2014-07-17 15:28:07 INFO  SmackCcsClient:364 - Received: <message><gcm xmlns="google:mobile:data">{"message_id":"m--67217279174474916","message_type":"ack","from":"APA91bHhv2UhyO0rAadJIkJ0MYW4t-fIzPCM2G9QM-IfG2BH5LLWPwlIo5MoqPaYP2peSvqhOiUR-bGFzxtWVDayI0o6WXtqO2GiwOfbVL-kMn9AbfDM6P9mLJ60WQrmvxz2aUCm9R3_FF-ItXndAgs1ycNV0ZrztVJ9ltb6WnObX3q2YQA4QCY"}</gcm></message>
+2014-07-17 15:28:07 INFO  SmackCcsClient:231 - handleAckReceipt() from: APA91bHhv2UhyO0rAadJIkJ0MYW4t-fIzPCM2G9QM-IfG2BH5LLWPwlIo5MoqPaYP2peSvqhOiUR-bGFzxtWVDayI0o6WXtqO2GiwOfbVL-kMn9AbfDM6P9mLJ60WQrmvxz2aUCm9R3_FF-ItXndAgs1ycNV0ZrztVJ9ltb6WnObX3q2YQA4QCY, messageId: m--67217279174474916
+2014-07-17 15:36:16 INFO  SmackCcsClient:409 - Sent: {0}
+2014-07-17 15:42:41 INFO  SmackCcsClient:409 - Sent: {0}
+2014-07-17 15:51:13 INFO  SmackCcsClient:409 - Sent: {0}
+2014-07-17 15:52:23 INFO  SmackCcsClient:409 - Sent: {0}
+2014-07-17 15:58:54 INFO  SmackCcsClient:409 - Sent: {0}
+2014-07-17 16:07:51 INFO  SmackCcsClient:409 - Sent: {0}
+2014-07-17 16:09:06 INFO  SmackCcsClient:409 - Sent: {0}
+2014-07-17 16:09:06 INFO  SmackCcsClient:364 - Received: <message><gcm xmlns="google:mobile:data">{"message_id":"m-5961980206915553716","message_type":"ack","from":"APA91bHhv2UhyO0rAadJIkJ0MYW4t-fIzPCM2G9QM-IfG2BH5LLWPwlIo5MoqPaYP2peSvqhOiUR-bGFzxtWVDayI0o6WXtqO2GiwOfbVL-kMn9AbfDM6P9mLJ60WQrmvxz2aUCm9R3_FF-ItXndAgs1ycNV0ZrztVJ9ltb6WnObX3q2YQA4QCY"}</gcm></message>
+2014-07-17 16:09:06 INFO  SmackCcsClient:231 - handleAckReceipt() from: APA91bHhv2UhyO0rAadJIkJ0MYW4t-fIzPCM2G9QM-IfG2BH5LLWPwlIo5MoqPaYP2peSvqhOiUR-bGFzxtWVDayI0o6WXtqO2GiwOfbVL-kMn9AbfDM6P9mLJ60WQrmvxz2aUCm9R3_FF-ItXndAgs1ycNV0ZrztVJ9ltb6WnObX3q2YQA4QCY, messageId: m-5961980206915553716
+2014-07-17 16:10:43 INFO  SmackCcsClient:409 - Sent: {0}
+2014-07-17 16:12:44 INFO  SmackCcsClient:409 - Sent: {0}
+2014-07-17 16:17:03 INFO  SmackCcsClient:409 - Sent: {0}
+2014-07-17 16:19:12 INFO  SmackCcsClient:409 - Sent: {0}
+2014-07-17 16:22:13 INFO  SmackCcsClient:409 - Sent: {0}

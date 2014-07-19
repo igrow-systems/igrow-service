@@ -136,4 +136,24 @@ public class Location {
 		return mLocationProtoBuf;
 	}
 	
+	@Override
+	public String toString() {
+		
+		StringBuffer sb = new StringBuffer();
+		sb.append("( ");
+		sb.append(mLatitude);
+		sb.append(", ");
+		sb.append(mLongitude);
+		sb.append(", ");
+		sb.append(mAltitude);
+		sb.append(" ( ");
+		sb.append(mHDOP);
+		sb.append(", ");
+		sb.append(mVDOP);
+		sb.append(" ))");
+		
+		return sb.toString();
+		
+	}
+	
 }

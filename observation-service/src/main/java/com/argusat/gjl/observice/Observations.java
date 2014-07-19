@@ -3,7 +3,7 @@
 /*
  * @(#)Observations.java        
  *
- * Copyright (c) 2013 -2014 Argusat Limited
+ * Copyright (c) 2013 - 2014 Argusat Limited
  * 10 Underwood Road,  Southampton.  UK
  * All rights reserved.
  *
@@ -16,6 +16,7 @@
 
 package com.argusat.gjl.observice;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -31,6 +32,8 @@ import org.slf4j.LoggerFactory;
 
 import com.argusat.gjl.model.Observation;
 import com.argusat.gjl.model.ObservationCollection;
+import com.argusat.gjl.observice.publisher.Publisher;
+import com.argusat.gjl.observice.publisher.rabbitmq.PublisherRabbitMQ;
 import com.argusat.gjl.observice.repository.ObservationRepository;
 import com.argusat.gjl.observice.repository.postgis.ObservationRepositoryPostGISImpl;
 
@@ -43,6 +46,8 @@ public class Observations {
 
 	private static ObservationRepository mObservationRepository = null;
 
+	private static Publisher mPublisher = null;
+
 	static {
 		try {
 			mObservationRepository = new ObservationRepositoryPostGISImpl();
@@ -50,6 +55,12 @@ public class Observations {
 			LOGGER.error("Couldn't construct PostGIS repository", e);
 		} catch (SQLException e) {
 			LOGGER.error("Couldn't construct PostGIS repository", e);
+		}
+		try {
+			mPublisher = new PublisherRabbitMQ();
+			mPublisher.connect();
+		} catch (IOException e) {
+			LOGGER.error("Couldn't connect to RabbitMQ server", e);
 		}
 	}
 
@@ -69,12 +80,16 @@ public class Observations {
 
 		List<Observation> obsList = observations.getObservations();
 		if (obsList != null && obsList.size() > 0) {
+			mObservationRepository.storeObservations(obsList);
 			for (Observation observation : obsList) {
 				LOGGER.debug(observation.getType() + " - "
 						+ observation.getTimestamp());
-				// System.out.println(observation.getTimestamp());
+				try {
+					mPublisher.publish(observation);
+				} catch (IOException e) {
+					LOGGER.error("Failed to publish {}", observation.toString());
+				}
 			}
-			mObservationRepository.storeObservations(obsList);
 		}
 
 		return "OK";
@@ -97,7 +112,7 @@ public class Observations {
 				latitude, longitude, radius);
 		ObservationCollection obsCollection = new ObservationCollection();
 		obsCollection.setObservations(obs);
-		
+
 		return obsCollection;
 
 	}

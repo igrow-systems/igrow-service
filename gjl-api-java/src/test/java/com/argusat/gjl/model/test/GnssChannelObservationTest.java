@@ -113,13 +113,21 @@ public class GnssChannelObservationTest {
 		assertTrue(observation.isValid());
 
 		// Test the GNSS channel information
-		assertEquals(25, ((GnssChannelObservation)observation).getPrn());
-		assertEquals(27.0f, ((GnssChannelObservation)observation).getAzimuth(), 1e-6);
-		assertEquals(43.1f, ((GnssChannelObservation)observation).getElevation(), 1e-6);
-		assertEquals(14.7f, ((GnssChannelObservation)observation).getC0_n(), 1e-6);
-		
+		assertEquals(25, ((GnssChannelObservation) observation).getPrn());
+		assertEquals(27.0f,
+				((GnssChannelObservation) observation).getAzimuth(), 1e-6);
+		assertEquals(43.1f,
+				((GnssChannelObservation) observation).getElevation(), 1e-6);
+		assertEquals(14.7f, ((GnssChannelObservation) observation).getC0_n(),
+				1e-6);
+
 		assertTrue(observation.getValues() != null);
 		assertEquals(3, observation.getValues().length);
+
+		// ensure that construction from a protobuf results in a valid
+		// internal protobuf and that the builder is in the correct state
+		// , that is to say, pre-seeded with setX() calls
+		assertNotNull(observation.getObservationProtoBuf());
 	}
 
 	@Test

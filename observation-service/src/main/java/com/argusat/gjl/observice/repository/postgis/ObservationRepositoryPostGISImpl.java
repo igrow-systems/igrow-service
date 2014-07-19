@@ -285,8 +285,6 @@ public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 			mPreparedStatementSelectLocalObservations.setObject(1, geometry);
 			// TODO: Fix this hack.  Learn about coordinate systems and projections
 			mPreparedStatementSelectLocalObservations.setFloat(2, (float)radius / 111128f);
-
-			System.err.println(mPreparedStatementSelectLocalObservations.toString());
 			
 			ResultSet resultSet = mPreparedStatementSelectLocalObservations
 					.executeQuery();

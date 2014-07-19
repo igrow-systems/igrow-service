@@ -118,6 +118,10 @@ public class RotationVectorObservationTest {
 		assertNotNull(location);
 		assertTrue(observation.isValid());
 
+		// ensure that construction from a protobuf results in a valid
+		// internal protobuf and that the builder is in the correct state
+		// , that is to say, pre-seeded with setX() calls
+		assertNotNull(observation.getObservationProtoBuf());
 	}
 
 	@Test

@@ -66,7 +66,7 @@ public abstract class Observation {
 
 		assert (observationProtoBuf.isInitialized());
 		
-		mObservationProtoBuf = null;
+		mObservationProtoBuf = observationProtoBuf;
 		mObservationProtoBufBuilder = ObservationProtoBuf.Observation
 				.newBuilder(observationProtoBuf);
 		
@@ -197,6 +197,23 @@ public abstract class Observation {
 
 	public ObservationProtoBuf.Observation getObservationProtoBuf() {
 		return mObservationProtoBuf;
+	}
+	
+	@Override
+	public String toString() {
+		
+		StringBuffer sb = new StringBuffer();
+		sb.append("[ ");
+		sb.append(mTimestamp);
+		sb.append(" ");
+		sb.append(mLocation);
+		sb.append(" ");
+		sb.append(mDeviceId);
+		sb.append(" ]");
+		
+		return sb.toString();
+		
+		
 	}
 
 }

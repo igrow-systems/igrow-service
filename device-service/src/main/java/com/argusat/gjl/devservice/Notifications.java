@@ -17,17 +17,23 @@
 package com.argusat.gjl.devservice;
 
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
+import org.jivesoftware.smack.XMPPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.argusat.gjl.devservice.push.gcmxmpp.SmackCcsClient;
 import com.argusat.gjl.devservice.repository.DeviceRepository;
 import com.argusat.gjl.devservice.repository.postgis.DeviceRepositoryPostGISImpl;
+import com.argusat.gjl.model.Device;
+import com.argusat.gjl.model.Device.OSType;
 import com.argusat.gjl.service.device.DeviceProtoBuf;
 import com.argusat.gjl.service.device.DeviceProtoBuf.NotifyDeviceResponse;
 
@@ -35,17 +41,23 @@ import com.argusat.gjl.service.device.DeviceProtoBuf.NotifyDeviceResponse;
 @Path("/notifications")
 public class Notifications {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(Notifications.class);
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(Notifications.class);
 
 	private static DeviceRepository mDeviceRepository = null;
+
+	private static final SmackCcsClient mGcmPushClient = new SmackCcsClient();
 
 	static {
 		try {
 			mDeviceRepository = new DeviceRepositoryPostGISImpl();
+			mGcmPushClient.connect();
 		} catch (ClassNotFoundException e) {
 			LOGGER.error("Couldn't construct PostGIS repository", e);
 		} catch (SQLException e) {
 			LOGGER.error("Couldn't construct PostGIS repository", e);
+		} catch (XMPPException e) {
+			LOGGER.error("Couldn't connect to Google Cloud Messaging", e);
 		}
 	}
 
@@ -64,11 +76,38 @@ public class Notifications {
 	public DeviceProtoBuf.NotifyDeviceResponse notifyDevice(
 			DeviceProtoBuf.NotifyDeviceRequest notifyDeviceRequest) {
 
-		mDeviceRepository.findDevice(notifyDeviceRequest.getDeviceId());
-
 		DeviceProtoBuf.NotifyDeviceResponse.Builder builder = DeviceProtoBuf.NotifyDeviceResponse
 				.newBuilder();
-		builder.setResponseCode(NotifyDeviceResponse.ErrorCode.INTERNAL_ERROR);
+
+		Device device = mDeviceRepository.findDevice(notifyDeviceRequest
+				.getDeviceId());
+
+		if (device == null) {
+			builder.setResponseCode(NotifyDeviceResponse.ErrorCode.DEVICE_NOT_FOUND);
+		}
+
+		// send message via Google Cloud Messaging if it's an Android device
+		if (device.getOsType() == OSType.GOOGLE_ANDROID) {
+
+			// Send a sample hello downstream message to a device.
+			String toRegId = device.getPushToken();
+			String messageId = mGcmPushClient.getRandomMessageId();
+			Map<String, String> payload = new HashMap<String, String>();
+			payload.put("Hello", "World");
+			payload.put("CCS", "Dummy Message");
+			payload.put("EmbeddedMessageId", messageId);
+			String collapseKey = "sample";
+			Long timeToLive = 10000L;
+			Boolean delayWhileIdle = true;
+			mGcmPushClient.send(SmackCcsClient
+					.createJsonMessage(toRegId, messageId, payload,
+							collapseKey, timeToLive, delayWhileIdle));
+
+			builder.setResponseCode(NotifyDeviceResponse.ErrorCode.NONE);
+
+		} else {
+			builder.setResponseCode(NotifyDeviceResponse.ErrorCode.DEVICE_NOT_SUPPORTED);
+		}
 
 		return builder.build();
 

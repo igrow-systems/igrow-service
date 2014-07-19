@@ -102,7 +102,11 @@ public class LocationOnlyObservationTest {
 		assertEquals(120.0f, location.getAltitude(), 1e-6);
 		assertEquals(5.0f, location.getHDOP(), 1e-6);
 		assertEquals(12.0f, location.getVDOP(), 1e-6);
-		
+
+		// ensure that construction from a protobuf results in a valid
+		// internal protobuf and that the builder is in the correct state
+		// , that is to say, pre-seeded with setX() calls
+		assertNotNull(observation.getObservationProtoBuf());
 	}
 
 	@Test
