@@ -27,6 +27,6 @@ public interface ObservationRepository {
 	void storeObservations(List<Observation> observations);
 
 	List<Observation> findObservations(float latitude, float longitude,
-			int radius);
+			long radius, long limit);
 
 }

@@ -3,7 +3,7 @@
 /*
  * @(#)Main.java        
  *
- * Copyright (c) 2013 Argusat Limited
+ * Copyright (c) 2013 - 2014 Argusat Limited
  * 10 Underwood Road,  Southampton.  UK
  * All rights reserved.
  *
@@ -14,54 +14,73 @@
  * with Argusat Limited.
  */
 
-
 package com.argusat.gjl.observice;
 
 import com.sun.jersey.api.container.grizzly2.GrizzlyWebContainerFactory;
+
+import org.glassfish.grizzly.filterchain.FilterChain;
+import org.glassfish.grizzly.http.HttpCodecFilter;
 import org.glassfish.grizzly.http.server.HttpServer;
+
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
-import javax.ws.rs.core.UriBuilder;
 
+import javax.ws.rs.core.UriBuilder;
 
 public class Main {
 
-    private static int getPort(int defaultPort) {
-        //grab port from environment, otherwise fall back to default port 9998
-        String httpPort = System.getProperty("jersey.test.port");
-        if (null != httpPort) {
-            try {
-                return Integer.parseInt(httpPort);
-            } catch (NumberFormatException e) {
-            }
-        }
-        return defaultPort;
-    }
+	private static int getPort(int defaultPort) {
+		// grab port from environment, otherwise fall back to default port 9998
+		String httpPort = System.getProperty("jersey.test.port");
+		if (null != httpPort) {
+			try {
+				return Integer.parseInt(httpPort);
+			} catch (NumberFormatException e) {
+			}
+		}
+		return defaultPort;
+	}
 
-    private static URI getBaseURI() {
-        return UriBuilder.fromUri("http://0.0.0.0/").port(getPort(9998)).build();
-    }
+	private static URI getBaseURI() {
+		return UriBuilder.fromUri("http://0.0.0.0/").port(getPort(9998))
+				.build();
+	}
 
-    public static final URI BASE_URI = getBaseURI();
-    
-    public static HttpServer startServer() throws IOException {
-        final Map<String, String> initParams = new HashMap<String, String>();
+	public static final URI BASE_URI = getBaseURI();
 
-        initParams.put("com.sun.jersey.config.property.packages", "com.argusat.gjl.observice");
+	public static HttpServer startServer() throws IOException {
+		final Map<String, String> initParams = new HashMap<String, String>();
 
-        System.out.println("Starting grizzly2...");
-        return GrizzlyWebContainerFactory.create(BASE_URI, initParams);
-    }
-    
-    public static void main(String[] args) throws IOException {
-        // Grizzly 2 initialization
-        HttpServer httpServer = startServer();
-        System.out.println(String.format("Jersey app started with WADL available at "
-                + "%sapplication.wadl\nHit enter to stop it...",
-                BASE_URI));
-        System.in.read();
-        httpServer.stop();
-    }    
+		initParams.put("com.sun.jersey.config.property.packages",
+				"com.argusat.gjl.observice");
+
+		System.out.println("Starting grizzly2...");
+		return GrizzlyWebContainerFactory.create(BASE_URI, initParams);
+	}
+
+	public static void main(String[] args) throws IOException {
+		// Grizzly 2 initialization
+		HttpServer httpServer = startServer();
+		System.out.println(String.format(
+				"Jersey app started with WADL available at "
+						+ "%sapplication.wadl\nHit enter to stop it...",
+				BASE_URI));
+
+		if (Boolean.valueOf(System.getProperty(
+				"com.argusat.gjl.observice.debug", "false"))) {
+			
+			System.out.println("Enabling debug output");
+			
+			final FilterChain filterChain = httpServer.getListener("grizzly")
+					.getFilterChain();
+			HttpCodecFilter codecFilter = (HttpCodecFilter) filterChain
+					.get(filterChain.indexOfType(HttpCodecFilter.class));
+			codecFilter.getMonitoringConfig().addProbes(new LoggingHttpProbe());
+		}
+
+		System.in.read();
+		httpServer.stop();
+	}
 }

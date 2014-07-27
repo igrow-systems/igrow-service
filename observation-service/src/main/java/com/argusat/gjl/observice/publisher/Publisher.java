@@ -22,8 +22,9 @@ import com.argusat.gjl.model.Observation;
 
 public interface Publisher {
 
-	public void connect() throws IOException;
+	void connect() throws IOException;
 
-	public void publish(Observation observation) throws IOException;
+	void publish(Observation observation) throws IOException;
 
+	boolean isConnected();
 }

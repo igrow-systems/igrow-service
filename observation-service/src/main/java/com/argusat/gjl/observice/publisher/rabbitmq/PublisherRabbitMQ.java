@@ -36,7 +36,7 @@ public class PublisherRabbitMQ implements Publisher, Closeable {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(PublisherRabbitMQ.class);
 
-	private static final String QUEUE_NAME = "observations";
+	private static final String EXCHANGE_NAME = "topic_observations";
 
 	private static final String PROPERTIES_FILENAME = "observation-service.properties";
 
@@ -89,7 +89,8 @@ public class PublisherRabbitMQ implements Publisher, Closeable {
 			mConnection = factory.newConnection();
 			mChannel = mConnection.createChannel();
 
-			mChannel.queueDeclare(QUEUE_NAME, false, false, false, null);
+			mChannel.exchangeDeclare(EXCHANGE_NAME, "topic");
+			//mChannel.queueDeclare(QUEUE_NAME, false, false, false, null);
 
 			LOGGER.info("RabbitMQ publisher connected");
 		}
@@ -101,7 +102,7 @@ public class PublisherRabbitMQ implements Publisher, Closeable {
 		if (observation.isValid()) {
 			ByteArrayOutputStream oStream = new ByteArrayOutputStream();
 			observation.getObservationProtoBuf().writeTo(oStream);
-			mChannel.basicPublish("", QUEUE_NAME, null, oStream.toByteArray());
+			mChannel.basicPublish(EXCHANGE_NAME, observation.getDeviceId(), null, oStream.toByteArray());
 			LOGGER.info("Published observation: {}", observation.toString());
 		}
 	}
@@ -124,6 +125,11 @@ public class PublisherRabbitMQ implements Publisher, Closeable {
 			}
 		}
 		LOGGER.info("RabbitMQ publisher disconnected");
+	}
+
+	@Override
+	public boolean isConnected() {
+		return (mConnection != null && mConnection.isOpen());
 	}
 
 }

@@ -85,7 +85,9 @@ public class Observations {
 				LOGGER.debug(observation.getType() + " - "
 						+ observation.getTimestamp());
 				try {
-					mPublisher.publish(observation);
+					if (mPublisher.isConnected()) {
+						mPublisher.publish(observation);
+					}
 				} catch (IOException e) {
 					LOGGER.error("Failed to publish {}", observation.toString());
 				}
@@ -106,10 +108,11 @@ public class Observations {
 	@Consumes("text/plain")
 	public ObservationCollection getObservations(
 			@QueryParam("lat") float latitude,
-			@QueryParam("lon") float longitude, @QueryParam("radius") int radius) {
+			@QueryParam("lon") float longitude,
+			@QueryParam("radius") long radius, @QueryParam("limit") long limit) {
 
 		List<Observation> obs = mObservationRepository.findObservations(
-				latitude, longitude, radius);
+				latitude, longitude, radius, limit);
 		ObservationCollection obsCollection = new ObservationCollection();
 		obsCollection.setObservations(obs);
 

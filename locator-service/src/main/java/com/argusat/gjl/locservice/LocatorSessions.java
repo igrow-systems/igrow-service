@@ -40,7 +40,7 @@ public class LocatorSessions {
 	private static LocatorSessionCache mLocatorSessionCache = null;
 
 	static {
-			mLocatorSessionCache = new LocatorSessionCache();
+		mLocatorSessionCache = new LocatorSessionCache();
 		
 	}
 
@@ -59,6 +59,8 @@ public class LocatorSessions {
 	public BeginLocatorSessionResponse postLocatorSession(
 			BeginLocatorSessionRequest beginLocatorSessionRequest) {
 
+		
+		
 		return null;
 	}
 

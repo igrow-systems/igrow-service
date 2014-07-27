@@ -62,12 +62,15 @@ public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 			// + "(ST_SetSRID(ST_MakePoint(?,?,?), 4326) ,?,?,?,?,?,?,?,?,?,?)";
 			+ "(ST_GeomFromEWKB(?),?,?,?,?,?,?,?,?,?,?,?,?)";
 
-	private static final String SELECT_LOCAL_OBSERVATIONS_SQL = "select distinct on (o.device_id) "
+	//private static final String SELECT_LOCAL_OBSERVATIONS_SQL = "select distinct on (o.device_id) "
+	private static final String SELECT_LOCAL_OBSERVATIONS_SQL = "select "
 			+ " o.location, o.obs_timestamp, o.device_id, o.sensor_id, "
 			+ " o.hdop, o.vdop, o.obs_type, o.obs_mode, "
 			+ " o.value0, o.value1, o.value2, o.value3, o.value4"
 			+ " from observations o"
-			+ " where ST_DWithin(ST_GeomFromEWKB(?), o.location, ?)";
+			+ " where ST_DWithin(ST_GeomFromEWKB(?), o.location, ?) "
+			+ " order by obs_timestamp desc"
+			+ " limit(?)";
 
 	private PreparedStatement mPreparedStatementInsertObservation;
 
@@ -266,7 +269,7 @@ public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 
 	@Override
 	public List<Observation> findObservations(float latitude, float longitude,
-			int radius) {
+			long radius, long limit) {
 
 		ObservationCollection obsCollection = new ObservationCollection();
 		try {
@@ -285,6 +288,7 @@ public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 			mPreparedStatementSelectLocalObservations.setObject(1, geometry);
 			// TODO: Fix this hack.  Learn about coordinate systems and projections
 			mPreparedStatementSelectLocalObservations.setFloat(2, (float)radius / 111128f);
+			mPreparedStatementSelectLocalObservations.setLong(3, limit);
 			
 			ResultSet resultSet = mPreparedStatementSelectLocalObservations
 					.executeQuery();

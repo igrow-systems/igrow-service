@@ -120,7 +120,7 @@ public class ObservationRepositoryHBaseImpl implements ObservationRepository,
 
 	@Override
 	public List<Observation> findObservations(float latitude, float longitude,
-			int radius) {
+			long radius, long limit) {
 		// TODO Auto-generated method stub
 		return null;
 	}
