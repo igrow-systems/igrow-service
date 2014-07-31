@@ -21,6 +21,8 @@ import com.sun.jersey.api.container.grizzly2.GrizzlyWebContainerFactory;
 import org.glassfish.grizzly.filterchain.FilterChain;
 import org.glassfish.grizzly.http.HttpCodecFilter;
 import org.glassfish.grizzly.http.server.HttpServer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
@@ -30,6 +32,8 @@ import java.util.Map;
 import javax.ws.rs.core.UriBuilder;
 
 public class Main {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
 	private static int getPort(int defaultPort) {
 		// grab port from environment, otherwise fall back to default port 9998
@@ -56,23 +60,19 @@ public class Main {
 		initParams.put("com.sun.jersey.config.property.packages",
 				"com.argusat.gjl.observice");
 
-		System.out.println("Starting grizzly2...");
+		LOGGER.info("Starting grizzly2...");
 		return GrizzlyWebContainerFactory.create(BASE_URI, initParams);
 	}
 
 	public static void main(String[] args) throws IOException {
 		// Grizzly 2 initialization
-		HttpServer httpServer = startServer();
-		System.out.println(String.format(
-				"Jersey app started with WADL available at "
-						+ "%sapplication.wadl\nHit enter to stop it...",
-				BASE_URI));
+		final HttpServer httpServer = startServer();
 
 		if (Boolean.valueOf(System.getProperty(
 				"com.argusat.gjl.observice.debug", "false"))) {
-			
-			System.out.println("Enabling debug output");
-			
+
+			LOGGER.info("Enabling debug output");
+
 			final FilterChain filterChain = httpServer.getListener("grizzly")
 					.getFilterChain();
 			HttpCodecFilter codecFilter = (HttpCodecFilter) filterChain
@@ -80,7 +80,24 @@ public class Main {
 			codecFilter.getMonitoringConfig().addProbes(new LoggingHttpProbe());
 		}
 
-		System.in.read();
-		httpServer.stop();
+		// register shutdown hook
+		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+			@Override
+			public void run() {
+				LOGGER.info("Stopping server..");
+				httpServer.stop();
+			}
+		}, "shutdownHook"));
+
+		try {
+			//httpServer.start();
+			LOGGER.info(String.format(
+					"Jersey app started with WADL available at "
+							+ "%sapplication.wadl.", BASE_URI));
+			Thread.currentThread().join();
+		} catch (Exception e) {
+			LOGGER.error(
+					"There was an error while starting Grizzly HTTP server.", e);
+		}
 	}
 }
