@@ -58,7 +58,7 @@ public class Main {
 		final Map<String, String> initParams = new HashMap<String, String>();
 
 		initParams.put("com.sun.jersey.config.property.packages",
-				"com.argusat.gjl.observice");
+				"com.argusat.gjl.devservice");
 
 		LOGGER.info("Starting grizzly2...");
 		return GrizzlyWebContainerFactory.create(BASE_URI, initParams);

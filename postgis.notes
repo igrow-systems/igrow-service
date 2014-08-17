@@ -1,3 +1,8 @@
 
 SELECT PostGIS_full_version();
 
+
+
+select ST_AsText(location) from observations where ST_X(location) > 180.0 or ST_X(location) < -180.0 or ST_Y(location) > 90.0 or ST_Y(location) < -90.0;
+
+delete from observations where (location,obs_timestamp) in (select location,obs_timestamp from observations where ST_X(location) > 180.0 or ST_X(location) < -180.0 or ST_Y(location) > 90.0 or ST_Y(location) < -90.0);

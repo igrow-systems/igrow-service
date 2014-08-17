@@ -1,0 +1,52 @@
+library('rgdal')
+dsn="PG:dbname=argusat-gjl-dev user=argusat-gjl-dev password=argusat-gjl-dev host=localhost port=5432"
+ogrListLayers(dsn)
+ogrListLayers(dsn)
+obs = readOGR(dsn=dsn, 'observations')
+summary(obs)
+slotNames(obs)
+obs$data
+obs@data
+testobs1 <- clone(obs)
+testobs1 <- obs
+summary(subset(testobs1, obs_type = 2))
+summary(subset(testobs1, obs_type == 2))
+summary(subset(testobs1, obs_type == 2)$value2)
+gnssobs = subset(testobs1, obs_type == 2)
+hist(gnssobs$value2)
+obs = readOGR(dsn=dsn, 'observations')
+testobs1 <- obs
+gnssobs = subset(testobs1, obs_type == 2)
+summary(gnssobs)
+plot (x=obs_timestamp,y=value2)
+plot (x=gnssobs$obs_timestamp,y=gnssobs$value2)
+plot (x=gnssobs$obs_timestamp,y=gnssobs$value2,z=gnssobs$sensor_id)
+
+
+
+install.packages('ggplot2')
+library('ggplot2')
+gnssobs@data$obs_timestamp <- as.POSIXlt(gnssobs@data$obs_timestamp)
+gnssobs = subset(testobs1, obs_type == 'TYPE_GNSS_CHANNEL')
+
+gnssobs@data$obs_timestamp <- as.POSIXlt(gnssobs@data$obs_timestamp)
+
+str(gnssobs@data)
+gnssobs@data$sensor_id <- as.factor(gnssobs@data$sensor_id)
+
+p <- ggplot(data=gnssobs@data,aes(gnssobs@data$sensor_id, gnssobs@data$value2))
+p + geom_boxplot()
+
+library('maps')
+map('worldHires',
+    c('UK', 'Ireland', 'Isle of Man','Isle of Wight'),
+    xlim=c(-2,-1), ylim=c(50,51))
+points(x=gnssobs@data$coords.x2, y=gnssobs@data$coords.x1, cex=gnssobs@data$hdop)
+
+
+
+p <- ggplot(data=gnssobs@data,aes(x=gnssobs@data$value2))
+> p <- p + geom_histogram(binwidth=0.5)
+> p <- p + facet_wrap(~ sensor_id, ncol=4)
+> p
+
