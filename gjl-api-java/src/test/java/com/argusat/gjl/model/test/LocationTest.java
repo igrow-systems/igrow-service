@@ -77,5 +77,25 @@ public class LocationTest {
 		assertEquals(88762L, mLocation.getLocationProtoBuf().getLongitude());
 		assertEquals(126400001L, mLocation.getLocationProtoBuf().getAltitude());
 	}
+	
+	@Test
+	public void testEquality() {
+		
+		Location location1 = new Location();
+		location1.setLatitude(12.32783f);
+		location1.setLongitude(0.088762f);
+		location1.setAltitude(126.4f);
+		location1.setHDOP(32.0f);
+		location1.setVDOP(8.0f);
+		
+		Location location2 = new Location();
+		location2.setLatitude(12.32783f);
+		location2.setLongitude(0.088762f);
+		location2.setAltitude(126.4f);
+		location2.setHDOP(32.0f);
+		location2.setVDOP(8.0f);
+		
+		assertEquals(location1, location2);
+	}
 
 }

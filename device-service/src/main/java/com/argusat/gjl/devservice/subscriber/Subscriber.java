@@ -14,9 +14,11 @@
  * with Argusat Limited.
  */
 
-package com.argusat.gjl.locservice.subscriber;
+package com.argusat.gjl.devservice.subscriber;
 
 import java.io.IOException;
+
+import com.argusat.gjl.devservice.subscriber.MessageHandler;
 
 public interface Subscriber {
 

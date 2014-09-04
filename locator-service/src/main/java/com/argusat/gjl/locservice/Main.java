@@ -69,7 +69,7 @@ public class Main {
 		final HttpServer httpServer = startServer();
 
 		if (Boolean.valueOf(System.getProperty(
-				"com.argusat.gjl.observice.debug", "false"))) {
+				"com.argusat.gjl.locservice.debug", "false"))) {
 
 			LOGGER.info("Enabling debug output");
 

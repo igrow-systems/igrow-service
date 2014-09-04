@@ -31,7 +31,8 @@ message BeginLocatorSessionResponse {
 
   enum ErrorCode {
     NONE = 0;
-    INSUFFICIENT_LOCAL_CANDIDATES = 1;
+    SESSION_ALREADY_STARTED = 1;
+    INSUFFICIENT_LOCAL_CANDIDATES = 2;
   }
 
   required ErrorCode responseCode = 1;

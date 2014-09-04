@@ -19,25 +19,49 @@ package com.argusat.gjl.devservice.repository.postgis;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
 import static org.junit.Assert.*;
 
+import com.argusat.gjl.devservice.repository.DeviceRepositoryException;
 import com.argusat.gjl.model.Device;
 import com.argusat.gjl.model.Device.OSType;
+import com.argusat.gjl.model.Location;
 
 public class DeviceRepositoryPostGISImplTest {
 
 	private DeviceRepositoryPostGISImpl mDeviceRepository;
 
-	private Device mDevice;
+	private Device mInvalidDevice;
+	
+	private Device mValidDevice;
 
 	@Before
 	public void setUp() throws Exception {
 
-		mDevice = new Device();
-		mDevice.setDeviceId("test-id-009");
-		mDevice.setOsType(OSType.GOOGLE_ANDROID);
-		mDevice.setOsVersion("4.1.1_r99");
-		mDevice.setPushToken("test_push_token");
+		mInvalidDevice = new Device();
+		mInvalidDevice.setDeviceId("test-id-009");
+		mInvalidDevice.setOsType(OSType.GOOGLE_ANDROID);
+		mInvalidDevice.setOsVersion("4.1.1_r99");
+		mInvalidDevice.setPushToken("test_push_token");
+		
+		mValidDevice = new Device();
+		mValidDevice.setDeviceId("test-id-011");
+		mValidDevice.setOsType(OSType.GOOGLE_ANDROID);
+		mValidDevice.setOsVersion("4.1.1_r99");
+		mValidDevice.setPushToken("test_push_token");
+		mValidDevice.setManufacturer("HUAWEI");
+		mValidDevice.setModel("HUAWEI G510-0100");
+		mValidDevice.setProduct("G510-0100");
+		mValidDevice.setDevice("hwG510-0100");
+		
+		Location lastKnownLocation =new Location();
+		lastKnownLocation.setLatitude(12.32783f);
+		lastKnownLocation.setLongitude(0.088762f);
+		lastKnownLocation.setAltitude(126.4f);
+		
+		mValidDevice.setLastKnownLocation(lastKnownLocation);
+		
+		
 		mDeviceRepository = new DeviceRepositoryPostGISImpl();
 	}
 
@@ -46,15 +70,35 @@ public class DeviceRepositoryPostGISImplTest {
 	}
 
 	@Test
-	public void testStoreDevice() {
+	public void testStoreDevice() throws DeviceRepositoryException {
 
-		mDeviceRepository.storeDevice(mDevice);
-		Device device = mDeviceRepository.findDevice(mDevice.getDeviceId());
+		mDeviceRepository.storeDevice(mValidDevice);
+		Device device = mDeviceRepository.findDevice(mValidDevice.getDeviceId());
 		
-		assertEquals(mDevice.getDeviceId(), device.getDeviceId());
-		assertEquals(mDevice.getOsType(), device.getOsType());
-		assertEquals(mDevice.getOsVersion(), device.getOsVersion());
-		assertEquals(mDevice.getPushToken(), device.getPushToken());
+		assertEquals(mValidDevice.getDeviceId(), device.getDeviceId());
+		assertEquals(mValidDevice.getOsType(), device.getOsType());
+		assertEquals(mValidDevice.getOsVersion(), device.getOsVersion());
+		assertEquals(mValidDevice.getPushToken(), device.getPushToken());
+		assertEquals(mValidDevice.getManufacturer(), device.getManufacturer());
+		assertEquals(mValidDevice.getModel(), device.getModel());
+		assertEquals(mValidDevice.getProduct(), device.getProduct());
+		assertEquals(mValidDevice.getDevice(), device.getDevice());
+		assertEquals(mValidDevice.getLastKnownLocation(), device.getLastKnownLocation());
+		
+	}
+	
+	@Test
+	public void testStoreDeviceThrowsDeviceRepositoryExceptionInvalidDevice() throws DeviceRepositoryException {
+
+		mDeviceRepository.storeDevice(mInvalidDevice);
+		
+	}
+	
+	@Test(expected=DeviceRepositoryException.class)
+	public void testStoreDeviceThrowsDeviceRepositoryExceptionNullDevice() throws DeviceRepositoryException {
+
+		mDeviceRepository.storeDevice(null);
+		
 	}
 
 }

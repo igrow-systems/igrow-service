@@ -1,7 +1,7 @@
 /* -*- mode: java; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
 
 /*
- * @(#)LocatorSessionCache.java        
+ * @(#)MessageHandler.java        
  *
  * Copyright (c) 2014 Argusat Limited
  * 10 Underwood Road,  Southampton.  UK
@@ -14,9 +14,10 @@
  * with Argusat Limited.
  */
 
+package com.argusat.gjl.devservice.subscriber;
 
-package com.argusat.gjl.locservice.session;
+import com.argusat.gjl.model.Observation;
 
-public class LocatorSessionCache {
-
+public interface MessageHandler {
+	void handleMessage(Observation observation);
 }

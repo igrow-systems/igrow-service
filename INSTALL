@@ -107,9 +107,11 @@ cd observation-service
 psql -U argusat-gjl-dev -h localhost < src/main/resources/initdb.sql
 mvn test package install
 
+mvn clean compile assembly:single
+
 mvn -DskipTests=true -Djersey.test.port=9998 -Dcom.argusat.gjl.observice.debug=true -e exec:java
 
-mvn -DskipTests=true dependency:build-classpath
+
 
 
 

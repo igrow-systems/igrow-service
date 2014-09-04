@@ -14,7 +14,7 @@
  * with Argusat Limited.
  */
 
-package com.argusat.gjl.locservice.subscriber.rabbitmq;
+package com.argusat.gjl.devservice.subscriber;
 
 import java.io.ByteArrayInputStream;
 import java.io.Closeable;
@@ -25,8 +25,6 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.argusat.gjl.locservice.subscriber.MessageHandler;
-import com.argusat.gjl.locservice.subscriber.Subscriber;
 import com.argusat.gjl.model.Observation;
 import com.argusat.gjl.service.observation.ObservationProtoBuf;
 import com.rabbitmq.client.AMQP.BasicProperties;
@@ -47,7 +45,7 @@ public class SubscriberRabbitMQ implements Subscriber, Closeable {
 
 	private static final String OBSERVATIONS_CONSUMER_TAG = "observationsConsumerTag";
 
-	private static final String PROPERTIES_FILENAME = "locator-service.properties";
+	private static final String PROPERTIES_FILENAME = "device-service.properties";
 
 	private static Properties mProperties = new Properties();
 
@@ -65,7 +63,7 @@ public class SubscriberRabbitMQ implements Subscriber, Closeable {
 
 	private Channel mChannel;
 	
-	private MessageHandler mMessageHandler = null;
+	private MessageHandler mMessageHandler;
 
 	static {
 		try {
@@ -187,5 +185,5 @@ public class SubscriberRabbitMQ implements Subscriber, Closeable {
 	public void unregisterMessageHandler() {
 		mMessageHandler = null;
 	}
-
+	
 }

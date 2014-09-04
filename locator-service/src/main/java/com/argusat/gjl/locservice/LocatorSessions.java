@@ -25,9 +25,13 @@ import javax.ws.rs.Produces;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.argusat.gjl.locservice.session.LocatorSessionCache;
+import com.argusat.gjl.locservice.session.LocatorSession;
+import com.argusat.gjl.locservice.session.LocatorSessionManger;
+import com.argusat.gjl.locservice.subscriber.Subscriber;
+import com.argusat.gjl.locservice.subscriber.rabbitmq.SubscriberRabbitMQ;
 import com.argusat.gjl.service.locator.LocatorProtoBuf.BeginLocatorSessionRequest;
 import com.argusat.gjl.service.locator.LocatorProtoBuf.BeginLocatorSessionResponse;
+import com.argusat.gjl.service.locator.LocatorProtoBuf.BeginLocatorSessionResponse.ErrorCode;
 import com.argusat.gjl.service.locator.LocatorProtoBuf.EndLocatorSessionRequest;
 import com.argusat.gjl.service.locator.LocatorProtoBuf.EndLocatorSessionResponse;
 
@@ -37,11 +41,13 @@ public class LocatorSessions {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(LocatorSessions.class);
 
-	private static LocatorSessionCache mLocatorSessionCache = null;
+	private static LocatorSessionManger mLocatorSessionManager = null;
+	
+	private static Subscriber mSubscriber = null;
 
 	static {
-		mLocatorSessionCache = new LocatorSessionCache();
-		
+		mLocatorSessionManager = new LocatorSessionManger();
+		mSubscriber = new SubscriberRabbitMQ();
 	}
 
 	public LocatorSessions() {
@@ -61,7 +67,24 @@ public class LocatorSessions {
 
 		
 		
-		return null;
+		BeginLocatorSessionResponse.Builder responseBuilder = BeginLocatorSessionResponse.newBuilder();
+		String deviceId = beginLocatorSessionRequest.getDeviceId();
+		
+		if (mLocatorSessionManager.containsKey(deviceId)) {
+			responseBuilder.setResponseCode(ErrorCode.SESSION_ALREADY_STARTED);
+			responseBuilder.setResponseMessage("Session already started for device [ " + deviceId + " ]");
+			return responseBuilder.build();
+		}
+		
+		
+		
+		LocatorSession locatorSession = LocatorSession.newLocatorSession(deviceId);
+		
+		mLocatorSessionManager.put(deviceId, locatorSession);
+		
+		responseBuilder.setResponseCode(ErrorCode.NONE);
+		
+		return responseBuilder.build();
 	}
 
 	// The Java method will process HTTP DELETE requests

@@ -78,12 +78,16 @@ public class MainTest extends TestCase {
 		{
 			DeviceProtoBuf.Device.Builder deviceBuilder = DeviceProtoBuf.Device
 					.newBuilder();
-			deviceBuilder.setDeviceId("test-id-009");
+			deviceBuilder.setDeviceId("test-id-010");
 			deviceBuilder
 					.setOsType(DeviceProtoBuf.Device.OSType.GOOGLE_ANDROID);
 			deviceBuilder.setOsVersion("4.1.1_r99");
 			deviceBuilder.setPushToken("test_push_token");
-
+			deviceBuilder.setManufacturer("HUAWEI");
+			deviceBuilder.setModel("HUAWEI G510-0100");
+			deviceBuilder.setProduct("G510-0100");
+			deviceBuilder.setDevice("hwG510-0100");
+			
 			RegisterDeviceRequest.Builder builder = DeviceProtoBuf.RegisterDeviceRequest
 					.newBuilder();
 			builder.setDevice(deviceBuilder.build());

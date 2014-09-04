@@ -84,6 +84,7 @@ public class Notifications {
 
 		if (device == null) {
 			builder.setResponseCode(NotifyDeviceResponse.ErrorCode.DEVICE_NOT_FOUND);
+			return builder.build();
 		}
 
 		// send message via Google Cloud Messaging if it's an Android device

@@ -23,12 +23,17 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 
+import org.postgis.PGgeometry;
+import org.postgis.Point;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.argusat.gjl.devservice.repository.DeviceRepository;
+import com.argusat.gjl.devservice.repository.DeviceRepositoryException;
 import com.argusat.gjl.model.Device;
+import com.argusat.gjl.model.Location;
 
 public class DeviceRepositoryPostGISImpl implements DeviceRepository, Closeable {
 
@@ -45,15 +50,19 @@ public class DeviceRepositoryPostGISImpl implements DeviceRepository, Closeable 
 			+ DATABASE;
 
 	private static final String SELECT_DEVICE_SQL = "select "
-			+ "d.device_id, d.os_type, d.os_version, d.push_token "
-			+ "from devices d WHERE d.device_id = ?";
+			+ "d.device_id, d.os_type, d.os_version, d.push_token, "
+			+ "d.manufacturer, d.model, d.product, d.device, "
+			+ "d.last_known_location " + "from devices d WHERE d.device_id = ?";
 
 	private static final String INSERT_DEVICE_SQL = "insert into devices "
-			+ "(device_id, os_type, os_version, push_token) VALUES"
-			+ "(?,?,?,?)";
+			+ "(device_id, os_type, os_version, push_token, "
+			+ "manufacturer, model, product, device, "
+			+ "last_known_location) VALUES" + "(?,?,?,?,?,?,?,?,?)";
 
 	private static final String UPDATE_DEVICE_SQL = "update devices "
-			+ " SET os_version = ?, push_token = ? WHERE device_id = ?";
+			+ "SET os_version = ?, push_token = ?, manufacturer = ?, "
+			+ "model = ?, product = ?, device = ?, "
+			+ "last_known_location = ? " + "WHERE device_id = ?";
 
 	private PreparedStatement mPreparedStatementSelectDevice;
 
@@ -85,8 +94,16 @@ public class DeviceRepositoryPostGISImpl implements DeviceRepository, Closeable 
 	}
 
 	@Override
-	public void storeDevice(Device device) {
+	public void storeDevice(Device device) throws DeviceRepositoryException {
 
+		if (device == null) {
+			throw new DeviceRepositoryException("Device was null!");
+		}
+		
+		if (!device.isValid()) {
+			throw new DeviceRepositoryException("Invalid device!");
+		}
+		
 		try {
 
 			mConnection.setAutoCommit(false);
@@ -97,16 +114,41 @@ public class DeviceRepositoryPostGISImpl implements DeviceRepository, Closeable 
 
 			int rowsAffected = 0;
 
+			PGgeometry geometry = null;
+			Location lastKnownLocation = device.getLastKnownLocation();
+			if (lastKnownLocation != null) {
+				Point point = new Point();
+				point.dimension = 3;
+				point.x = lastKnownLocation.getLongitude();
+				point.y = lastKnownLocation.getLatitude();
+				point.z = lastKnownLocation.getAltitude();
+				point.srid = 4326;
+
+				geometry = new PGgeometry(point);
+			}
+
 			if (resultSet.next()) {
 				// update
 				mPreparedStatementUpdateDevice.setString(1,
 						device.getOsVersion());
 				mPreparedStatementUpdateDevice.setString(2,
 						device.getPushToken());
-				// where clause
 				mPreparedStatementUpdateDevice.setString(3,
+						device.getManufacturer());
+				mPreparedStatementUpdateDevice.setString(4, device.getModel());
+				mPreparedStatementUpdateDevice
+						.setString(5, device.getProduct());
+				mPreparedStatementUpdateDevice.setString(6, device.getDevice());
+
+				if (geometry != null) {
+					mPreparedStatementUpdateDevice.setObject(7, geometry);
+				} else {
+					mPreparedStatementUpdateDevice.setNull(7, Types.NULL);
+				}
+				// where clause
+				mPreparedStatementUpdateDevice.setString(8,
 						device.getDeviceId());
-				
+
 				rowsAffected = mPreparedStatementUpdateDevice.executeUpdate();
 			} else {
 				// insert
@@ -121,6 +163,22 @@ public class DeviceRepositoryPostGISImpl implements DeviceRepository, Closeable 
 
 				mPreparedStatementInsertDevice.setString(4,
 						device.getPushToken());
+
+				mPreparedStatementInsertDevice.setString(5,
+						device.getManufacturer());
+
+				mPreparedStatementInsertDevice.setString(6, device.getModel());
+
+				mPreparedStatementInsertDevice
+						.setString(7, device.getProduct());
+
+				mPreparedStatementInsertDevice.setString(8, device.getDevice());
+
+				if (geometry != null) {
+					mPreparedStatementInsertDevice.setObject(9, geometry);
+				} else {
+					mPreparedStatementInsertDevice.setNull(9, Types.NULL);
+				}
 
 				rowsAffected = mPreparedStatementInsertDevice.executeUpdate();
 			}
@@ -185,8 +243,7 @@ public class DeviceRepositoryPostGISImpl implements DeviceRepository, Closeable 
 
 		Device device = null;
 		try {
-			device = new Device();
-
+			
 			mPreparedStatementSelectDevice.setString(1, deviceId);
 			ResultSet resultSet = mPreparedStatementSelectDevice.executeQuery();
 
@@ -194,10 +251,25 @@ public class DeviceRepositoryPostGISImpl implements DeviceRepository, Closeable 
 				return device;
 			}
 
+			device = new Device();
 			device.setDeviceId(resultSet.getString(1));
 			device.setOsType(Device.OSType.valueOf(resultSet.getString(2)));
 			device.setOsVersion(resultSet.getString(3));
 			device.setPushToken(resultSet.getString(4));
+			device.setManufacturer(resultSet.getString(5));
+			device.setModel(resultSet.getString(6));
+			device.setProduct(resultSet.getString(7));
+			device.setDevice(resultSet.getString(8));
+
+			PGgeometry geomLocation = (PGgeometry) resultSet.getObject(9);
+			if (geomLocation != null) {
+				Point point = geomLocation.getGeometry().getFirstPoint();
+				Location location = new Location();
+				location.setLatitude((float) point.y);
+				location.setLongitude((float) point.x);
+				location.setAltitude((float) point.z);
+				device.setLastKnownLocation(location);
+			}
 
 		} catch (SQLException e) {
 			LOGGER.error("findDevice", e);

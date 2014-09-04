@@ -35,6 +35,16 @@ public class Device {
 	private OSType mOsType;
 	
 	private String mOsVersion;
+	
+	private String mManufacturer;
+	
+	private String mModel;
+	
+	private String mProduct;
+	
+	private String mDevice;
+	
+	private Location mLastKnownLocation;
 
 	public Device() {
 		mIsDirty = true;
@@ -59,6 +69,10 @@ public class Device {
 		}
 		modelDevice.setOsVersion(device.getOsVersion());
 		modelDevice.setPushToken(device.getPushToken());
+		modelDevice.setManufacturer(device.getManufacturer());
+		modelDevice.setModel(device.getModel());
+		modelDevice.setProduct(device.getProduct());
+		modelDevice.setDevice(device.getDevice());
 		
 		return modelDevice;
 	}
@@ -99,12 +113,61 @@ public class Device {
 		mIsDirty = true;
 	}
 
+	public Location getLastKnownLocation() {
+		return mLastKnownLocation;
+	}
+
+	public void setLastKnownLocation(Location lastKnownLocation) {
+		mLastKnownLocation = lastKnownLocation;
+		mIsDirty = true;
+	}
+
+	public String getDevice() {
+		return mDevice;
+	}
+
+	public void setDevice(String device) {
+		mDevice = device;
+		mIsDirty = true;
+	}
+
+	public String getManufacturer() {
+		return mManufacturer;
+	}
+
+	public void setManufacturer(String manufacturer) {
+		mManufacturer = manufacturer;
+		mIsDirty = true;
+	}
+
+	public String getModel() {
+		return mModel;
+	}
+
+	public void setModel(String model) {
+		mModel = model;
+		mIsDirty = true;
+	}
+
+	public String getProduct() {
+		return mProduct;
+	}
+
+	public void setProduct(String product) {
+		mProduct = product;
+		mIsDirty = true;
+	}
+
 	public boolean isValid() {
 		if (mIsDirty) {
 			mIsValid = ((mDeviceId != null && !mDeviceId.isEmpty()) 
 					&& (mOsType != null)
 					&& (mOsVersion != null && !mOsVersion.isEmpty())
-					&& (mPushToken != null && !mPushToken.isEmpty()));
+					&& (mPushToken != null && !mPushToken.isEmpty())
+					&& (mManufacturer != null && !mManufacturer.isEmpty())
+					&& (mModel != null && !mModel.isEmpty())
+					&& (mProduct != null && !mProduct.isEmpty())
+					&& (mDevice != null && !mDevice.isEmpty()));
 			mIsDirty = false;
 		}
 		return mIsValid;

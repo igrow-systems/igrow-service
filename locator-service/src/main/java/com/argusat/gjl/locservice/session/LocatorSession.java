@@ -17,14 +17,33 @@
 
 package com.argusat.gjl.locservice.session;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
+
+import com.argusat.gjl.model.Device;
 
 public class LocatorSession {
 
 	private UUID mSessionId;
 	
-	private ArrayList<Participant> mParticipants;
+	private final Map<String, Device> mParticipants;
+	
+	private final String mInitiatorDeviceId;
 
+	protected LocatorSession(String deviceId) {
+		mInitiatorDeviceId = deviceId;
+		mParticipants = new HashMap<String, Device>();
+	}
+	
+	public static LocatorSession newLocatorSession(String deviceId) {
+		LocatorSession locatorSession = new LocatorSession(deviceId);
+		locatorSession.newSessionId();
+		return locatorSession;
+	}
+	
+	protected void newSessionId() {
+		mSessionId = UUID.randomUUID();
+	}
 	
 }

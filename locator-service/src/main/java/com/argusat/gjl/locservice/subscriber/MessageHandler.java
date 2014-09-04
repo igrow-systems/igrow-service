@@ -1,9 +1,9 @@
 /* -*- mode: java; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
 
 /*
- * @(#)DeviceRepository.java        
+ * @(#)MessageHandler.java        
  *
- * Copyright (c) 2013 - 2014 Argusat Limited
+ * Copyright (c) 2014 Argusat Limited
  * 10 Underwood Road,  Southampton.  UK
  * All rights reserved.
  *
@@ -14,13 +14,10 @@
  * with Argusat Limited.
  */
 
-package com.argusat.gjl.devservice.repository;
+package com.argusat.gjl.locservice.subscriber;
 
-import com.argusat.gjl.model.Device;
+import com.argusat.gjl.model.Observation;
 
-public interface DeviceRepository {
-
-	void storeDevice(Device device) throws DeviceRepositoryException;
-	Device findDevice(String deviceId);
-	
+public interface MessageHandler {
+	void handleMessage(Observation observation);
 }

@@ -31,6 +31,10 @@ message Device {
   required OSType osType = 2;
   required string osVersion = 3;
   required string pushToken = 4;
+  required string manufacturer = 5;
+  required string model = 6;
+  required string product = 7;
+  required string device = 8;
 }
 
 message RegisterDeviceRequest {

@@ -16,6 +16,9 @@
 
 package com.argusat.gjl.model;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import com.argusat.gjl.service.observation.LocationProtoBuf;
 
 public class Location {
@@ -31,13 +34,13 @@ public class Location {
 	private float mVDOP;
 
 	private boolean mDirty;
-	
+
 	private boolean mValid;
 
 	private boolean mProtoBufValid;
 
 	private LocationProtoBuf.Location mLocationProtoBuf;
-	
+
 	private LocationProtoBuf.Location.Builder mLocationProtoBufBuilder;
 
 	public Location() {
@@ -51,25 +54,26 @@ public class Location {
 		mHDOP = 0.0f;
 		mVDOP = 0.0f;
 	}
-	
+
 	public Location(LocationProtoBuf.Location location) {
-		assert(location.isInitialized());
+		assert (location.isInitialized());
 		mLocationProtoBuf = location;
-		mLocationProtoBufBuilder = LocationProtoBuf.Location.newBuilder(location);
-		mLatitude = (float)location.getLatitude() / (float)1e6;
-		mLongitude = (float)location.getLongitude() / (float)1e6;
-		mAltitude = (float)location.getAltitude() / (float)1e6;
+		mLocationProtoBufBuilder = LocationProtoBuf.Location
+				.newBuilder(location);
+		mLatitude = (float) location.getLatitude() / (float) 1e6;
+		mLongitude = (float) location.getLongitude() / (float) 1e6;
+		mAltitude = (float) location.getAltitude() / (float) 1e6;
 		mHDOP = location.getHdop();
 		mVDOP = location.getVdop();
 	}
-	
+
 	public float getLatitude() {
 		return mLatitude;
 	}
 
 	public void setLatitude(float latitude) {
 		this.mLatitude = latitude;
-		mLocationProtoBufBuilder.setLatitude((int)(latitude * 1e6));
+		mLocationProtoBufBuilder.setLatitude((int) (latitude * 1e6));
 		mDirty = true;
 	}
 
@@ -79,7 +83,7 @@ public class Location {
 
 	public void setLongitude(float longitude) {
 		this.mLongitude = longitude;
-		mLocationProtoBufBuilder.setLongitude((int)(longitude * 1e6));
+		mLocationProtoBufBuilder.setLongitude((int) (longitude * 1e6));
 		mDirty = true;
 	}
 
@@ -89,7 +93,7 @@ public class Location {
 
 	public void setAltitude(float altitude) {
 		this.mAltitude = altitude;
-		mLocationProtoBufBuilder.setAltitude((int)(altitude * 1e6));
+		mLocationProtoBufBuilder.setAltitude((int) (altitude * 1e6));
 		mDirty = true;
 	}
 
@@ -99,7 +103,7 @@ public class Location {
 
 	public void setHDOP(float hdop) {
 		this.mHDOP = hdop;
-		mLocationProtoBufBuilder.setHdop((int)hdop);
+		mLocationProtoBufBuilder.setHdop((int) hdop);
 		mDirty = true;
 	}
 
@@ -109,15 +113,15 @@ public class Location {
 
 	public void setVDOP(float vdop) {
 		this.mVDOP = vdop;
-		mLocationProtoBufBuilder.setVdop((int)vdop);
+		mLocationProtoBufBuilder.setVdop((int) vdop);
 		mDirty = true;
 	}
-	
+
 	protected void validate() {
 
 		mLocationProtoBuf = mLocationProtoBufBuilder.buildPartial();
 		mProtoBufValid = mLocationProtoBuf.isInitialized();
-		mValid =  mProtoBufValid;
+		mValid = mProtoBufValid;
 		mDirty = false;
 
 	}
@@ -135,10 +139,10 @@ public class Location {
 		}
 		return mLocationProtoBuf;
 	}
-	
+
 	@Override
 	public String toString() {
-		
+
 		StringBuffer sb = new StringBuffer();
 		sb.append("( ");
 		sb.append(mLatitude);
@@ -151,9 +155,35 @@ public class Location {
 		sb.append(", ");
 		sb.append(mVDOP);
 		sb.append(" ))");
-		
+
 		return sb.toString();
-		
+
 	}
-	
+
+	public int hashCode() {
+		return new HashCodeBuilder(15, 39)
+				.
+				// if deriving: appendSuper(super.hashCode()).
+				append(mLatitude).append(mLongitude).append(mAltitude)
+				.append(mHDOP).append(mVDOP).toHashCode();
+	}
+
+	public boolean equals(Object obj) {
+		if (!(obj instanceof Location)) {
+			return false;
+		}
+		if (obj == this) {
+			return true;
+		}
+
+		Location rhs = (Location) obj;
+		return new EqualsBuilder()
+				.
+				// if deriving: appendSuper(super.equals(obj)).
+				append(mLatitude, rhs.mLatitude)
+				.append(mLongitude, rhs.mLongitude)
+				.append(mAltitude, rhs.mAltitude).append(mHDOP, rhs.mHDOP)
+				.append(mVDOP, rhs.mVDOP).isEquals();
+	}
+
 }
