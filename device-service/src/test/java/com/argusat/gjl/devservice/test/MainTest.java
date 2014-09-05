@@ -19,8 +19,13 @@ package com.argusat.gjl.devservice.test;
 import junit.framework.TestCase;
 
 import org.glassfish.grizzly.http.server.HttpServer;
+import org.junit.Test;
 
 import com.argusat.gjl.devservice.Main;
+import com.argusat.gjl.devservice.providers.FindLocalDevicesRequestProtobufReader;
+import com.argusat.gjl.devservice.providers.FindLocalDevicesRequestProtobufWriter;
+import com.argusat.gjl.devservice.providers.FindLocalDevicesResponseProtobufReader;
+import com.argusat.gjl.devservice.providers.FindLocalDevicesResponseProtobufWriter;
 import com.argusat.gjl.devservice.providers.NotifyDeviceRequestProtobufReader;
 import com.argusat.gjl.devservice.providers.NotifyDeviceRequestProtobufWriter;
 import com.argusat.gjl.devservice.providers.NotifyDeviceResponseProtobufReader;
@@ -29,7 +34,10 @@ import com.argusat.gjl.devservice.providers.RegisterDeviceRequestProtobufReader;
 import com.argusat.gjl.devservice.providers.RegisterDeviceRequestProtobufWriter;
 import com.argusat.gjl.devservice.providers.RegisterDeviceResponseProtobufReader;
 import com.argusat.gjl.devservice.providers.RegisterDeviceResponseProtobufWriter;
+import com.argusat.gjl.model.Location;
 import com.argusat.gjl.service.device.DeviceProtoBuf;
+import com.argusat.gjl.service.device.DeviceProtoBuf.FindLocalDevicesRequest;
+import com.argusat.gjl.service.device.DeviceProtoBuf.FindLocalDevicesResponse;
 import com.argusat.gjl.service.device.DeviceProtoBuf.NotifyDeviceRequest;
 import com.argusat.gjl.service.device.DeviceProtoBuf.NotifyDeviceResponse;
 import com.argusat.gjl.service.device.DeviceProtoBuf.RegisterDeviceRequest;
@@ -45,6 +53,8 @@ public class MainTest extends TestCase {
 	private RegisterDeviceRequest mRegisterDeviceRequest;
 
 	private NotifyDeviceRequest mNotifyDeviceRequest;
+	
+	private FindLocalDevicesRequest mFindLocalDevicesRequest;
 
 	private HttpServer httpServer;
 
@@ -70,6 +80,10 @@ public class MainTest extends TestCase {
 		cc.getClasses().add(NotifyDeviceRequestProtobufWriter.class);
 		cc.getClasses().add(NotifyDeviceResponseProtobufReader.class);
 		cc.getClasses().add(NotifyDeviceResponseProtobufWriter.class);
+		cc.getClasses().add(FindLocalDevicesRequestProtobufReader.class);
+		cc.getClasses().add(FindLocalDevicesRequestProtobufWriter.class);
+		cc.getClasses().add(FindLocalDevicesResponseProtobufReader.class);
+		cc.getClasses().add(FindLocalDevicesResponseProtobufWriter.class);
 
 		Client c = Client.create(cc);
 
@@ -94,6 +108,25 @@ public class MainTest extends TestCase {
 
 			mRegisterDeviceRequest = builder.build();
 		}
+		
+		{
+			DeviceProtoBuf.FindLocalDevicesRequest.Builder builder = DeviceProtoBuf.FindLocalDevicesRequest.newBuilder();
+			Location location = new Location();
+			location.setLatitude(50.9399695f);
+			location.setLongitude(-1.415058f);
+			// the following need to be set
+			// to form a valid Location but
+			// the values are currently ignored
+			// by the service. 
+			location.setAltitude(0.0f);
+			location.setHDOP(0.0f);
+			location.setVDOP(0.0f);
+			builder.setCentre(location.getLocationProtoBuf());
+			builder.setRadius(1000L);
+			builder.setLimit(5);
+			
+			mFindLocalDevicesRequest = builder.build();
+		}
 
 		{
 			NotifyDeviceRequest.Builder builder = DeviceProtoBuf.NotifyDeviceRequest
@@ -113,8 +146,9 @@ public class MainTest extends TestCase {
 	}
 
 	/**
-	 * Test to see that the message "Got it!" is sent in the response.
+	 * Test to see that a device is correctly registered
 	 */
+	@Test
 	public void testRegisterDevice() {
 
 		WebResource wr = r.path("devices");
@@ -125,10 +159,26 @@ public class MainTest extends TestCase {
 		assertEquals(RegisterDeviceResponse.ErrorCode.NONE,
 				response.getResponseCode());
 	}
+	
+	/**
+	 * Test to see that local devices can be found
+	 */
+	@Test
+	public void testFindLocalDevices() {
+
+		WebResource wr = r.path("devices/local");
+		FindLocalDevicesResponse response = wr.type("application/octet-stream")
+				.post(DeviceProtoBuf.FindLocalDevicesResponse.class,
+						mFindLocalDevicesRequest);
+
+		assertEquals(FindLocalDevicesResponse.ErrorCode.NONE,
+				response.getResponseCode());
+	}
 
 	/**
-	 * Test to see that the message "Got it!" is sent in the response.
+	 * Test to see that a device can be notified
 	 */
+	@Test
 	public void testNotifyDevice() {
 
 		WebResource wr = r.path("notifications");
@@ -144,6 +194,7 @@ public class MainTest extends TestCase {
 	 * Test if a WADL document is available at the relative path
 	 * "application.wadl".
 	 */
+	@Test
 	public void testApplicationWadl() {
 		String serviceWadl = r.path("application.wadl").accept(MediaTypes.WADL)
 				.get(String.class);

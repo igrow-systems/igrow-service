@@ -16,21 +16,37 @@
 
 package com.argusat.gjl.model.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.argusat.gjl.model.Location;
+import com.argusat.gjl.service.observation.LocationProtoBuf;
 
 public class LocationTest {
 
 	private Location mLocation;
 
+	private LocationProtoBuf.Location mLocationProtoBuf;
+	
 	@Before
 	public void setUp() throws Exception {
 		mLocation = new Location();
+		
+		LocationProtoBuf.Location.Builder builder = LocationProtoBuf.Location.newBuilder();
+		builder.setLatitude(12327830);
+		builder.setLongitude(88762);
+		builder.setAltitude(126400001);
+		builder.setHdop(32);
+		builder.setVdop(8);
+		
+		mLocationProtoBuf = builder.build();
+		
 	}
 
 	@After
@@ -76,6 +92,19 @@ public class LocationTest {
 		assertEquals(12327830L, mLocation.getLocationProtoBuf().getLatitude());
 		assertEquals(88762L, mLocation.getLocationProtoBuf().getLongitude());
 		assertEquals(126400001L, mLocation.getLocationProtoBuf().getAltitude());
+	}
+	
+	@Test
+	public void testGetProtoBufConstructFromProtoBuf() {
+		
+		Location location = new Location(mLocationProtoBuf);
+
+		assertNotNull(location.getLocationProtoBuf());
+		assertTrue(location.getLocationProtoBuf().isInitialized());
+
+		assertEquals(12327830L, location.getLocationProtoBuf().getLatitude());
+		assertEquals(88762L, location.getLocationProtoBuf().getLongitude());
+		assertEquals(126400001L, location.getLocationProtoBuf().getAltitude());
 	}
 	
 	@Test

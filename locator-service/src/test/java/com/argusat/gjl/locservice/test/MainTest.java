@@ -21,14 +21,11 @@ import junit.framework.TestCase;
 import org.glassfish.grizzly.http.server.HttpServer;
 
 import com.argusat.gjl.locservice.Main;
-import com.argusat.gjl.locservice.ObservationProtobufReader;
-import com.argusat.gjl.locservice.ObservationProtobufWriter;
+import com.argusat.gjl.locservice.provider.BeginLocatorSessionRequestProtobufReader;
+import com.argusat.gjl.locservice.provider.BeginLocatorSessionRequestProtobufWriter;
 import com.argusat.gjl.model.Location;
-import com.argusat.gjl.model.Observation;
-import com.argusat.gjl.model.Observation.ModeType;
-import com.argusat.gjl.model.Observation.ObservationType;
-import com.argusat.gjl.model.ObservationCollection;
-import com.argusat.gjl.service.observation.ObservationProtoBuf;
+import com.argusat.gjl.service.locator.LocatorProtoBuf.BeginLocatorSessionRequest;
+import com.argusat.gjl.service.locator.LocatorProtoBuf.BeginLocatorSessionResponse;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
@@ -37,7 +34,7 @@ import com.sun.jersey.core.header.MediaTypes;
 
 public class MainTest extends TestCase {
 
-	private ObservationCollection mObservationCollection;
+	private BeginLocatorSessionRequest mBeginLocatorSessionRequest;
 
 	private HttpServer httpServer;
 
@@ -55,39 +52,31 @@ public class MainTest extends TestCase {
 		httpServer = Main.startServer();
 
 		ClientConfig cc = new DefaultClientConfig();
-		cc.getClasses().add(ObservationProtobufReader.class);
-		cc.getClasses().add(ObservationProtobufWriter.class);
+		cc.getClasses().add(BeginLocatorSessionRequestProtobufReader.class);
+		cc.getClasses().add(BeginLocatorSessionRequestProtobufWriter.class);
 
 		Client c = Client.create(cc);
 
 		r = c.resource(Main.BASE_URI);
 
-		mObservationCollection = new ObservationCollection();
-		
-		ObservationProtoBuf.Observations.Builder builder = ObservationProtoBuf.Observations
-				.newBuilder();
+		{
+			BeginLocatorSessionRequest.Builder builder = BeginLocatorSessionRequest
+					.newBuilder();
+			Location location = new Location();
+			location.setLatitude(50.9399695f);
+			location.setLongitude(-1.415058f);
+			// the following need to be set
+			// to form a valid Location but
+			// the values are currently ignored
+			// by the service.
+			location.setAltitude(0.0f);
+			location.setHDOP(0.0f);
+			location.setVDOP(0.0f);
+			builder.setLocation(location.getLocationProtoBuf());
+			builder.setDeviceId("test-id-441");
 
-		for (int i = 0; i < 4; ++i) {
-			Observation observation = Observation
-					.newObservation(ObservationType.TYPE_LOCATION_ONLY);
-
-			observation.setTimestamp(111889349L);
-			observation.setMode(ModeType.PASSIVE);
-			// assertEquals()
-			// assertEquals(137483L, location.getLatitude());
-			Location location = observation.getLocation();
-			location.setLatitude(1982384L);
-			location.setLongitude(1237843L);
-			location.setAltitude(120.0f);
-			location.setHDOP(5.0f);
-			location.setVDOP(12.0f);
-			observation.setLocation(location);
-
-			mObservationCollection.add(observation);
-			builder.addObservations(observation.getObservationProtoBuf());
+			mBeginLocatorSessionRequest = builder.build();
 		}
-
-		// mObservationsProtoBuf = builder.build();
 	}
 
 	@Override
@@ -98,15 +87,22 @@ public class MainTest extends TestCase {
 	}
 
 	/**
-	 * Test to see that the message "Got it!" is sent in the response.
+	 * Test to see that the /locatorsessions endpoint is available and
+	 * processing BeginLocatorSession requests.
 	 */
-	public void testObservations() {
+	public void testBeginLocatorSession() {
 
-		WebResource wr = r.path("observations");
-		String response = wr.type("application/octet-stream").post(String.class,
-				mObservationCollection);
+		BeginLocatorSessionRequest.Builder builder = BeginLocatorSessionRequest
+				.newBuilder();
+		builder.setDeviceId("test-id-009");
 
-		assertEquals("OK", response);
+		WebResource wr = r.path("locatorsessions");
+		BeginLocatorSessionResponse response = wr.type(
+				"application/octet-stream").post(
+				BeginLocatorSessionResponse.class, mBeginLocatorSessionRequest);
+
+		assertEquals(BeginLocatorSessionResponse.ErrorCode.NONE,
+				response.getResponseCode());
 	}
 
 	/**

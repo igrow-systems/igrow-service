@@ -24,6 +24,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.List;
+import java.util.Vector;
 
 import org.postgis.PGgeometry;
 import org.postgis.Point;
@@ -54,6 +56,18 @@ public class DeviceRepositoryPostGISImpl implements DeviceRepository, Closeable 
 			+ "d.manufacturer, d.model, d.product, d.device, "
 			+ "d.last_known_location " + "from devices d WHERE d.device_id = ?";
 
+	// TODO: There must be a better way to write the following
+	// by setting a variable for the passed in as the
+	// centre point/location/geometry object instead of setting
+	// two query parameters.
+	private static final String SELECT_LOCAL_DEVICES_SQL = "select "
+			+ "d.device_id, d.os_type, d.os_version, d.push_token, "
+			+ "d.manufacturer, d.model, d.product, d.device, "
+			+ "d.last_known_location "
+			+ "from devices d WHERE ST_DWithin(ST_GeomFromEWKB(?), d.last_known_location, ?) "
+			+ "order by ST_Distance(ST_GeomFromEWKB(?),d.last_known_location) asc "
+			+ "limit(?)";
+
 	private static final String INSERT_DEVICE_SQL = "insert into devices "
 			+ "(device_id, os_type, os_version, push_token, "
 			+ "manufacturer, model, product, device, "
@@ -65,6 +79,8 @@ public class DeviceRepositoryPostGISImpl implements DeviceRepository, Closeable 
 			+ "last_known_location = ? " + "WHERE device_id = ?";
 
 	private PreparedStatement mPreparedStatementSelectDevice;
+
+	private PreparedStatement mPreparedStatementSelectLocalDevices;
 
 	private PreparedStatement mPreparedStatementInsertDevice;
 
@@ -81,6 +97,9 @@ public class DeviceRepositoryPostGISImpl implements DeviceRepository, Closeable 
 
 			mPreparedStatementSelectDevice = mConnection
 					.prepareStatement(SELECT_DEVICE_SQL);
+
+			mPreparedStatementSelectLocalDevices = mConnection
+					.prepareStatement(SELECT_LOCAL_DEVICES_SQL);
 
 			mPreparedStatementInsertDevice = mConnection
 					.prepareStatement(INSERT_DEVICE_SQL);
@@ -99,11 +118,11 @@ public class DeviceRepositoryPostGISImpl implements DeviceRepository, Closeable 
 		if (device == null) {
 			throw new DeviceRepositoryException("Device was null!");
 		}
-		
+
 		if (!device.isValid()) {
 			throw new DeviceRepositoryException("Invalid device!");
 		}
-		
+
 		try {
 
 			mConnection.setAutoCommit(false);
@@ -243,7 +262,7 @@ public class DeviceRepositoryPostGISImpl implements DeviceRepository, Closeable 
 
 		Device device = null;
 		try {
-			
+
 			mPreparedStatementSelectDevice.setString(1, deviceId);
 			ResultSet resultSet = mPreparedStatementSelectDevice.executeQuery();
 
@@ -284,5 +303,104 @@ public class DeviceRepositoryPostGISImpl implements DeviceRepository, Closeable 
 
 		}
 		return device;
+	}
+
+	@Override
+	public List<Device> findLocalDevices(double latitude, double longitude,
+			long radius, long limit) {
+
+		List<Device> devices = null;
+		try {
+
+			mConnection.setAutoCommit(false);
+
+			Point centrePoint = new Point();
+			centrePoint.dimension = 3;
+			centrePoint.x = longitude;
+			centrePoint.y = latitude;
+			centrePoint.z = 0.0d;
+			centrePoint.srid = 4326;
+
+			PGgeometry geometry = new PGgeometry(centrePoint);
+
+			mPreparedStatementSelectLocalDevices.setObject(1, geometry);
+			// TODO: Fix this hack. Learn about coordinate systems and
+			// projections
+			mPreparedStatementSelectLocalDevices.setFloat(2,
+					(float) radius / 111128f);
+			mPreparedStatementSelectLocalDevices.setObject(3, geometry);
+			mPreparedStatementSelectLocalDevices.setLong(4, limit);
+
+			ResultSet resultSet = mPreparedStatementSelectLocalDevices
+					.executeQuery();
+
+			if (!resultSet.isBeforeFirst()) {
+				return null;
+			}
+
+			// presize the vector to limit or Integer.MAX_VALUE, whichever is
+			// smaller
+			// as I don't think it's possible to obtain the resultSet size
+			// without
+			// iterating over it
+			devices = new Vector<Device>((int) Math.min(limit,
+					Integer.MAX_VALUE));
+
+			while (resultSet.next()) {
+
+				Device device = new Device();
+
+				device.setDeviceId(resultSet.getString(1));
+				device.setOsType(Device.OSType.valueOf(resultSet.getString(2)));
+				device.setOsVersion(resultSet.getString(3));
+				device.setPushToken(resultSet.getString(4));
+				device.setManufacturer(resultSet.getString(5));
+				device.setModel(resultSet.getString(6));
+				device.setProduct(resultSet.getString(7));
+				device.setDevice(resultSet.getString(8));
+
+				PGgeometry geomLocation = (PGgeometry) resultSet.getObject(9);
+				if (geomLocation != null) {
+					Point point = geomLocation.getGeometry().getFirstPoint();
+					Location location = new Location();
+					location.setLatitude((float) point.y);
+					location.setLongitude((float) point.x);
+					location.setAltitude((float) point.z);
+					location.setHDOP(0.0f);  // need these to be set
+					location.setVDOP(0.0f);  // in order to produce valid protobuf
+					device.setLastKnownLocation(location);
+				}
+
+				if (device.isValid()) {
+					devices.add(device);
+				} else {
+					for (String error : device.getDeviceProtoBuf()
+							.findInitializationErrors())
+						LOGGER.error(error);
+				}
+
+				mConnection.commit();
+
+			}
+
+		} catch (SQLException e) {
+			LOGGER.error("findLocalDevices", e);
+		} catch (Throwable t) {
+			LOGGER.error("findLocalDevices", t);
+		} finally {
+			if (mConnection != null) {
+				try {
+					mConnection.setAutoCommit(true);
+				} catch (SQLException e) {
+					LOGGER.error("findLocalDevices", e);
+				}
+			}
+		}
+		
+		if (devices.size() == 0) {
+			devices = null;
+		}
+		
+		return devices;
 	}
 }

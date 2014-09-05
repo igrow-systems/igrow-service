@@ -21,11 +21,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class LocatorSessionManger implements Map<String, LocatorSession> {
+public class LocatorSessionManager implements Map<String, LocatorSession> {
 
 	private final Map<String, LocatorSession> locatorSessions = new ConcurrentHashMap<String, LocatorSession>();
 
-	public LocatorSessionManger() {
+	public LocatorSessionManager() {
 
 	}
 

@@ -24,6 +24,7 @@ import "location.proto";
 message BeginLocatorSessionRequest {
 
   required string deviceId = 1;
+  required com.argusat.gjl.observation.Location location = 2;
 
 }
 

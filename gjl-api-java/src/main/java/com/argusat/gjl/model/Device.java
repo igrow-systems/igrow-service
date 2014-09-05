@@ -23,38 +23,46 @@ public class Device {
 	public enum OSType {
 		MS_WINDOWS, GOOGLE_ANDROID, APPLE_IOS
 	}
-	
-	private boolean mIsValid;
-	
-	private boolean mIsDirty;
-	
+
+	private boolean mValid;
+
+	private boolean mDirty;
+
+	private boolean mProtoBufValid;
+
+	private DeviceProtoBuf.Device.Builder mDeviceProtoBufBuilder;
+
+	private DeviceProtoBuf.Device mDeviceProtoBuf;
+
 	private String mDeviceId;
-	
+
 	private String mPushToken;
-	
+
 	private OSType mOsType;
-	
+
 	private String mOsVersion;
-	
+
 	private String mManufacturer;
-	
+
 	private String mModel;
-	
+
 	private String mProduct;
-	
+
 	private String mDevice;
-	
+
 	private Location mLastKnownLocation;
 
 	public Device() {
-		mIsDirty = true;
-		mIsValid = false; // to be explicit
+		mDirty = true;
+		mValid = false; // to be explicit
+		mProtoBufValid = false;
+		mDeviceProtoBufBuilder = DeviceProtoBuf.Device.newBuilder();
 	}
-	
+
 	public static Device newDevice(DeviceProtoBuf.Device device) {
-		
+
 		Device modelDevice = new Device();
-		
+
 		modelDevice.setDeviceId(device.getDeviceId());
 		switch (device.getOsType()) {
 		case MS_WINDOWS:
@@ -73,17 +81,18 @@ public class Device {
 		modelDevice.setModel(device.getModel());
 		modelDevice.setProduct(device.getProduct());
 		modelDevice.setDevice(device.getDevice());
-		
+
 		return modelDevice;
 	}
-	
+
 	public String getDeviceId() {
 		return mDeviceId;
 	}
 
 	public void setDeviceId(String deviceId) {
 		mDeviceId = deviceId;
-		mIsDirty = true;
+		mDeviceProtoBufBuilder.setDeviceId(deviceId);
+		mDirty = true;
 	}
 
 	public String getPushToken() {
@@ -92,7 +101,8 @@ public class Device {
 
 	public void setPushToken(String pushToken) {
 		mPushToken = pushToken;
-		mIsDirty = true;
+		mDeviceProtoBufBuilder.setPushToken(pushToken);
+		mDirty = true;
 	}
 
 	public OSType getOsType() {
@@ -101,16 +111,31 @@ public class Device {
 
 	public void setOsType(OSType osType) {
 		mOsType = osType;
-		mIsDirty = true;
+		switch (osType) {
+		case MS_WINDOWS:
+			mDeviceProtoBufBuilder
+					.setOsType(DeviceProtoBuf.Device.OSType.MS_WINDOWS);
+			break;
+		case GOOGLE_ANDROID:
+			mDeviceProtoBufBuilder
+					.setOsType(DeviceProtoBuf.Device.OSType.GOOGLE_ANDROID);
+			break;
+		case APPLE_IOS:
+			mDeviceProtoBufBuilder
+					.setOsType(DeviceProtoBuf.Device.OSType.APPLE_IOS);
+			break;
+		}
+		mDirty = true;
 	}
 
 	public String getOsVersion() {
 		return mOsVersion;
 	}
 
-	public void setOsVersion(String OSVersion) {
-		mOsVersion = OSVersion;
-		mIsDirty = true;
+	public void setOsVersion(String osVersion) {
+		mOsVersion = osVersion;
+		mDeviceProtoBufBuilder.setOsVersion(osVersion);
+		mDirty = true;
 	}
 
 	public Location getLastKnownLocation() {
@@ -119,7 +144,8 @@ public class Device {
 
 	public void setLastKnownLocation(Location lastKnownLocation) {
 		mLastKnownLocation = lastKnownLocation;
-		mIsDirty = true;
+		mDeviceProtoBufBuilder.setLastKnownLocation(lastKnownLocation.getLocationProtoBuf());
+		mDirty = true;
 	}
 
 	public String getDevice() {
@@ -128,7 +154,8 @@ public class Device {
 
 	public void setDevice(String device) {
 		mDevice = device;
-		mIsDirty = true;
+		mDeviceProtoBufBuilder.setDevice(device);
+		mDirty = true;
 	}
 
 	public String getManufacturer() {
@@ -137,7 +164,8 @@ public class Device {
 
 	public void setManufacturer(String manufacturer) {
 		mManufacturer = manufacturer;
-		mIsDirty = true;
+		mDeviceProtoBufBuilder.setManufacturer(manufacturer);
+		mDirty = true;
 	}
 
 	public String getModel() {
@@ -146,7 +174,8 @@ public class Device {
 
 	public void setModel(String model) {
 		mModel = model;
-		mIsDirty = true;
+		mDeviceProtoBufBuilder.setModel(model);
+		mDirty = true;
 	}
 
 	public String getProduct() {
@@ -155,22 +184,38 @@ public class Device {
 
 	public void setProduct(String product) {
 		mProduct = product;
-		mIsDirty = true;
+		mDeviceProtoBufBuilder.setProduct(product);
+		mDirty = true;
+	}
+
+	protected void validate() {
+
+		mDeviceProtoBuf = mDeviceProtoBufBuilder.buildPartial();
+		mProtoBufValid = mDeviceProtoBuf.isInitialized();
+		mValid = ((mDeviceId != null && !mDeviceId.isEmpty())
+				&& (mOsType != null)
+				&& (mOsVersion != null && !mOsVersion.isEmpty())
+				&& (mPushToken != null && !mPushToken.isEmpty())
+				&& (mManufacturer != null && !mManufacturer.isEmpty())
+				&& (mModel != null && !mModel.isEmpty())
+				&& (mProduct != null && !mProduct.isEmpty()) && (mDevice != null && !mDevice
+				.isEmpty()));
+		mDirty = false;
+
 	}
 
 	public boolean isValid() {
-		if (mIsDirty) {
-			mIsValid = ((mDeviceId != null && !mDeviceId.isEmpty()) 
-					&& (mOsType != null)
-					&& (mOsVersion != null && !mOsVersion.isEmpty())
-					&& (mPushToken != null && !mPushToken.isEmpty())
-					&& (mManufacturer != null && !mManufacturer.isEmpty())
-					&& (mModel != null && !mModel.isEmpty())
-					&& (mProduct != null && !mProduct.isEmpty())
-					&& (mDevice != null && !mDevice.isEmpty()));
-			mIsDirty = false;
+		if (mDirty) {
+			validate();
 		}
-		return mIsValid;
+		return mValid;
 	}
-	
+
+	public DeviceProtoBuf.Device getDeviceProtoBuf() {
+		if (mDirty) {
+			validate();
+		}
+		return mDeviceProtoBuf;
+	}
+
 }

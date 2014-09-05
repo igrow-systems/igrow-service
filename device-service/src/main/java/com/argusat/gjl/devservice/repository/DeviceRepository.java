@@ -16,11 +16,16 @@
 
 package com.argusat.gjl.devservice.repository;
 
+import java.util.List;
+
 import com.argusat.gjl.model.Device;
 
 public interface DeviceRepository {
 
 	void storeDevice(Device device) throws DeviceRepositoryException;
+
 	Device findDevice(String deviceId);
-	
+
+	List<Device> findLocalDevices(double latitude, double longitude,
+			long radius, long limit);
 }

@@ -1,9 +1,9 @@
 /* -*- mode: java; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
 
 /*
- * @(#)ObservationProtobufReader.java        
+ * @(#)DeviceProtobufReader.java        
  *
- * Copyright (c) 2013 Argusat Limited
+ * Copyright (c) 2014 Argusat Limited
  * 10 Underwood Road,  Southampton.  UK
  * All rights reserved.
  *
@@ -14,7 +14,7 @@
  * with Argusat Limited.
  */
 
-package com.argusat.gjl.locservice;
+package com.argusat.gjl.devservice.providers;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,38 +28,31 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
 
-import com.argusat.gjl.model.Observation;
-import com.argusat.gjl.model.ObservationCollection;
-import com.argusat.gjl.service.observation.ObservationProtoBuf;
+import com.argusat.gjl.service.device.DeviceProtoBuf;
 
 @Provider
 @Consumes("application/octet-stream")
-public class ObservationProtobufReader implements
-		MessageBodyReader<ObservationCollection> {
+public class DeviceProtobufReader implements
+		MessageBodyReader<DeviceProtoBuf.Device> {
 
 	@Override
 	public boolean isReadable(Class<?> type, Type genericType,
 			Annotation[] annotations, MediaType mediaType) {
-		return ObservationCollection.class.isAssignableFrom(type);
+		return DeviceProtoBuf.Device.class
+				.isAssignableFrom(type);
 	}
 
-	public ObservationCollection readFrom(Class<ObservationCollection> type,
+	public DeviceProtoBuf.Device readFrom(
+			Class<DeviceProtoBuf.Device> type,
 			Type genericType, Annotation[] annotations, MediaType mediaType,
 			MultivaluedMap<String, String> httpHeaders, InputStream entityStream)
 			throws IOException, WebApplicationException {
 
-		ObservationCollection observations = new ObservationCollection();
 		try {
-			ObservationProtoBuf.Observations observationsProtobuf = ObservationProtoBuf.Observations
+			DeviceProtoBuf.Device device = DeviceProtoBuf.Device
 					.newBuilder().mergeFrom(entityStream).build();
-			
-			for (ObservationProtoBuf.Observation observationProtoBuf : observationsProtobuf
-					.getObservationsList()) {
-				Observation observation = Observation
-						.newObservation(observationProtoBuf);
-				observations.add(observation);
-			}
-			return observations;
+
+			return device;
 		} catch (Exception e) {
 			throw new WebApplicationException(e);
 		}

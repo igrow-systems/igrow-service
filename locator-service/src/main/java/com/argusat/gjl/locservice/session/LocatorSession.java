@@ -46,4 +46,8 @@ public class LocatorSession {
 		mSessionId = UUID.randomUUID();
 	}
 	
+	public void addParticipant(Device device) {
+		mParticipants.put(device.getDeviceId(), device);
+	}
+	
 }

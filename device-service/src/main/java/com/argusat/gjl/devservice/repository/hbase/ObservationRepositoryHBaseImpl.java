@@ -18,6 +18,7 @@ package com.argusat.gjl.devservice.repository.hbase;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.List;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
@@ -113,6 +114,13 @@ public class ObservationRepositoryHBaseImpl implements DeviceRepository,
 
 	@Override
 	public Device findDevice(String deviceId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Device> findLocalDevices(double latitude, double longitude,
+			long radius, long limit) {
 		// TODO Auto-generated method stub
 		return null;
 	}

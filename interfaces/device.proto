@@ -19,6 +19,8 @@ package com.argusat.gjl.locator;
 option java_package = "com.argusat.gjl.service.device";
 option java_outer_classname = "DeviceProtoBuf";
 
+import "location.proto";
+
 message Device {
 
   enum OSType {
@@ -35,6 +37,7 @@ message Device {
   required string model = 6;
   required string product = 7;
   required string device = 8;
+  optional com.argusat.gjl.observation.Location lastKnownLocation = 9;
 }
 
 message RegisterDeviceRequest {
@@ -70,4 +73,24 @@ message NotifyDeviceResponse {
   optional string responseMessage = 2;
   
 }
+
+message FindLocalDevicesRequest {
+  required com.argusat.gjl.observation.Location centre = 1;
+  required uint64 radius = 2;
+  required uint32 limit = 3;
+}
+
+message FindLocalDevicesResponse {
+
+  enum ErrorCode {
+    NONE = 0;
+    NO_LOCAL_DEVICES = 1;
+  }
+
+  required ErrorCode responseCode = 1;
+  optional string responseMessage = 2;
+  
+  repeated Device devices = 3;
+}
+
 

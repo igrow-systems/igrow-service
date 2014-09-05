@@ -16,6 +16,8 @@
 
 package com.argusat.gjl.devservice.repository.postgis;
 
+import java.util.List;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -87,7 +89,7 @@ public class DeviceRepositoryPostGISImplTest {
 		
 	}
 	
-	@Test
+	@Test(expected=DeviceRepositoryException.class)
 	public void testStoreDeviceThrowsDeviceRepositoryExceptionInvalidDevice() throws DeviceRepositoryException {
 
 		mDeviceRepository.storeDevice(mInvalidDevice);
@@ -100,5 +102,22 @@ public class DeviceRepositoryPostGISImplTest {
 		mDeviceRepository.storeDevice(null);
 		
 	}
+	
+	@Test
+	public void testFindLocalDevices() throws DeviceRepositoryException {
+		
+		// this is a *really* bad test
+		// TODO: do it properly
+		for (int i = 0; i < 5; ++i) {
+			mValidDevice.setDeviceId(String.format("test-id-44%d", i));
+			mDeviceRepository.storeDevice(mValidDevice);
+		}
+		
+		List<Device> devices = mDeviceRepository.findLocalDevices(12.32783f, 0.088762f, 1000, 5);
+		
+		assertEquals(5, devices.size());
+		
+	}
+	
 
 }

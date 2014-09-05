@@ -342,7 +342,7 @@ public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 				} else {
 					for (String error : observation.getObservationProtoBuf()
 							.findInitializationErrors())
-						System.err.println(error);
+						LOGGER.error(error);
 				}
 
 				mConnection.commit();
