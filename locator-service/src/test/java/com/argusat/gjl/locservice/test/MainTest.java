@@ -3,7 +3,7 @@
 /*
  * @(#)MainTest.java        
  *
- * Copyright (c) 2013 Argusat Limited
+ * Copyright (c) 2013 - 2014 Argusat Limited
  * 10 Underwood Road,  Southampton.  UK
  * All rights reserved.
  *
@@ -16,21 +16,25 @@
 
 package com.argusat.gjl.locservice.test;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
+
 import junit.framework.TestCase;
 
 import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.message.internal.MediaTypes;
 
 import com.argusat.gjl.locservice.Main;
 import com.argusat.gjl.locservice.provider.BeginLocatorSessionRequestProtobufReader;
 import com.argusat.gjl.locservice.provider.BeginLocatorSessionRequestProtobufWriter;
+import com.argusat.gjl.locservice.provider.BeginLocatorSessionResponseProtobufReader;
+import com.argusat.gjl.locservice.provider.BeginLocatorSessionResponseProtobufWriter;
 import com.argusat.gjl.model.Location;
 import com.argusat.gjl.service.locator.LocatorProtoBuf.BeginLocatorSessionRequest;
 import com.argusat.gjl.service.locator.LocatorProtoBuf.BeginLocatorSessionResponse;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
-import com.sun.jersey.core.header.MediaTypes;
 
 public class MainTest extends TestCase {
 
@@ -38,7 +42,7 @@ public class MainTest extends TestCase {
 
 	private HttpServer httpServer;
 
-	private WebResource r;
+	private WebTarget r;
 
 	public MainTest(String testName) {
 		super(testName);
@@ -51,13 +55,15 @@ public class MainTest extends TestCase {
 		// start the Grizzly2 web container
 		httpServer = Main.startServer();
 
-		ClientConfig cc = new DefaultClientConfig();
-		cc.getClasses().add(BeginLocatorSessionRequestProtobufReader.class);
-		cc.getClasses().add(BeginLocatorSessionRequestProtobufWriter.class);
+		ClientConfig cc = new ClientConfig();
+		cc.register(BeginLocatorSessionRequestProtobufReader.class);
+		cc.register(BeginLocatorSessionRequestProtobufWriter.class);
+		cc.register(BeginLocatorSessionResponseProtobufReader.class);
+		cc.register(BeginLocatorSessionResponseProtobufWriter.class);
 
-		Client c = Client.create(cc);
+		Client c = ClientBuilder.newClient(cc);
 
-		r = c.resource(Main.BASE_URI);
+		r = c.target(Main.BASE_URI);
 
 		{
 			BeginLocatorSessionRequest.Builder builder = BeginLocatorSessionRequest
@@ -83,7 +89,7 @@ public class MainTest extends TestCase {
 	protected void tearDown() throws Exception {
 		super.tearDown();
 
-		httpServer.stop();
+		httpServer.shutdownNow();
 	}
 
 	/**
@@ -96,10 +102,12 @@ public class MainTest extends TestCase {
 				.newBuilder();
 		builder.setDeviceId("test-id-009");
 
-		WebResource wr = r.path("locatorsessions");
-		BeginLocatorSessionResponse response = wr.type(
+		WebTarget wr = r.path("locatorsessions");
+		BeginLocatorSessionResponse response = wr.request(
 				"application/octet-stream").post(
-				BeginLocatorSessionResponse.class, mBeginLocatorSessionRequest);
+				Entity.entity(mBeginLocatorSessionRequest,
+						"application/octet-stream"),
+				BeginLocatorSessionResponse.class);
 
 		assertEquals(BeginLocatorSessionResponse.ErrorCode.NONE,
 				response.getResponseCode());
@@ -110,8 +118,8 @@ public class MainTest extends TestCase {
 	 * "application.wadl".
 	 */
 	public void testApplicationWadl() {
-		String serviceWadl = r.path("application.wadl").accept(MediaTypes.WADL)
-				.get(String.class);
+		String serviceWadl = r.path("application.wadl")
+				.request(MediaTypes.WADL).get(String.class);
 
 		assertTrue(serviceWadl.length() > 0);
 	}

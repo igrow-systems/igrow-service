@@ -14,11 +14,17 @@
  * with Argusat Limited.
  */
 
-package com.argusat.gjl.locservice.subscriber;
+package com.argusat.gjl.subscriber;
 
+import java.io.Closeable;
 import java.io.IOException;
 
-public interface Subscriber {
+import org.jvnet.hk2.annotations.Contract;
+
+import com.argusat.gjl.subscriber.MessageHandler;
+
+@Contract
+public interface Subscriber extends Closeable {
 
 	public void connect() throws IOException;
 

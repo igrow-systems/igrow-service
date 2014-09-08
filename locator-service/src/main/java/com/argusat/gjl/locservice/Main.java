@@ -16,11 +16,12 @@
 
 package com.argusat.gjl.locservice;
 
-import com.sun.jersey.api.container.grizzly2.GrizzlyWebContainerFactory;
+
 
 import org.glassfish.grizzly.filterchain.FilterChain;
 import org.glassfish.grizzly.http.HttpCodecFilter;
 import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.jersey.grizzly2.servlet.GrizzlyWebContainerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +49,7 @@ public class Main {
 	}
 
 	private static URI getBaseURI() {
-		return UriBuilder.fromUri("http://0.0.0.0/").port(getPort(9998))
+		return UriBuilder.fromUri("http://0.0.0.0/").port(getPort(9996))
 				.build();
 	}
 
@@ -57,7 +58,7 @@ public class Main {
 	public static HttpServer startServer() throws IOException {
 		final Map<String, String> initParams = new HashMap<String, String>();
 
-		initParams.put("com.sun.jersey.config.property.packages",
+		initParams.put("jersey.config.server.provider.packages",
 				"com.argusat.gjl.locservice");
 
 		LOGGER.info("Starting grizzly2...");
@@ -85,7 +86,7 @@ public class Main {
 			@Override
 			public void run() {
 				LOGGER.info("Stopping server..");
-				httpServer.stop();
+				httpServer.shutdownNow();
 			}
 		}, "shutdownHook"));
 

@@ -16,11 +16,9 @@
 
 package com.argusat.gjl.devservice;
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -33,52 +31,27 @@ import org.slf4j.LoggerFactory;
 
 import com.argusat.gjl.devservice.repository.DeviceRepository;
 import com.argusat.gjl.devservice.repository.DeviceRepositoryException;
-import com.argusat.gjl.devservice.repository.postgis.DeviceRepositoryPostGISImpl;
-import com.argusat.gjl.devservice.subscriber.MessageHandler;
-import com.argusat.gjl.devservice.subscriber.Subscriber;
-import com.argusat.gjl.devservice.subscriber.SubscriberRabbitMQ;
 import com.argusat.gjl.model.Device;
 import com.argusat.gjl.model.Location;
-import com.argusat.gjl.model.Observation;
 import com.argusat.gjl.service.device.DeviceProtoBuf;
-import com.argusat.gjl.service.device.DeviceProtoBuf.RegisterDeviceResponse;
 import com.argusat.gjl.service.device.DeviceProtoBuf.FindLocalDevicesResponse;
+import com.argusat.gjl.service.device.DeviceProtoBuf.RegisterDeviceResponse;
 
 // The Java class will be hosted at the URI path "/devices"
 @Path("/devices")
-public class Devices implements MessageHandler, Closeable {
+public class Devices {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(Devices.class);
+	private static final transient Logger LOGGER = LoggerFactory
+			.getLogger(Devices.class);
 
-	private static DeviceRepository mDeviceRepository = null;
-
-	private static Subscriber mSubscriber = null;
+	@Inject
+	private DeviceRepository mDeviceRepository;
 
 	static {
 
 	}
 
-	public Devices() throws ClassNotFoundException, SQLException {
-
-		try {
-			mDeviceRepository = new DeviceRepositoryPostGISImpl();
-		} catch (ClassNotFoundException e) {
-			LOGGER.error("Couldn't construct PostGIS repository", e);
-			throw e;
-		} catch (SQLException e) {
-			LOGGER.error("Couldn't construct PostGIS repository", e);
-			throw e;
-		}
-
-		mSubscriber = new SubscriberRabbitMQ();
-
-		try {
-			mSubscriber.registerMessageHandler(this);
-			mSubscriber.connect();
-			mSubscriber.subscribe("*");
-		} catch (IOException e) {
-			LOGGER.error("Subscriber couldn't connect to broker", e);
-		}
+	public Devices() {
 	}
 
 	// The Java method will process HTTP POST requests
@@ -92,6 +65,9 @@ public class Devices implements MessageHandler, Closeable {
 	public DeviceProtoBuf.RegisterDeviceResponse registerDevice(
 			DeviceProtoBuf.RegisterDeviceRequest registerDeviceRequest)
 			throws DeviceRepositoryException {
+
+		LOGGER.info(String.format(">registerDevice [ %s ]",
+				registerDeviceRequest.getDevice().getDeviceId()));
 
 		Device device = Device.newDevice(registerDeviceRequest.getDevice());
 
@@ -118,24 +94,11 @@ public class Devices implements MessageHandler, Closeable {
 			@PathParam("deviceId") String deviceId)
 			throws DeviceRepositoryException {
 
+		LOGGER.info(String.format(">getDevice [ %s ]", deviceId));
+
 		Device device = mDeviceRepository.findDevice(deviceId);
 
 		return device.getDeviceProtoBuf();
-
-	}
-
-	@Override
-	public void handleMessage(Observation observation) {
-
-		Device device = mDeviceRepository.findDevice(observation.getDeviceId());
-
-		device.setLastKnownLocation(observation.getLocation());
-
-		try {
-			mDeviceRepository.storeDevice(device);
-		} catch (DeviceRepositoryException e) {
-			LOGGER.error("Couldn't store device", e);
-		}
 
 	}
 
@@ -156,6 +119,10 @@ public class Devices implements MessageHandler, Closeable {
 		long radius = findLocalDevicesRequest.getRadius();
 		long limit = findLocalDevicesRequest.getLimit();
 
+		LOGGER.info(String.format(
+				">findLocalDevices [ %s, radius = %d, limit = %d ]", centre,
+				radius, limit));
+
 		List<Device> devices = mDeviceRepository.findLocalDevices(
 				centre.getLatitude(), centre.getLongitude(), radius, limit);
 
@@ -173,23 +140,6 @@ public class Devices implements MessageHandler, Closeable {
 		}
 
 		return builder.build();
-
-	}
-
-	@Override
-	public void close() throws IOException {
-
-		LOGGER.info("Closing resource class Devices");
-
-		if (mDeviceRepository != null) {
-			// close
-		}
-
-		if (mSubscriber != null) {
-			mSubscriber.unsubscribe("*");
-			mSubscriber.unregisterMessageHandler();
-			((Closeable) mSubscriber).close();
-		}
 
 	}
 

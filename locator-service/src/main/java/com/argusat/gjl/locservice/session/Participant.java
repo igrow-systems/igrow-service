@@ -32,7 +32,7 @@ public class Participant {
 	
 	private long mLastUpdateTimestamp;
 
-	public ParticipantState getmCurrentState() {
+	public ParticipantState getCurrentState() {
 		return mCurrentState;
 	}
 

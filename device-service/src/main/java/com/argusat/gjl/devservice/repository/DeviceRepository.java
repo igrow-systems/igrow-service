@@ -16,11 +16,15 @@
 
 package com.argusat.gjl.devservice.repository;
 
+import java.io.Closeable;
 import java.util.List;
+
+import org.jvnet.hk2.annotations.Contract;
 
 import com.argusat.gjl.model.Device;
 
-public interface DeviceRepository {
+@Contract
+public interface DeviceRepository extends Closeable {
 
 	void storeDevice(Device device) throws DeviceRepositoryException;
 

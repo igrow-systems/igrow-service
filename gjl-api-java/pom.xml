@@ -57,6 +57,16 @@
 			<artifactId>commons-lang3</artifactId>
 			<version>3.3.2</version>
 		</dependency>
+		<dependency>
+			<groupId>com.rabbitmq</groupId>
+			<artifactId>amqp-client</artifactId>
+			<version>3.3.4</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.hk2</groupId>
+			<artifactId>auto-depends</artifactId>
+			<version>1.6.22</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>

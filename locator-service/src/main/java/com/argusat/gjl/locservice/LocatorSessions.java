@@ -16,16 +16,25 @@
 
 package com.argusat.gjl.locservice;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.UriBuilder;
 
+import org.glassfish.jersey.client.ClientConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.argusat.gjl.devservice.Main;
 import com.argusat.gjl.devservice.providers.FindLocalDevicesRequestProtobufReader;
 import com.argusat.gjl.devservice.providers.FindLocalDevicesRequestProtobufWriter;
 import com.argusat.gjl.devservice.providers.FindLocalDevicesResponseProtobufReader;
@@ -36,8 +45,6 @@ import com.argusat.gjl.devservice.providers.NotifyDeviceResponseProtobufReader;
 import com.argusat.gjl.devservice.providers.NotifyDeviceResponseProtobufWriter;
 import com.argusat.gjl.locservice.session.LocatorSession;
 import com.argusat.gjl.locservice.session.LocatorSessionManager;
-import com.argusat.gjl.locservice.subscriber.Subscriber;
-import com.argusat.gjl.locservice.subscriber.rabbitmq.SubscriberRabbitMQ;
 import com.argusat.gjl.model.Device;
 import com.argusat.gjl.service.device.DeviceProtoBuf;
 import com.argusat.gjl.service.device.DeviceProtoBuf.FindLocalDevicesRequest;
@@ -49,10 +56,7 @@ import com.argusat.gjl.service.locator.LocatorProtoBuf.BeginLocatorSessionRespon
 import com.argusat.gjl.service.locator.LocatorProtoBuf.BeginLocatorSessionResponse.ErrorCode;
 import com.argusat.gjl.service.locator.LocatorProtoBuf.EndLocatorSessionRequest;
 import com.argusat.gjl.service.locator.LocatorProtoBuf.EndLocatorSessionResponse;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
+import com.argusat.gjl.subscriber.Subscriber;
 
 // The Java class will be hosted at the URI path "/locatorsessions"
 @Path("/locatorsessions")
@@ -65,36 +69,39 @@ public class LocatorSessions {
 
 	private Subscriber mSubscriber = null;
 
-	private Client mHttpClient = null;
+	private Client mClient = null;
 
 	private ClientConfig mClientConfig;
+
+	private static final String PROPERTIES_FILENAME = "locator-service.properties";
+
+	private final Properties mProperties = new Properties();
 
 	static {
 
 	}
 
-	public LocatorSessions() {
+	public LocatorSessions() throws IOException {
+
+		InputStream entityStream = LocatorSessions.class
+				.getResourceAsStream("/" + PROPERTIES_FILENAME);
+
+		mProperties.load(entityStream);
+		entityStream.close();
 
 		mLocatorSessionManager = new LocatorSessionManager();
-		mSubscriber = new SubscriberRabbitMQ();
 
-		mClientConfig = new DefaultClientConfig();
-		mClientConfig.getClasses().add(NotifyDeviceRequestProtobufReader.class);
-		mClientConfig.getClasses().add(NotifyDeviceRequestProtobufWriter.class);
-		mClientConfig.getClasses()
-				.add(NotifyDeviceResponseProtobufReader.class);
-		mClientConfig.getClasses()
-				.add(NotifyDeviceResponseProtobufWriter.class);
-		mClientConfig.getClasses().add(
-				FindLocalDevicesRequestProtobufReader.class);
-		mClientConfig.getClasses().add(
-				FindLocalDevicesRequestProtobufWriter.class);
-		mClientConfig.getClasses().add(
-				FindLocalDevicesResponseProtobufReader.class);
-		mClientConfig.getClasses().add(
-				FindLocalDevicesResponseProtobufWriter.class);
+		mClientConfig = new ClientConfig();
+		mClientConfig.register(NotifyDeviceRequestProtobufReader.class);
+		mClientConfig.register(NotifyDeviceRequestProtobufWriter.class);
+		mClientConfig.register(NotifyDeviceResponseProtobufReader.class);
+		mClientConfig.register(NotifyDeviceResponseProtobufWriter.class);
+		mClientConfig.register(FindLocalDevicesRequestProtobufReader.class);
+		mClientConfig.register(FindLocalDevicesRequestProtobufWriter.class);
+		mClientConfig.register(FindLocalDevicesResponseProtobufReader.class);
+		mClientConfig.register(FindLocalDevicesResponseProtobufWriter.class);
 
-		mHttpClient = Client.create(mClientConfig);
+		mClient = ClientBuilder.newClient(mClientConfig);
 	}
 
 	// The Java method will process HTTP POST requests
@@ -105,12 +112,14 @@ public class LocatorSessions {
 	// The Java method will produce content identified by the MIME Media
 	// type "application/octet-stream"
 	@Consumes("application/octet-stream")
-	public BeginLocatorSessionResponse postLocatorSession(
+	public BeginLocatorSessionResponse beginLocatorSession(
 			BeginLocatorSessionRequest beginLocatorSessionRequest) {
 
 		BeginLocatorSessionResponse.Builder responseBuilder = BeginLocatorSessionResponse
 				.newBuilder();
 		String deviceId = beginLocatorSessionRequest.getDeviceId();
+
+		LOGGER.info(String.format(">beginLocatorSession [ %s ]", deviceId));
 
 		if (mLocatorSessionManager.containsKey(deviceId)) {
 			responseBuilder.setResponseCode(ErrorCode.SESSION_ALREADY_STARTED);
@@ -126,11 +135,19 @@ public class LocatorSessions {
 		requestBuilder.setRadius(1000L);
 		requestBuilder.setLimit(5);
 
-		WebResource r = mHttpClient.resource(Main.BASE_URI);
-		WebResource wr = r.path("devices/local");
-		FindLocalDevicesResponse response = wr.type("application/octet-stream")
-				.post(DeviceProtoBuf.FindLocalDevicesResponse.class,
-						requestBuilder.build());
+		WebTarget r = mClient
+				.target(UriBuilder
+						.fromUri(
+								String.format("http://%s/", mProperties
+										.getProperty("service.device.host")))
+						.port(Integer.parseInt(mProperties
+								.getProperty("service.device.port"))).build());
+		WebTarget wr = r.path("devices/local");
+		FindLocalDevicesResponse response = wr.request(
+				"application/octet-stream").post(
+				Entity.entity(requestBuilder.build(),
+						"application/octet-stream"),
+				FindLocalDevicesResponse.class);
 
 		if (FindLocalDevicesResponse.ErrorCode.NONE == response
 				.getResponseCode()) {
@@ -155,11 +172,12 @@ public class LocatorSessions {
 				notifyDeviceBuilder
 						.setMessage("{\"msg_type\":\"begin_locator_session_request\" }");
 
-				WebResource notificationsWr = r.path("notifications");
+				WebTarget notificationsWr = r.path("notifications");
 				NotifyDeviceResponse notifyDeviceResponse = notificationsWr
-						.type("application/octet-stream").post(
-								DeviceProtoBuf.NotifyDeviceResponse.class,
-								notifyDeviceBuilder.build());
+						.request("application/octet-stream").post(
+								Entity.entity(notifyDeviceBuilder.build(),
+										"application/octet-stream"),
+								NotifyDeviceResponse.class);
 
 				if (notifyDeviceResponse.getResponseCode() != NotifyDeviceResponse.ErrorCode.NONE) {
 					LOGGER.error(String.format(

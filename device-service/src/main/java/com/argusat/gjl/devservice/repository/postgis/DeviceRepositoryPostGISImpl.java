@@ -16,7 +16,6 @@
 
 package com.argusat.gjl.devservice.repository.postgis;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -27,6 +26,7 @@ import java.sql.Types;
 import java.util.List;
 import java.util.Vector;
 
+import org.jvnet.hk2.annotations.Service;
 import org.postgis.PGgeometry;
 import org.postgis.Point;
 import org.slf4j.Logger;
@@ -37,7 +37,8 @@ import com.argusat.gjl.devservice.repository.DeviceRepositoryException;
 import com.argusat.gjl.model.Device;
 import com.argusat.gjl.model.Location;
 
-public class DeviceRepositoryPostGISImpl implements DeviceRepository, Closeable {
+@Service
+public class DeviceRepositoryPostGISImpl implements DeviceRepository {
 
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(DeviceRepositoryPostGISImpl.class);
@@ -397,7 +398,7 @@ public class DeviceRepositoryPostGISImpl implements DeviceRepository, Closeable 
 			}
 		}
 		
-		if (devices.size() == 0) {
+		if (devices != null && devices.size() == 0) {
 			devices = null;
 		}
 		

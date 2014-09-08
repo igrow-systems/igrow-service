@@ -14,7 +14,6 @@
  * with Argusat Limited.
  */
 
-
 package com.argusat.gjl.locservice.session;
 
 import java.util.HashMap;
@@ -25,29 +24,33 @@ import com.argusat.gjl.model.Device;
 
 public class LocatorSession {
 
+	public enum SessionStatus {
+		CREATED, RUNNING, STOPPED
+	}
+
 	private UUID mSessionId;
-	
+
 	private final Map<String, Device> mParticipants;
-	
+
 	private final String mInitiatorDeviceId;
 
 	protected LocatorSession(String deviceId) {
 		mInitiatorDeviceId = deviceId;
 		mParticipants = new HashMap<String, Device>();
 	}
-	
+
 	public static LocatorSession newLocatorSession(String deviceId) {
 		LocatorSession locatorSession = new LocatorSession(deviceId);
 		locatorSession.newSessionId();
 		return locatorSession;
 	}
-	
+
 	protected void newSessionId() {
 		mSessionId = UUID.randomUUID();
 	}
-	
+
 	public void addParticipant(Device device) {
 		mParticipants.put(device.getDeviceId(), device);
 	}
-	
+
 }

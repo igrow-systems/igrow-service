@@ -21,6 +21,7 @@ import org.glassfish.grizzly.Connection;
 import org.glassfish.grizzly.http.ContentEncoding;
 import org.glassfish.grizzly.http.HttpContent;
 import org.glassfish.grizzly.http.HttpHeader;
+import org.glassfish.grizzly.http.HttpPacket;
 import org.glassfish.grizzly.http.HttpProbe;
 import org.glassfish.grizzly.http.TransferEncoding;
 import org.slf4j.Logger;
@@ -68,12 +69,6 @@ public class LoggingHttpProbe implements HttpProbe {
 	}
 
 	@Override
-	public void onErrorEvent(Connection connection, Throwable arg1) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public void onHeaderParseEvent(Connection connection, HttpHeader header, int arg2) {
 		LOGGER.debug(header.toString());
 	}
@@ -97,6 +92,26 @@ public class LoggingHttpProbe implements HttpProbe {
 			HttpHeader arg1, Buffer arg2, TransferEncoding arg3) {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public void onContentEncodingParseResultEvent(Connection arg0,
+			HttpHeader arg1, Buffer arg2, ContentEncoding arg3) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onContentEncodingSerializeResultEvent(Connection arg0,
+			HttpHeader arg1, Buffer arg2, ContentEncoding arg3) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onErrorEvent(Connection arg0, HttpPacket arg1, Throwable arg2) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

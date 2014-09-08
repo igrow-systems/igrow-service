@@ -3,7 +3,7 @@
 /*
  * @(#)locator.proto        
  *
- * Copyright (c) 2013 Argusat Limited
+ * Copyright (c) 2013 - 2014 Argusat Limited
  * 10 Underwood Road,  Southampton.  UK
  * All rights reserved.
  *
@@ -37,7 +37,7 @@ message BeginLocatorSessionResponse {
   }
 
   required ErrorCode responseCode = 1;
-  required string responseMessage = 2;
+  optional string responseMessage = 2;
   
 }
 
@@ -56,7 +56,7 @@ message JoinLocatorSessionResponse {
   }
 
   required ErrorCode responseCode = 1;
-  required string responseMessage = 2;
+  optional string responseMessage = 2;
 
 
 }
@@ -76,6 +76,6 @@ message EndLocatorSessionResponse {
   }
 
   required ErrorCode responseCode = 1;
-  required string responseMessage = 2;
+  optional string responseMessage = 2;
   
 }

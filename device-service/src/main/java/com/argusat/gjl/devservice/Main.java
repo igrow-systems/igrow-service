@@ -16,24 +16,27 @@
 
 package com.argusat.gjl.devservice;
 
-import com.sun.jersey.api.container.grizzly2.GrizzlyWebContainerFactory;
+import java.io.IOException;
+import java.net.URI;
+
+import javax.ws.rs.core.UriBuilder;
 
 import org.glassfish.grizzly.filterchain.FilterChain;
 import org.glassfish.grizzly.http.HttpCodecFilter;
 import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.hk2.api.ServiceLocator;
+import org.glassfish.hk2.api.ServiceLocatorFactory;
+import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
+import org.glassfish.jersey.server.ApplicationHandler;
+import org.glassfish.jersey.server.ResourceConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.ws.rs.core.UriBuilder;
 
 public class Main {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
+
+	private static ServiceLocator mServiceLocator;
 
 	private static int getPort(int defaultPort) {
 		// grab port from environment, otherwise fall back to default port 9998
@@ -48,25 +51,38 @@ public class Main {
 	}
 
 	private static URI getBaseURI() {
-		return UriBuilder.fromUri("http://0.0.0.0/").port(getPort(9998))
+		return UriBuilder.fromUri("http://0.0.0.0/").port(getPort(9997))
 				.build();
 	}
 
 	public static final URI BASE_URI = getBaseURI();
 
 	public static HttpServer startServer() throws IOException {
-		final Map<String, String> initParams = new HashMap<String, String>();
+		// final Map<String, String> initParams = new HashMap<String, String>();
+		// ResourceConfig resourceConfig = new
+		// DefaultResourceConfig(DeviceServiceApplication.class);
+		// initParams.put("jersey.config.server.provider.packages",
+		// "com.argusat.gjl.devservice");
 
-		initParams.put("com.sun.jersey.config.property.packages",
-				"com.argusat.gjl.devservice");
-
+		ResourceConfig resourceConfig = new DeviceServiceApplication();
+		
 		LOGGER.info("Starting grizzly2...");
-		return GrizzlyWebContainerFactory.create(BASE_URI, initParams);
+		return GrizzlyHttpServerFactory.createHttpServer(BASE_URI,
+				resourceConfig, mServiceLocator);
 	}
 
 	public static void main(String[] args) throws IOException {
 		// Grizzly 2 initialization
+
+		mServiceLocator = ServiceLocatorFactory.getInstance().create(
+				"non-Jersey types");
+
 		final HttpServer httpServer = startServer();
+		
+		final ObservationListener listener = mServiceLocator
+				.createAndInitialize(ObservationListener.class);
+		assert(listener != null);
+		//listener.connectSubscriber();
 
 		if (Boolean.valueOf(System.getProperty(
 				"com.argusat.gjl.devservice.debug", "false"))) {
@@ -85,12 +101,17 @@ public class Main {
 			@Override
 			public void run() {
 				LOGGER.info("Stopping server..");
-				httpServer.stop();
+				try {
+					listener.close();
+				} catch (IOException e) {
+					LOGGER.error("Failed to close ObservationListener");
+				}
+				httpServer.shutdownNow();
 			}
 		}, "shutdownHook"));
 
 		try {
-			//httpServer.start();
+			// httpServer.start();
 			LOGGER.info(String.format(
 					"Jersey app started with WADL available at "
 							+ "%sapplication.wadl.", BASE_URI));

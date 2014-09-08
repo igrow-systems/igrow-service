@@ -16,10 +16,10 @@
 
 package com.argusat.gjl.devservice;
 
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
 
 import com.argusat.gjl.devservice.push.gcmxmpp.SmackCcsClient;
 import com.argusat.gjl.devservice.repository.DeviceRepository;
-import com.argusat.gjl.devservice.repository.postgis.DeviceRepositoryPostGISImpl;
 import com.argusat.gjl.model.Device;
 import com.argusat.gjl.model.Device.OSType;
 import com.argusat.gjl.service.device.DeviceProtoBuf;
@@ -44,18 +43,14 @@ public class Notifications {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(Notifications.class);
 
-	private static DeviceRepository mDeviceRepository = null;
+	@Inject
+	private DeviceRepository mDeviceRepository;
 
 	private static final SmackCcsClient mGcmPushClient = new SmackCcsClient();
 
 	static {
 		try {
-			mDeviceRepository = new DeviceRepositoryPostGISImpl();
 			mGcmPushClient.connect();
-		} catch (ClassNotFoundException e) {
-			LOGGER.error("Couldn't construct PostGIS repository", e);
-		} catch (SQLException e) {
-			LOGGER.error("Couldn't construct PostGIS repository", e);
 		} catch (XMPPException e) {
 			LOGGER.error("Couldn't connect to Google Cloud Messaging", e);
 		}
@@ -76,6 +71,10 @@ public class Notifications {
 	public DeviceProtoBuf.NotifyDeviceResponse notifyDevice(
 			DeviceProtoBuf.NotifyDeviceRequest notifyDeviceRequest) {
 
+		LOGGER.info(String.format(">notifyDevice [ %s ]",
+				notifyDeviceRequest
+				.getDeviceId()));
+		
 		DeviceProtoBuf.NotifyDeviceResponse.Builder builder = DeviceProtoBuf.NotifyDeviceResponse
 				.newBuilder();
 

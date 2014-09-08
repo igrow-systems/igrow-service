@@ -1,7 +1,7 @@
 /* -*- mode: java; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
 
 /*
- * @(#)PublisherRabbitMQ.java        
+ * @(#)SubscriberRabbitMQ.java        
  *
  * Copyright (c) 2014 Argusat Limited
  * 10 Underwood Road,  Southampton.  UK
@@ -14,7 +14,7 @@
  * with Argusat Limited.
  */
 
-package com.argusat.gjl.locservice.subscriber.rabbitmq;
+package com.argusat.gjl.subscriber;
 
 import java.io.ByteArrayInputStream;
 import java.io.Closeable;
@@ -22,11 +22,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import org.jvnet.hk2.annotations.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.argusat.gjl.locservice.subscriber.MessageHandler;
-import com.argusat.gjl.locservice.subscriber.Subscriber;
 import com.argusat.gjl.model.Observation;
 import com.argusat.gjl.service.observation.ObservationProtoBuf;
 import com.rabbitmq.client.AMQP.BasicProperties;
@@ -36,6 +35,7 @@ import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 
+@Service
 public class SubscriberRabbitMQ implements Subscriber, Closeable {
 
 	private static final Logger LOGGER = LoggerFactory
@@ -47,7 +47,7 @@ public class SubscriberRabbitMQ implements Subscriber, Closeable {
 
 	private static final String OBSERVATIONS_CONSUMER_TAG = "observationsConsumerTag";
 
-	private static final String PROPERTIES_FILENAME = "locator-service.properties";
+	private static final String PROPERTIES_FILENAME = "subscriber.properties";
 
 	private static Properties mProperties = new Properties();
 
@@ -65,7 +65,7 @@ public class SubscriberRabbitMQ implements Subscriber, Closeable {
 
 	private Channel mChannel;
 	
-	private MessageHandler mMessageHandler = null;
+	private MessageHandler mMessageHandler;
 
 	static {
 		try {
@@ -187,5 +187,5 @@ public class SubscriberRabbitMQ implements Subscriber, Closeable {
 	public void unregisterMessageHandler() {
 		mMessageHandler = null;
 	}
-
+	
 }
