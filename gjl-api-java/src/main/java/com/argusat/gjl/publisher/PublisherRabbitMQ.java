@@ -14,7 +14,7 @@
  * with Argusat Limited.
  */
 
-package com.argusat.gjl.observice.publisher.rabbitmq;
+package com.argusat.gjl.publisher;
 
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
@@ -25,8 +25,7 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.argusat.gjl.model.Observation;
-import com.argusat.gjl.observice.publisher.Publisher;
+import com.google.protobuf.AbstractMessage;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -38,7 +37,7 @@ public class PublisherRabbitMQ implements Publisher, Closeable {
 
 	private static final String EXCHANGE_NAME = "topic_observations";
 
-	private static final String PROPERTIES_FILENAME = "observation-service.properties";
+	private static final String PROPERTIES_FILENAME = "publisher.properties";
 
 	private static Properties mProperties = new Properties();
 
@@ -90,21 +89,21 @@ public class PublisherRabbitMQ implements Publisher, Closeable {
 			mChannel = mConnection.createChannel();
 
 			mChannel.exchangeDeclare(EXCHANGE_NAME, "topic");
-			//mChannel.queueDeclare(QUEUE_NAME, false, false, false, null);
+			// mChannel.queueDeclare(QUEUE_NAME, false, false, false, null);
 
 			LOGGER.info("RabbitMQ publisher connected");
 		}
 	}
 
 	@Override
-	public void publish(Observation observation) throws IOException {
+	public <T extends AbstractMessage> void publish(String topic,
+			Class<T> clazz, T message) throws IOException {
 
-		if (observation.isValid()) {
-			ByteArrayOutputStream oStream = new ByteArrayOutputStream();
-			observation.getObservationProtoBuf().writeTo(oStream);
-			mChannel.basicPublish(EXCHANGE_NAME, observation.getDeviceId(), null, oStream.toByteArray());
-			LOGGER.info("Published observation: {}", observation.toString());
-		}
+		ByteArrayOutputStream oStream = new ByteArrayOutputStream();
+		message.writeTo(oStream);
+		mChannel.basicPublish(EXCHANGE_NAME, topic, null, oStream.toByteArray());
+		LOGGER.info("Published observation: {}", message.toString());
+
 	}
 
 	@Override

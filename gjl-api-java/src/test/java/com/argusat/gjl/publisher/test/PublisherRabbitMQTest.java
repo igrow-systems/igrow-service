@@ -14,7 +14,7 @@
  * with Argusat Limited.
  */
 
-package com.argusat.gjl.observice.publisher.rabbitmq.test;
+package com.argusat.gjl.publisher.test;
 
 import java.io.IOException;
 
@@ -28,12 +28,13 @@ import com.argusat.gjl.model.Location;
 import com.argusat.gjl.model.Observation;
 import com.argusat.gjl.model.Observation.ModeType;
 import com.argusat.gjl.model.Observation.ObservationType;
-import com.argusat.gjl.observice.publisher.rabbitmq.PublisherRabbitMQ;
+import com.argusat.gjl.publisher.PublisherRabbitMQ;
+import com.argusat.gjl.service.observation.ObservationProtoBuf;
 
 public class PublisherRabbitMQTest {
 
 	private Observation mObservation;
-	
+
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 	}
@@ -44,7 +45,7 @@ public class PublisherRabbitMQTest {
 
 	@Before
 	public void setUp() throws Exception {
-		
+
 		mObservation = Observation
 				.newObservation(ObservationType.TYPE_LOCATION_ONLY);
 
@@ -61,6 +62,8 @@ public class PublisherRabbitMQTest {
 		location.setVDOP(12.0f);
 		mObservation.setLocation(location);
 		
+		mObservation.isValid();
+
 	}
 
 	@After
@@ -69,35 +72,38 @@ public class PublisherRabbitMQTest {
 
 	@Test
 	public void testConnect() throws IOException {
-		
+
 		PublisherRabbitMQ publisher = new PublisherRabbitMQ();
-		
+
 		publisher.connect();
-		
+
 		publisher.close();
-		
+
 	}
 
 	@Test
 	public void testPublish() throws IOException {
 
 		PublisherRabbitMQ publisher = new PublisherRabbitMQ();
-		
+
 		publisher.connect();
-		publisher.publish(mObservation);
-		
+		publisher.publish(
+				String.format("observation.%s", mObservation.getDeviceId()),
+				ObservationProtoBuf.Observation.class,
+				mObservation.getObservationProtoBuf());
+
 		publisher.close();
 	}
 
 	@Test
 	public void testClose() throws IOException {
-		
+
 		PublisherRabbitMQ publisher = new PublisherRabbitMQ();
-		
+
 		publisher.connect();
-		
+
 		publisher.close();
-	
+
 	}
 
 }

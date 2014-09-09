@@ -14,17 +14,17 @@
  * with Argusat Limited.
  */
 
-package com.argusat.gjl.observice.publisher;
+package com.argusat.gjl.publisher;
 
 import java.io.IOException;
 
-import com.argusat.gjl.model.Observation;
+import com.google.protobuf.AbstractMessage;
 
 public interface Publisher {
 
 	void connect() throws IOException;
 
-	void publish(Observation observation) throws IOException;
+	<T extends AbstractMessage> void publish(String topic, Class<T> clazz, T message) throws IOException;
 
 	boolean isConnected();
 }

@@ -1,7 +1,7 @@
 /* -*- mode: java; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
 
 /*
- * @(#)DeviceServiceApplication.java        
+ * @(#)LocatorServiceApplication.java        
  *
  * Copyright (c) 2014 Argusat Limited
  * 10 Underwood Road,  Southampton.  UK
@@ -15,7 +15,7 @@
  */
 
 
-package com.argusat.gjl.devservice;
+package com.argusat.gjl.locservice;
 
 import java.util.Set;
 
@@ -26,24 +26,25 @@ import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.server.ResourceConfig;
 
-import com.argusat.gjl.devservice.repository.DeviceRepository;
+import com.argusat.gjl.locservice.session.LocatorSessionManager;
+import com.argusat.gjl.locservice.session.LocatorSessionManagerFactory;
 import com.argusat.gjl.subscriber.Subscriber;
 import com.argusat.gjl.subscriber.SubscriberFactory;
 
 @ApplicationPath("/")
-public class DeviceServiceApplication extends ResourceConfig {
+public class LocatorServiceApplication extends ResourceConfig {
 
 	@Inject
 	private ServiceLocator mServiceLocator;
 	
-	public DeviceServiceApplication() {
+	public LocatorServiceApplication() {
 		
-		packages("com.argusat.gjl.devservice");
+		packages("com.argusat.gjl.locservice");
 		
 		register(new AbstractBinder() {
             @Override
             protected void configure() {
-                bindFactory(DeviceRepositoryFactory.class).to(DeviceRepository.class);
+                bindFactory(LocatorSessionManagerFactory.class).to(LocatorSessionManager.class);
             }
         });
 		
@@ -53,26 +54,20 @@ public class DeviceServiceApplication extends ResourceConfig {
                 bindFactory(SubscriberFactory.class).to(Subscriber.class);
             }
         });
-		
-		register(new AbstractBinder() {
-            @Override
-            protected void configure() {
-                bindFactory(ObservationListenerFactory.class).to(ObservationListener.class);
-            }
-        });
+
 	}
 
-	public DeviceServiceApplication(Set<Class<?>> classes) {
+	public LocatorServiceApplication(Set<Class<?>> classes) {
 		super(classes);
 		// TODO Auto-generated constructor stub
 	}
 
-	public DeviceServiceApplication(Class<?>... classes) {
+	public LocatorServiceApplication(Class<?>... classes) {
 		super(classes);
 		// TODO Auto-generated constructor stub
 	}
 
-	public DeviceServiceApplication(ResourceConfig original) {
+	public LocatorServiceApplication(ResourceConfig original) {
 		super(original);
 		// TODO Auto-generated constructor stub
 	}

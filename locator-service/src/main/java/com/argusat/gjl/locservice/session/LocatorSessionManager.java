@@ -41,7 +41,7 @@ public class LocatorSessionManager implements Map<String, LocatorSession> {
 
 	@Override
 	public boolean containsValue(Object value) {
-		return locatorSessions.containsKey(value);
+		return locatorSessions.containsValue(value);
 	}
 
 	@Override

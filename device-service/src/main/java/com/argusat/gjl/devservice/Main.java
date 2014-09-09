@@ -79,9 +79,10 @@ public class Main {
 
 		final HttpServer httpServer = startServer();
 		
-		final ObservationListener listener = mServiceLocator
-				.createAndInitialize(ObservationListener.class);
-		assert(listener != null);
+		final ObservationListener listener = null;
+		//final ObservationListener listener = mServiceLocator
+		//		.createAndInitialize(ObservationListener.class);
+		//assert(listener != null);
 		//listener.connectSubscriber();
 
 		if (Boolean.valueOf(System.getProperty(
@@ -102,7 +103,9 @@ public class Main {
 			public void run() {
 				LOGGER.info("Stopping server..");
 				try {
+					if (listener != null) {
 					listener.close();
+					}
 				} catch (IOException e) {
 					LOGGER.error("Failed to close ObservationListener");
 				}

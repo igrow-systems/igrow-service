@@ -16,21 +16,18 @@
 
 package com.argusat.gjl.locservice;
 
+import java.io.IOException;
+import java.net.URI;
 
+import javax.ws.rs.core.UriBuilder;
 
 import org.glassfish.grizzly.filterchain.FilterChain;
 import org.glassfish.grizzly.http.HttpCodecFilter;
 import org.glassfish.grizzly.http.server.HttpServer;
-import org.glassfish.jersey.grizzly2.servlet.GrizzlyWebContainerFactory;
+import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
+import org.glassfish.jersey.server.ResourceConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.ws.rs.core.UriBuilder;
 
 public class Main {
 
@@ -56,13 +53,15 @@ public class Main {
 	public static final URI BASE_URI = getBaseURI();
 
 	public static HttpServer startServer() throws IOException {
-		final Map<String, String> initParams = new HashMap<String, String>();
+		// final Map<String, String> initParams = new HashMap<String, String>();
 
-		initParams.put("jersey.config.server.provider.packages",
-				"com.argusat.gjl.locservice");
+		// initParams.put("jersey.config.server.provider.packages",
+		// "com.argusat.gjl.locservice");
+		ResourceConfig resourceConfig = new LocatorServiceApplication();
 
 		LOGGER.info("Starting grizzly2...");
-		return GrizzlyWebContainerFactory.create(BASE_URI, initParams);
+		return GrizzlyHttpServerFactory.createHttpServer(BASE_URI,
+				resourceConfig);
 	}
 
 	public static void main(String[] args) throws IOException {
@@ -91,7 +90,7 @@ public class Main {
 		}, "shutdownHook"));
 
 		try {
-			//httpServer.start();
+			// httpServer.start();
 			LOGGER.info(String.format(
 					"Jersey app started with WADL available at "
 							+ "%sapplication.wadl.", BASE_URI));

@@ -16,7 +16,15 @@
 
 package com.argusat.gjl.locservice.session.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.util.AbstractMap;
+import java.util.Map;
+import java.util.Set;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -24,7 +32,14 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.argusat.gjl.locservice.session.LocatorSession;
+import com.argusat.gjl.locservice.session.LocatorSessionManager;
+
 public class LocatorSessionManagerTest {
+
+	private LocatorSessionManager mManager;
+
+	private LocatorSession mLocatorSession;
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -36,6 +51,10 @@ public class LocatorSessionManagerTest {
 
 	@Before
 	public void setUp() throws Exception {
+		mManager = new LocatorSessionManager();
+		mLocatorSession = LocatorSession.newLocatorSession("test-id-233");
+		mManager.put("test-id-233", mLocatorSession);
+		mManager.put("test-id-234", mLocatorSession);
 	}
 
 	@After
@@ -44,32 +63,46 @@ public class LocatorSessionManagerTest {
 
 	@Test
 	public void testClear() {
-		fail("Not yet implemented");
+		mManager.clear();
+		assertEquals(0, mManager.size());
+		assertTrue(mManager.isEmpty());
+		assertEquals(0, mManager.entrySet().size());
+		assertEquals(0, mManager.keySet().size());
 	}
 
 	@Test
 	public void testContainsKey() {
-		fail("Not yet implemented");
+		assertTrue(mManager.containsKey("test-id-233"));
 	}
 
 	@Test
 	public void testContainsValue() {
-		fail("Not yet implemented");
+		assertTrue(mManager.containsValue(mLocatorSession));
 	}
 
 	@Test
 	public void testEntrySet() {
-		fail("Not yet implemented");
+		Set<Map.Entry<String, LocatorSession>> entrySet = mManager.entrySet();
+		assertEquals(2, entrySet.size());
+		assertTrue(entrySet
+				.contains(new AbstractMap.SimpleEntry<String, LocatorSession>(
+						"test-id-233", mLocatorSession)));
+		assertTrue(entrySet
+				.contains(new AbstractMap.SimpleEntry<String, LocatorSession>(
+						"test-id-234", mLocatorSession)));
 	}
 
 	@Test
 	public void testGet() {
-		fail("Not yet implemented");
+		LocatorSession session = mManager.get("test-id-234");
+		assertNotNull(session);
 	}
 
 	@Test
 	public void testIsEmpty() {
-		fail("Not yet implemented");
+		assertFalse(mManager.isEmpty());
+		LocatorSessionManager manager = new LocatorSessionManager();
+		assertTrue(manager.isEmpty());
 	}
 
 	@Test
@@ -89,12 +122,14 @@ public class LocatorSessionManagerTest {
 
 	@Test
 	public void testRemove() {
-		fail("Not yet implemented");
+		assertTrue(mManager.containsKey("test-id-234"));
+		mManager.remove("test-id-234");
+		assertFalse(mManager.containsKey("test-id-234"));
 	}
 
 	@Test
 	public void testSize() {
-		fail("Not yet implemented");
+		assertEquals(2, mManager.size());
 	}
 
 	@Test

@@ -14,7 +14,7 @@
  * with Argusat Limited.
  */
 
-package com.argusat.gjl.devservice;
+package com.argusat.gjl.subscriber;
 
 import java.io.IOException;
 
@@ -22,20 +22,17 @@ import org.glassfish.hk2.api.Factory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.argusat.gjl.subscriber.Subscriber;
-import com.argusat.gjl.subscriber.SubscriberRabbitMQ;
-
 public class SubscriberFactory implements Factory<Subscriber> {
 
 	private static final transient Logger LOGGER = LoggerFactory
-			.getLogger(Devices.class);
+			.getLogger(SubscriberFactory.class);
 
 	@Override
 	public void dispose(Subscriber subscriber) {
 		try {
 			subscriber.close();
 		} catch (IOException e) {
-			LOGGER.error("Failed to close DeviceRepository", e);
+			LOGGER.error("Failed to close Subscriber", e);
 		}
 	}
 

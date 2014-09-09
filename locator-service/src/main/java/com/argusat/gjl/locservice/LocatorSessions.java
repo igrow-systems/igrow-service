@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
@@ -45,6 +46,7 @@ import com.argusat.gjl.devservice.providers.NotifyDeviceResponseProtobufReader;
 import com.argusat.gjl.devservice.providers.NotifyDeviceResponseProtobufWriter;
 import com.argusat.gjl.locservice.session.LocatorSession;
 import com.argusat.gjl.locservice.session.LocatorSessionManager;
+import com.argusat.gjl.locservice.session.Participant;
 import com.argusat.gjl.model.Device;
 import com.argusat.gjl.service.device.DeviceProtoBuf;
 import com.argusat.gjl.service.device.DeviceProtoBuf.FindLocalDevicesRequest;
@@ -65,9 +67,11 @@ public class LocatorSessions {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(LocatorSessions.class);
 
+	@Inject
 	private LocatorSessionManager mLocatorSessionManager = null;
 
-	private Subscriber mSubscriber = null;
+	@Inject
+	private Subscriber mSubscriber;
 
 	private Client mClient = null;
 
@@ -122,6 +126,9 @@ public class LocatorSessions {
 		LOGGER.info(String.format(">beginLocatorSession [ %s ]", deviceId));
 
 		if (mLocatorSessionManager.containsKey(deviceId)) {
+			// actually this will happen if the device is already
+			// a member of any session, not just an initiator as
+			// implied
 			responseBuilder.setResponseCode(ErrorCode.SESSION_ALREADY_STARTED);
 			responseBuilder
 					.setResponseMessage("Session already started for device [ "
@@ -157,8 +164,13 @@ public class LocatorSessions {
 
 			for (DeviceProtoBuf.Device deviceProtoBuf : response
 					.getDevicesList()) {
-				// for each of the device we find, notify each one and
-				// add it to the LocatorSession
+
+				Participant participant = Participant.create(Device
+						.newDevice(deviceProtoBuf));
+				locatorSession.addParticipant(participant);
+				mLocatorSessionManager.put(participant.getDeviceId(),
+						locatorSession);
+
 				if (deviceProtoBuf.getDeviceId().equals(deviceId)) {
 					// if the device we are doing this on behalf of
 					// is this one in the returned list then don't
@@ -180,17 +192,15 @@ public class LocatorSessions {
 								NotifyDeviceResponse.class);
 
 				if (notifyDeviceResponse.getResponseCode() != NotifyDeviceResponse.ErrorCode.NONE) {
+
 					LOGGER.error(String.format(
 							"Failed to notify device [ %s ] reponse was: %s ",
 							deviceProtoBuf.getDeviceId(),
 							notifyDeviceResponse.toString()));
 				}
 
-				locatorSession.addParticipant(Device.newDevice(deviceProtoBuf));
-
 			}
 
-			mLocatorSessionManager.put(deviceId, locatorSession);
 		}
 
 		if (FindLocalDevicesResponse.ErrorCode.NO_LOCAL_DEVICES == response

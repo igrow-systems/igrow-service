@@ -32,10 +32,11 @@ import org.slf4j.LoggerFactory;
 
 import com.argusat.gjl.model.Observation;
 import com.argusat.gjl.model.ObservationCollection;
-import com.argusat.gjl.observice.publisher.Publisher;
-import com.argusat.gjl.observice.publisher.rabbitmq.PublisherRabbitMQ;
 import com.argusat.gjl.observice.repository.ObservationRepository;
 import com.argusat.gjl.observice.repository.postgis.ObservationRepositoryPostGISImpl;
+import com.argusat.gjl.publisher.Publisher;
+import com.argusat.gjl.publisher.PublisherRabbitMQ;
+import com.argusat.gjl.service.observation.ObservationProtoBuf;
 
 // The Java class will be hosted at the URI path "/observations"
 @Path("/observations")
@@ -85,8 +86,12 @@ public class Observations {
 				LOGGER.debug(observation.getType() + " - "
 						+ observation.getTimestamp());
 				try {
-					if (mPublisher.isConnected()) {
-						mPublisher.publish(observation);
+					if (mPublisher != null && mPublisher.isConnected()) {
+						mPublisher.publish(
+								String.format("observations.%s",
+										observation.getDeviceId()),
+								ObservationProtoBuf.Observation.class,
+								observation.getObservationProtoBuf());
 					}
 				} catch (IOException e) {
 					LOGGER.error("Failed to publish {}", observation.toString());
@@ -119,7 +124,5 @@ public class Observations {
 		return obsCollection;
 
 	}
-	
-	
 
 }

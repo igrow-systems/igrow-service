@@ -16,21 +16,31 @@
 
 package com.argusat.gjl.locservice.session;
 
+import com.argusat.gjl.model.Device;
+import com.argusat.gjl.service.locator.LocatorSessionInfoProtoBuf.LocatorSessionInfo;
+import com.argusat.gjl.service.locator.LocatorSessionInfoProtoBuf.LocatorSessionInfo.Participant.ParticipantStatus;
+
 public class Participant {
 
-	public enum ParticipantState { 
-		CREATED,
-		AWAITING_RESPONSE,
-		REFUSED,
-		ACCEPTED,
-		EXPIRED
+	public enum ParticipantState {
+		CREATED, AWAITING_RESPONSE, FAILED_TO_NOTIFY, REFUSED, ACCEPTED, EXPIRED
 	}
-	
+
 	private ParticipantState mCurrentState;
-	
-	private String mDeviceId;
-	
+
 	private long mLastUpdateTimestamp;
+
+	private Device mDevice;
+
+	protected Participant() {
+		mCurrentState = ParticipantState.CREATED;
+	}
+
+	public static Participant create(Device device) {
+		Participant participant = new Participant();
+		participant.setDevice(device);
+		return participant;
+	}
 
 	public ParticipantState getCurrentState() {
 		return mCurrentState;
@@ -41,11 +51,7 @@ public class Participant {
 	}
 
 	public String getDeviceId() {
-		return mDeviceId;
-	}
-
-	public void setDeviceId(String deviceId) {
-		this.mDeviceId = deviceId;
+		return mDevice.getDeviceId();
 	}
 
 	public long getLastUpdateTimestamp() {
@@ -55,6 +61,48 @@ public class Participant {
 	public void setLastUpdateTimestamp(long lastUpdateTimestamp) {
 		this.mLastUpdateTimestamp = lastUpdateTimestamp;
 	}
-	
-	
+
+	public Device getDevice() {
+		return mDevice;
+	}
+
+	protected void setDevice(Device mDevice) {
+		this.mDevice = mDevice;
+	}
+
+	public LocatorSessionInfo.Participant getProtoBuf() {
+
+		LocatorSessionInfo.Participant.Builder participantBuilder = LocatorSessionInfo.Participant
+				.newBuilder();
+
+		participantBuilder.setDeviceId(getDeviceId());
+		participantBuilder.setLocation(getDevice().getLastKnownLocation()
+				.getLocationProtoBuf());
+		participantBuilder.setLastUpdateTimestamp(getLastUpdateTimestamp());
+
+		switch (getCurrentState()) {
+		case ACCEPTED:
+			participantBuilder.setParticipantStatus(ParticipantStatus.ACTIVE);
+			break;
+		case AWAITING_RESPONSE:
+			participantBuilder.setParticipantStatus(ParticipantStatus.NOTIFIED);
+			break;
+		case CREATED:
+			participantBuilder.setParticipantStatus(ParticipantStatus.STOPPED);
+			break;
+		case EXPIRED:
+			participantBuilder.setParticipantStatus(ParticipantStatus.STOPPED);
+			break;
+		case FAILED_TO_NOTIFY:
+			participantBuilder.setParticipantStatus(ParticipantStatus.STOPPED);
+			break;
+		case REFUSED:
+			participantBuilder.setParticipantStatus(ParticipantStatus.STOPPED);
+			break;
+		default:
+			break;
+		}
+
+		return participantBuilder.build();
+	}
 }

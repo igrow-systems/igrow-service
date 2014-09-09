@@ -29,7 +29,7 @@ import com.argusat.gjl.devservice.repository.postgis.DeviceRepositoryPostGISImpl
 public class DeviceRepositoryFactory implements Factory<DeviceRepository> {
 
 	private static final transient Logger LOGGER = LoggerFactory
-			.getLogger(Devices.class);
+			.getLogger(DeviceRepositoryFactory.class);
 
 	@Override
 	public void dispose(DeviceRepository deviceRepository) {
