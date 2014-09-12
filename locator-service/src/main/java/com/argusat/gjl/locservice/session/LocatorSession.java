@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
 
 import com.argusat.gjl.publisher.Publisher;
 import com.argusat.gjl.service.locator.LocatorSessionInfoProtoBuf.LocatorSessionInfo;
-import com.argusat.gjl.subscriber.Subscriber;
 
 public class LocatorSession {
 
@@ -53,9 +52,6 @@ public class LocatorSession {
 	private final Vector<GnssJammer> mGnssJammers;
 
 	private final Timer mTimer;
-
-	@Inject
-	private Subscriber mSubscriber;
 
 	@Inject
 	private Publisher mPublisher;
@@ -100,6 +96,8 @@ public class LocatorSession {
 		return mSessionState;
 	}
 
+	// TODO: this class is an ideal candidate for
+	// using the GoF State pattern 
 	public void setSessionState(SessionStatus sessionState) {
 		if (sessionState == SessionStatus.RUNNING
 				&& mSessionState != SessionStatus.RUNNING) {

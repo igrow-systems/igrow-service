@@ -88,7 +88,7 @@ public class Observations {
 				try {
 					if (mPublisher != null && mPublisher.isConnected()) {
 						mPublisher.publish(
-								String.format("observations.%s",
+								String.format("observation.%s",
 										observation.getDeviceId()),
 								ObservationProtoBuf.Observation.class,
 								observation.getObservationProtoBuf());

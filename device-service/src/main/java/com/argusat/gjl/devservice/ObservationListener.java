@@ -1,7 +1,7 @@
 /* -*- mode: java; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
 
 /*
- * @(#)ObservationsListener.java        
+ * @(#)ObservationListener.java        
  *
  * Copyright (c) 2014 Argusat Limited
  * 10 Underwood Road,  Southampton.  UK
@@ -18,10 +18,14 @@ package com.argusat.gjl.devservice;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 
+import org.glassfish.hk2.api.Immediate;
 import org.jvnet.hk2.annotations.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,12 +33,15 @@ import org.slf4j.LoggerFactory;
 import com.argusat.gjl.devservice.repository.DeviceRepository;
 import com.argusat.gjl.devservice.repository.DeviceRepositoryException;
 import com.argusat.gjl.model.Device;
-import com.argusat.gjl.model.Observation;
+import com.argusat.gjl.service.observation.ObservationProtoBuf.Observation;
 import com.argusat.gjl.subscriber.MessageHandler;
 import com.argusat.gjl.subscriber.Subscriber;
+import com.argusat.gjl.subscriber.SubscriberRabbitMQ;
 
+@Immediate
 @Service
-public class ObservationListener implements MessageHandler, Closeable {
+public class ObservationListener implements MessageHandler<Observation>,
+		Closeable {
 
 	private static final transient Logger LOGGER = LoggerFactory
 			.getLogger(ObservationListener.class);
@@ -43,17 +50,33 @@ public class ObservationListener implements MessageHandler, Closeable {
 	private DeviceRepository mDeviceRepository;
 
 	@Inject
-	private Subscriber mSubscriber;
+	private Subscriber<Observation> mSubscriber;
+
+	private static class SingletonHelper {
+		private static final ObservationListener INSTANCE = new ObservationListener();
+	}
 
 	public ObservationListener() {
-		
+
+	}
+
+	public static ObservationListener getInstance() {
+		return SingletonHelper.INSTANCE;
 	}
 
 	@Override
-	public void handleMessage(Observation observation) {
+	public void handleMessage(Observation observationProtoBuf) {
+
+		assert (observationProtoBuf != null);
+
+		com.argusat.gjl.model.Observation observation = com.argusat.gjl.model.Observation
+				.newObservation(observationProtoBuf);
+
+		assert (observation != null);
 
 		Device device = mDeviceRepository.findDevice(observation.getDeviceId());
 
+		assert (device != null);
 		device.setLastKnownLocation(observation.getLocation());
 
 		try {
@@ -65,13 +88,14 @@ public class ObservationListener implements MessageHandler, Closeable {
 	}
 
 	@Override
+	@PreDestroy
 	public void close() throws IOException {
 
 		LOGGER.info("Closing ObservationsListener");
 
 		if (mSubscriber != null) {
-			mSubscriber.unsubscribe("*");
-			mSubscriber.unregisterMessageHandler();
+			mSubscriber.unsubscribe("observation.*");
+			mSubscriber.unregisterMessageHandler(this);
 			mSubscriber.close();
 		}
 
@@ -79,10 +103,28 @@ public class ObservationListener implements MessageHandler, Closeable {
 
 	@PostConstruct
 	protected void connectSubscriber() {
+
+		Properties properties = new Properties();
+		InputStream entityStream = ObservationListener.class
+				.getResourceAsStream("/"
+						+ SubscriberRabbitMQ.PROPERTIES_FILENAME);
+
+		if (entityStream == null) {
+			LOGGER.error(String.format("Couldn't open properties file: %s",
+					SubscriberRabbitMQ.PROPERTIES_FILENAME));
+		}
+
 		try {
+
+			properties.load(entityStream);
+			entityStream.close();
+
+			mSubscriber.initialise(properties);
+			
 			mSubscriber.registerMessageHandler(this);
 			mSubscriber.connect();
-			mSubscriber.subscribe("*");
+			mSubscriber.subscribe("observation.*");
+
 		} catch (IOException e) {
 			LOGGER.error("Subscriber couldn't connect to broker", e);
 		}

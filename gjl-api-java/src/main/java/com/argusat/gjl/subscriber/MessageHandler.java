@@ -16,8 +16,7 @@
 
 package com.argusat.gjl.subscriber;
 
-import com.argusat.gjl.model.Observation;
 
-public interface MessageHandler {
-	void handleMessage(Observation observation);
+public interface MessageHandler<T> {
+	void handleMessage(T message);
 }

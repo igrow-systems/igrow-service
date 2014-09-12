@@ -18,19 +18,22 @@ package com.argusat.gjl.subscriber;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.Properties;
 
 import org.jvnet.hk2.annotations.Contract;
 
 import com.argusat.gjl.subscriber.MessageHandler;
 
 @Contract
-public interface Subscriber extends Closeable {
+public interface Subscriber<T> extends Closeable {
 
 	public void connect() throws IOException;
-
-	public void registerMessageHandler(MessageHandler handler);
 	
-	public void unregisterMessageHandler();
+	public void initialise(Properties properties);
+
+	public void registerMessageHandler(MessageHandler<T> handler);
+	
+	public void unregisterMessageHandler(MessageHandler<T> handler);
 	
 	public void subscribe(String topic) throws IOException;
 	

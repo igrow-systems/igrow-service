@@ -38,6 +38,7 @@ message BeginLocatorSessionResponse {
 
   required ErrorCode responseCode = 1;
   optional string responseMessage = 2;
+  optional string sessionId = 3;
   
 }
 
@@ -45,14 +46,13 @@ message JoinLocatorSessionRequest {
 
   required string deviceId = 1;
   
-
 }
 
 message JoinLocatorSessionResponse {
 
   enum ErrorCode {
     NONE = 0;
-    SESSION_CANCELLED = 1;
+    SESSION_INVALID = 1;
   }
 
   required ErrorCode responseCode = 1;

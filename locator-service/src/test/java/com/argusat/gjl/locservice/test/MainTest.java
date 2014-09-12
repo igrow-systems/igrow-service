@@ -32,9 +32,18 @@ import com.argusat.gjl.locservice.provider.BeginLocatorSessionRequestProtobufRea
 import com.argusat.gjl.locservice.provider.BeginLocatorSessionRequestProtobufWriter;
 import com.argusat.gjl.locservice.provider.BeginLocatorSessionResponseProtobufReader;
 import com.argusat.gjl.locservice.provider.BeginLocatorSessionResponseProtobufWriter;
+import com.argusat.gjl.locservice.provider.EndLocatorSessionRequestProtobufReader;
+import com.argusat.gjl.locservice.provider.EndLocatorSessionRequestProtobufWriter;
+import com.argusat.gjl.locservice.provider.EndLocatorSessionResponseProtobufReader;
+import com.argusat.gjl.locservice.provider.EndLocatorSessionResponseProtobufWriter;
+import com.argusat.gjl.locservice.provider.JoinLocatorSessionRequestProtobufReader;
+import com.argusat.gjl.locservice.provider.JoinLocatorSessionRequestProtobufWriter;
+import com.argusat.gjl.locservice.provider.JoinLocatorSessionResponseProtobufReader;
+import com.argusat.gjl.locservice.provider.JoinLocatorSessionResponseProtobufWriter;
 import com.argusat.gjl.model.Location;
 import com.argusat.gjl.service.locator.LocatorProtoBuf.BeginLocatorSessionRequest;
 import com.argusat.gjl.service.locator.LocatorProtoBuf.BeginLocatorSessionResponse;
+import com.argusat.gjl.service.locator.LocatorProtoBuf.JoinLocatorSessionRequest;
 
 public class MainTest extends TestCase {
 
@@ -60,6 +69,14 @@ public class MainTest extends TestCase {
 		cc.register(BeginLocatorSessionRequestProtobufWriter.class);
 		cc.register(BeginLocatorSessionResponseProtobufReader.class);
 		cc.register(BeginLocatorSessionResponseProtobufWriter.class);
+		cc.register(JoinLocatorSessionRequestProtobufReader.class);
+		cc.register(JoinLocatorSessionRequestProtobufWriter.class);
+		cc.register(JoinLocatorSessionResponseProtobufReader.class);
+		cc.register(JoinLocatorSessionResponseProtobufWriter.class);
+		cc.register(EndLocatorSessionRequestProtobufReader.class);
+		cc.register(EndLocatorSessionRequestProtobufWriter.class);
+		cc.register(EndLocatorSessionResponseProtobufReader.class);
+		cc.register(EndLocatorSessionResponseProtobufWriter.class);
 
 		Client c = ClientBuilder.newClient(cc);
 
@@ -111,6 +128,45 @@ public class MainTest extends TestCase {
 
 		assertEquals(BeginLocatorSessionResponse.ErrorCode.NONE,
 				response.getResponseCode());
+		assertTrue(response.hasSessionId());
+	}
+	
+	/**
+	 * Test to see that the /locatorsessions endpoint is available and
+	 * processing JoinLocatorSession requests.
+	 */
+	public void testJoinLocatorSession() {
+
+		BeginLocatorSessionRequest.Builder builder = BeginLocatorSessionRequest
+				.newBuilder();
+		builder.setDeviceId("test-id-009");
+
+		WebTarget wr = r.path("locatorsessions");
+		BeginLocatorSessionResponse response = wr.request(
+				"application/octet-stream").post(
+				Entity.entity(mBeginLocatorSessionRequest,
+						"application/octet-stream"),
+				BeginLocatorSessionResponse.class);
+
+		assertEquals(BeginLocatorSessionResponse.ErrorCode.NONE,
+				response.getResponseCode());
+		
+		String sessionId = response.getSessionId();
+		
+		JoinLocatorSessionRequest.Builder joinBuilder = JoinLocatorSessionRequest
+				.newBuilder();
+		joinBuilder.setDeviceId("test-id-010");
+		
+
+		wr = r.path("locatorsessions/join");
+		BeginLocatorSessionResponse joinResponse = wr.request(
+				"application/octet-stream").post(
+				Entity.entity(joinBuilder.build(),
+						"application/octet-stream"),
+				BeginLocatorSessionResponse.class);
+
+		assertEquals(BeginLocatorSessionResponse.ErrorCode.NONE,
+				joinResponse.getResponseCode());
 	}
 
 	/**

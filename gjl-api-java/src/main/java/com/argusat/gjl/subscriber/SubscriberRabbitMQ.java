@@ -26,8 +26,7 @@ import org.jvnet.hk2.annotations.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.argusat.gjl.model.Observation;
-import com.argusat.gjl.service.observation.ObservationProtoBuf;
+import com.google.protobuf.AbstractMessage;
 import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -36,7 +35,8 @@ import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 
 @Service
-public class SubscriberRabbitMQ implements Subscriber, Closeable {
+public abstract class SubscriberRabbitMQ<T extends AbstractMessage> implements
+		Subscriber<T>, Closeable {
 
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(SubscriberRabbitMQ.class);
@@ -47,9 +47,9 @@ public class SubscriberRabbitMQ implements Subscriber, Closeable {
 
 	private static final String OBSERVATIONS_CONSUMER_TAG = "observationsConsumerTag";
 
-	private static final String PROPERTIES_FILENAME = "subscriber.properties";
+	public static final String PROPERTIES_FILENAME = "subscriber.properties";
 
-	private static Properties mProperties = new Properties();
+	private Properties mProperties;
 
 	private static final String RABBITMQ_SERVER_PROPERTY = "subscriber.rabbitmq.host";
 	private static final String RABBITMQ_PORT_PROPERTY = "subscriber.rabbitmq.port";
@@ -64,27 +64,23 @@ public class SubscriberRabbitMQ implements Subscriber, Closeable {
 	private Connection mConnection;
 
 	private Channel mChannel;
-	
-	private MessageHandler mMessageHandler;
 
-	static {
-		try {
-			InputStream entityStream = SubscriberRabbitMQ.class
-					.getResourceAsStream("/" + PROPERTIES_FILENAME);
+	private MessageHandler<T> mMessageHandler;
 
-			mProperties.load(entityStream);
-			entityStream.close();
+	public SubscriberRabbitMQ() {
 
-			mRabbitMQServer = mProperties.getProperty(RABBITMQ_SERVER_PROPERTY);
-			mRabbitMQPort = Integer.parseInt(mProperties
-					.getProperty(RABBITMQ_PORT_PROPERTY));
-			mRabbitMQUser = mProperties.getProperty(RABBITMQ_USER_PROPERTY);
-			mRabbitMQPassword = mProperties
-					.getProperty(RABBITMQ_PASSWORD_PROPERTY);
+	}
 
-		} catch (IOException e) {
-			LOGGER.error("Failed to load properties", e);
-		}
+	public void initialise(Properties properties) {
+
+		mProperties = properties;
+
+		mRabbitMQServer = mProperties.getProperty(RABBITMQ_SERVER_PROPERTY);
+		mRabbitMQPort = Integer.parseInt(mProperties
+				.getProperty(RABBITMQ_PORT_PROPERTY));
+		mRabbitMQUser = mProperties.getProperty(RABBITMQ_USER_PROPERTY);
+		mRabbitMQPassword = mProperties.getProperty(RABBITMQ_PASSWORD_PROPERTY);
+
 	}
 
 	@Override
@@ -120,19 +116,17 @@ public class SubscriberRabbitMQ implements Subscriber, Closeable {
 
 							ByteArrayInputStream bais = new ByteArrayInputStream(
 									body);
-							ObservationProtoBuf.Observation obsProtoBuf = ObservationProtoBuf.Observation
-									.newBuilder().mergeFrom(bais).build();
 
-							Observation observation = Observation
-									.newObservation(obsProtoBuf);
+							T protoBuf = deserialiseMessage(bais);
 
-							LOGGER.info("Received message {}", observation.toString());
-							
+							LOGGER.info("Received message {}",
+									protoBuf.toString());
+
 							// (process the message components here ...)
 							mChannel.basicAck(deliveryTag, false);
-							
+
 							if (mMessageHandler != null) {
-								mMessageHandler.handleMessage(observation);
+								mMessageHandler.handleMessage(protoBuf);
 							}
 						}
 					});
@@ -150,7 +144,8 @@ public class SubscriberRabbitMQ implements Subscriber, Closeable {
 	public void unsubscribe(String topic) throws IOException {
 
 		mChannel.queueUnbind(QUEUE_NAME, EXCHANGE_NAME, topic, null);
-		LOGGER.info("Unsubscribed from " + EXCHANGE_NAME + " topic [ {} ]", topic);
+		LOGGER.info("Unsubscribed from " + EXCHANGE_NAME + " topic [ {} ]",
+				topic);
 	}
 
 	@Override
@@ -160,7 +155,7 @@ public class SubscriberRabbitMQ implements Subscriber, Closeable {
 			try {
 				mChannel.basicCancel(OBSERVATIONS_CONSUMER_TAG);
 			} catch (IOException e) {
-				
+
 			}
 			try {
 				mChannel.close();
@@ -179,13 +174,15 @@ public class SubscriberRabbitMQ implements Subscriber, Closeable {
 	}
 
 	@Override
-	public void registerMessageHandler(MessageHandler handler) {
+	public void registerMessageHandler(MessageHandler<T> handler) {
 		mMessageHandler = handler;
 	}
 
 	@Override
-	public void unregisterMessageHandler() {
+	public void unregisterMessageHandler(MessageHandler<T> handler) {
 		mMessageHandler = null;
 	}
-	
+
+	abstract T deserialiseMessage(ByteArrayInputStream bais);
+
 }

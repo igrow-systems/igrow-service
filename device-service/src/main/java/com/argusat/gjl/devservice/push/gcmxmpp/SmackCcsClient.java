@@ -40,6 +40,7 @@ import org.jivesoftware.smack.packet.PacketExtension;
 import org.jivesoftware.smack.provider.PacketExtensionProvider;
 import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smack.util.StringUtils;
+import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
@@ -200,22 +201,22 @@ public class SmackCcsClient {
 	 * Subclasses should override this method to process an upstream message.
 	 */
 	public void handleIncomingDataMessage(Map<String, Object> jsonObject) {
-		String from = jsonObject.get("from").toString();
-
-		// PackageName of the application that sent this message.
-		String category = jsonObject.get("category").toString();
-
-		// Use the packageName as the collapseKey in the echo packet
-		String collapseKey = "echo:CollapseKey";
-		@SuppressWarnings("unchecked")
-		Map<String, String> payload = (Map<String, String>) jsonObject
-				.get("data");
-		payload.put("ECHO", "Application: " + category);
-
-		// Send an ECHO response back
-		String echo = createJsonMessage(from, getRandomMessageId(), payload,
-				collapseKey, null, false);
-		send(echo);
+//		String from = jsonObject.get("from").toString();
+//
+//		// PackageName of the application that sent this message.
+//		String category = jsonObject.get("category").toString();
+//
+//		// Use the packageName as the collapseKey in the echo packet
+//		String collapseKey = "echo:CollapseKey";
+//		@SuppressWarnings("unchecked")
+//		Map<String, String> payload = (Map<String, String>) jsonObject
+//				.get("data");
+//		payload.put("ECHO", "Application: " + category);
+//
+//		// Send an ECHO response back
+//		String echo = createJsonMessage(from, getRandomMessageId(), payload,
+//				collapseKey, null, false);
+//		send(echo);
 	}
 
 	/**
@@ -265,7 +266,7 @@ public class SmackCcsClient {
 	 * @return JSON encoded GCM message.
 	 */
 	public static String createJsonMessage(String to, String messageId,
-			Map<String, String> payload, String collapseKey, Long timeToLive,
+			Object payload, String collapseKey, Long timeToLive,
 			Boolean delayWhileIdle) {
 		Map<String, Object> message = new HashMap<String, Object>();
 		message.put("to", to);

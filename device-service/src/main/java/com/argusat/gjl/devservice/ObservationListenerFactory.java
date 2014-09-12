@@ -25,14 +25,14 @@ import org.slf4j.LoggerFactory;
 public class ObservationListenerFactory implements Factory<ObservationListener> {
 
 	private static final transient Logger LOGGER = LoggerFactory
-			.getLogger(Devices.class);
+			.getLogger(ObservationListenerFactory.class);
 
 	@Override
 	public void dispose(ObservationListener observationListener) {
 		try {
 			observationListener.close();
 		} catch (IOException e) {
-			LOGGER.error("Failed to close DeviceRepository", e);
+			LOGGER.error("Failed to close ObservationListener", e);
 		}
 	}
 
@@ -41,7 +41,7 @@ public class ObservationListenerFactory implements Factory<ObservationListener> 
 
 		ObservationListener observationListener = null;
 		
-		observationListener = new ObservationListener();
+		observationListener = ObservationListener.getInstance();
 		
 		return observationListener;
 	}

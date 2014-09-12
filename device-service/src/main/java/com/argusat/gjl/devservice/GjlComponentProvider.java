@@ -23,6 +23,7 @@ import org.glassfish.jersey.server.spi.ComponentProvider;
 
 public class GjlComponentProvider implements ComponentProvider {
 
+	@SuppressWarnings("unused")
 	private ServiceLocator mServiceLocator;
 	
 	public GjlComponentProvider() {

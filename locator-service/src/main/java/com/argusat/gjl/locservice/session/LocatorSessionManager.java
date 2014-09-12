@@ -16,16 +16,82 @@
 
 package com.argusat.gjl.locservice.session;
 
+import java.io.Closeable;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class LocatorSessionManager implements Map<String, LocatorSession> {
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.argusat.gjl.devservice.ObservationListener;
+import com.argusat.gjl.service.observation.ObservationProtoBuf.Observation;
+import com.argusat.gjl.subscriber.MessageHandler;
+import com.argusat.gjl.subscriber.Subscriber;
+import com.argusat.gjl.subscriber.SubscriberRabbitMQ;
+
+public class LocatorSessionManager implements Map<String, LocatorSession>,
+		MessageHandler<Observation>, Closeable {
+
+	private static final transient Logger LOGGER = LoggerFactory
+			.getLogger(LocatorSessionManager.class);
 
 	private final Map<String, LocatorSession> locatorSessions = new ConcurrentHashMap<String, LocatorSession>();
 
+	@Inject
+	private Subscriber<Observation> mSubscriber;
+
 	public LocatorSessionManager() {
+
+	}
+
+	@PostConstruct
+	public void initialise() {
+		Properties properties = new Properties();
+		InputStream entityStream = ObservationListener.class
+				.getResourceAsStream("/"
+						+ SubscriberRabbitMQ.PROPERTIES_FILENAME);
+
+		if (entityStream == null) {
+			LOGGER.error(String.format("Couldn't open properties file: %s",
+					SubscriberRabbitMQ.PROPERTIES_FILENAME));
+		}
+
+		try {
+
+			properties.load(entityStream);
+			entityStream.close();
+
+			mSubscriber.initialise(properties);
+
+			mSubscriber.registerMessageHandler(this);
+			mSubscriber.connect();
+			mSubscriber.subscribe("observation.*");
+
+		} catch (IOException e) {
+			LOGGER.error("Subscriber couldn't connect to broker", e);
+		}
+	}
+
+	@Override
+	@PreDestroy
+	public void close() throws IOException {
+
+		LOGGER.info("Closing ObservationsListener");
+
+		if (mSubscriber != null) {
+			mSubscriber.unsubscribe("observation.*");
+			mSubscriber.unregisterMessageHandler(this);
+			mSubscriber.close();
+		}
 
 	}
 
@@ -87,6 +153,23 @@ public class LocatorSessionManager implements Map<String, LocatorSession> {
 	@Override
 	public Collection<LocatorSession> values() {
 		return locatorSessions.values();
+	}
+
+	@Override
+	public void handleMessage(Observation observation) {
+
+		String deviceId = observation.getDeviceId();
+		if (locatorSessions.containsKey(deviceId)) {
+
+			LocatorSession session = locatorSessions.get(deviceId);
+			Participant participant = session.getParticipants().get(deviceId);
+			//participant.s
+			
+		} else {
+			LOGGER.warn(String.format(
+					"Couldn't find session for device [ %s ]", deviceId));
+		}
+
 	}
 
 }

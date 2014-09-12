@@ -67,6 +67,7 @@ message NotifyDeviceResponse {
     DEVICE_NOT_FOUND = 1;
     DEVICE_NOT_SUPPORTED = 2;
     INTERNAL_ERROR = 3;
+    MESSAGE_PARSE_ERROR = 4;
   }
 
   required ErrorCode responseCode = 1;

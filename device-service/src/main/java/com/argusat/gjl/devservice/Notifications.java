@@ -16,9 +16,6 @@
 
 package com.argusat.gjl.devservice;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -26,6 +23,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 import org.jivesoftware.smack.XMPPException;
+import org.json.simple.JSONValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,13 +87,15 @@ public class Notifications {
 		// send message via Google Cloud Messaging if it's an Android device
 		if (device.getOsType() == OSType.GOOGLE_ANDROID) {
 
-			// Send a sample hello downstream message to a device.
 			String toRegId = device.getPushToken();
 			String messageId = mGcmPushClient.getRandomMessageId();
-			Map<String, String> payload = new HashMap<String, String>();
-			payload.put("Hello", "World");
-			payload.put("CCS", "Dummy Message");
-			payload.put("EmbeddedMessageId", messageId);
+			Object payload = JSONValue.parse(notifyDeviceRequest.getMessage());
+			
+			if (payload == null) {
+				builder.setResponseCode(NotifyDeviceResponse.ErrorCode.MESSAGE_PARSE_ERROR);
+				return builder.build();
+			}
+			
 			String collapseKey = "sample";
 			Long timeToLive = 10000L;
 			Boolean delayWhileIdle = true;

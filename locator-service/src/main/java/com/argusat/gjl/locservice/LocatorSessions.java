@@ -45,6 +45,7 @@ import com.argusat.gjl.devservice.providers.NotifyDeviceRequestProtobufWriter;
 import com.argusat.gjl.devservice.providers.NotifyDeviceResponseProtobufReader;
 import com.argusat.gjl.devservice.providers.NotifyDeviceResponseProtobufWriter;
 import com.argusat.gjl.locservice.session.LocatorSession;
+import com.argusat.gjl.locservice.session.LocatorSession.SessionStatus;
 import com.argusat.gjl.locservice.session.LocatorSessionManager;
 import com.argusat.gjl.locservice.session.Participant;
 import com.argusat.gjl.model.Device;
@@ -58,6 +59,8 @@ import com.argusat.gjl.service.locator.LocatorProtoBuf.BeginLocatorSessionRespon
 import com.argusat.gjl.service.locator.LocatorProtoBuf.BeginLocatorSessionResponse.ErrorCode;
 import com.argusat.gjl.service.locator.LocatorProtoBuf.EndLocatorSessionRequest;
 import com.argusat.gjl.service.locator.LocatorProtoBuf.EndLocatorSessionResponse;
+import com.argusat.gjl.service.locator.LocatorProtoBuf.JoinLocatorSessionRequest;
+import com.argusat.gjl.service.locator.LocatorProtoBuf.JoinLocatorSessionResponse;
 import com.argusat.gjl.subscriber.Subscriber;
 
 // The Java class will be hosted at the URI path "/locatorsessions"
@@ -182,7 +185,11 @@ public class LocatorSessions {
 						.newBuilder();
 				notifyDeviceBuilder.setDeviceId(deviceProtoBuf.getDeviceId());
 				notifyDeviceBuilder
-						.setMessage("{\"msg_type\":\"begin_locator_session_request\" }");
+						.setMessage(String
+								.format("{\"msg_type\":\"begin_locator_session_request\",\"session_id\":\"%s\" }",
+								// .format("{msg_type:begin_locator_session_request,session_id:%s }",
+										locatorSession.getSessionId()
+												.toString()));
 
 				WebTarget notificationsWr = r.path("notifications");
 				NotifyDeviceResponse notifyDeviceResponse = notificationsWr
@@ -201,6 +208,8 @@ public class LocatorSessions {
 
 			}
 
+			locatorSession.setSessionState(SessionStatus.RUNNING);
+
 		}
 
 		if (FindLocalDevicesResponse.ErrorCode.NO_LOCAL_DEVICES == response
@@ -212,6 +221,21 @@ public class LocatorSessions {
 
 		responseBuilder.setResponseCode(ErrorCode.NONE);
 		return responseBuilder.build();
+	}
+
+	// The Java method will process HTTP POST requests
+	@POST
+	// The Java method will produce content identified by the MIME Media
+	// type "application/octet-stream"
+	@Produces("application/octet-stream")
+	// The Java method will produce content identified by the MIME Media
+	// type "application/octet-stream"
+	@Consumes("application/octet-stream")
+	@Path("join")
+	public JoinLocatorSessionResponse joinLocatorSession(
+			JoinLocatorSessionRequest joinLocatorSessionRequest) {
+
+		return null;
 	}
 
 	// The Java method will process HTTP DELETE requests

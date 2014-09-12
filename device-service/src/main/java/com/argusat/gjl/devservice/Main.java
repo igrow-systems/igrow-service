@@ -27,7 +27,6 @@ import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.hk2.api.ServiceLocatorFactory;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
-import org.glassfish.jersey.server.ApplicationHandler;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +64,7 @@ public class Main {
 		// "com.argusat.gjl.devservice");
 
 		ResourceConfig resourceConfig = new DeviceServiceApplication();
-		
+
 		LOGGER.info("Starting grizzly2...");
 		return GrizzlyHttpServerFactory.createHttpServer(BASE_URI,
 				resourceConfig, mServiceLocator);
@@ -78,12 +77,6 @@ public class Main {
 				"non-Jersey types");
 
 		final HttpServer httpServer = startServer();
-		
-		final ObservationListener listener = null;
-		//final ObservationListener listener = mServiceLocator
-		//		.createAndInitialize(ObservationListener.class);
-		//assert(listener != null);
-		//listener.connectSubscriber();
 
 		if (Boolean.valueOf(System.getProperty(
 				"com.argusat.gjl.devservice.debug", "false"))) {
@@ -102,13 +95,7 @@ public class Main {
 			@Override
 			public void run() {
 				LOGGER.info("Stopping server..");
-				try {
-					if (listener != null) {
-					listener.close();
-					}
-				} catch (IOException e) {
-					LOGGER.error("Failed to close ObservationListener");
-				}
+				
 				httpServer.shutdownNow();
 			}
 		}, "shutdownHook"));

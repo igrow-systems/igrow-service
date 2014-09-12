@@ -1,7 +1,7 @@
 /* -*- mode: java; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
 
 /*
- * @(#)SubscriberFactory.java        
+ * @(#)LocatorSessionInfoSubscriberRabbitMQ.java        
  *
  * Copyright (c) 2014 Argusat Limited
  * 10 Underwood Road,  Southampton.  UK
@@ -16,34 +16,29 @@
 
 package com.argusat.gjl.subscriber;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-import org.glassfish.hk2.api.Factory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SubscriberFactory implements Factory<Subscriber> {
+import com.argusat.gjl.service.locator.LocatorSessionInfoProtoBuf.LocatorSessionInfo;
 
-	private static final transient Logger LOGGER = LoggerFactory
-			.getLogger(SubscriberFactory.class);
+public class LocatorSessionInfoSubscriberRabbitMQ extends
+		SubscriberRabbitMQ<LocatorSessionInfo> {
+
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(LocatorSessionInfoSubscriberRabbitMQ.class);
 
 	@Override
-	public void dispose(Subscriber subscriber) {
+	LocatorSessionInfo deserialiseMessage(ByteArrayInputStream bais) {
+		LocatorSessionInfo protoBuf = null;
 		try {
-			subscriber.close();
+			protoBuf = LocatorSessionInfo.newBuilder().mergeFrom(bais).build();
 		} catch (IOException e) {
-			LOGGER.error("Failed to close Subscriber", e);
+			LOGGER.error("Failed to parse LocatorSessionInfo protocol buffer", e);
 		}
-	}
-
-	@Override
-	public Subscriber provide() {
-
-		Subscriber subscriber = null;
-
-		subscriber = new ObservationSubscriberRabbitMQ();
-
-		return subscriber;
+		return protoBuf;
 	}
 
 }

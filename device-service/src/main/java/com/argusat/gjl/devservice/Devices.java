@@ -43,10 +43,13 @@ public class Devices {
 
 	private static final transient Logger LOGGER = LoggerFactory
 			.getLogger(Devices.class);
-
+	
 	@Inject
 	private DeviceRepository mDeviceRepository;
 
+	@Inject
+	private ObservationListener mObservationListener;
+	
 	static {
 
 	}
