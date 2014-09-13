@@ -19,7 +19,6 @@ package com.argusat.gjl.publisher;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Properties;
 
 import org.slf4j.Logger;
@@ -37,7 +36,7 @@ public class PublisherRabbitMQ implements Publisher, Closeable {
 
 	private static final String EXCHANGE_NAME = "topic_observations";
 
-	private static final String PROPERTIES_FILENAME = "publisher.properties";
+	public static final String PROPERTIES_FILENAME = "publisher.properties";
 
 	private static Properties mProperties = new Properties();
 
@@ -54,25 +53,21 @@ public class PublisherRabbitMQ implements Publisher, Closeable {
 	private Connection mConnection;
 
 	private Channel mChannel;
-
-	static {
-		try {
-			InputStream entityStream = PublisherRabbitMQ.class
-					.getResourceAsStream("/" + PROPERTIES_FILENAME);
-
-			mProperties.load(entityStream);
-			entityStream.close();
-
-			mRabbitMQServer = mProperties.getProperty(RABBITMQ_SERVER_PROPERTY);
-			mRabbitMQPort = Integer.parseInt(mProperties
-					.getProperty(RABBITMQ_PORT_PROPERTY));
-			mRabbitMQUser = mProperties.getProperty(RABBITMQ_USER_PROPERTY);
-			mRabbitMQPassword = mProperties
-					.getProperty(RABBITMQ_PASSWORD_PROPERTY);
-
-		} catch (IOException e) {
-			LOGGER.error("Failed to load properties", e);
-		}
+	
+	public PublisherRabbitMQ() {
+		
+	}
+	
+	public void initialise(Properties properties) {
+		
+		mProperties = properties;
+		
+		mRabbitMQServer = mProperties.getProperty(RABBITMQ_SERVER_PROPERTY);
+		mRabbitMQPort = Integer.parseInt(mProperties
+				.getProperty(RABBITMQ_PORT_PROPERTY));
+		mRabbitMQUser = mProperties.getProperty(RABBITMQ_USER_PROPERTY);
+		mRabbitMQPassword = mProperties
+				.getProperty(RABBITMQ_PASSWORD_PROPERTY);
 	}
 
 	@Override
@@ -102,7 +97,7 @@ public class PublisherRabbitMQ implements Publisher, Closeable {
 		ByteArrayOutputStream oStream = new ByteArrayOutputStream();
 		message.writeTo(oStream);
 		mChannel.basicPublish(EXCHANGE_NAME, topic, null, oStream.toByteArray());
-		LOGGER.info("Published observation: {}", message.toString());
+		LOGGER.debug("Published observation: {}", message.toString());
 
 	}
 

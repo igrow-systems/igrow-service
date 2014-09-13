@@ -19,7 +19,6 @@ package com.argusat.gjl.subscriber;
 import java.io.ByteArrayInputStream;
 import java.io.Closeable;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Properties;
 
 import org.jvnet.hk2.annotations.Service;
@@ -43,7 +42,7 @@ public abstract class SubscriberRabbitMQ<T extends AbstractMessage> implements
 
 	private static final String EXCHANGE_NAME = "topic_observations";
 
-	private static final String QUEUE_NAME = "observations";
+	//private static final String QUEUE_NAME = "observations";
 
 	private static final String OBSERVATIONS_CONSUMER_TAG = "observationsConsumerTag";
 
@@ -66,6 +65,8 @@ public abstract class SubscriberRabbitMQ<T extends AbstractMessage> implements
 	private Channel mChannel;
 
 	private MessageHandler<T> mMessageHandler;
+	
+	private String mQueueName;
 
 	public SubscriberRabbitMQ() {
 
@@ -97,13 +98,13 @@ public abstract class SubscriberRabbitMQ<T extends AbstractMessage> implements
 			mChannel = mConnection.createChannel();
 
 			mChannel.exchangeDeclare(EXCHANGE_NAME, "topic");
-			mChannel.queueDeclare(QUEUE_NAME, false, true, true, null);
-			// mQueueName = mChannel.queueDeclare().getQueue();
+			//mChannel.queueDeclare(QUEUE_NAME, false, true, true, null);
+			mQueueName = mChannel.queueDeclare().getQueue();
 
 			LOGGER.info("RabbitMQ subscriber connected");
 
 			boolean autoAck = false;
-			mChannel.basicConsume(QUEUE_NAME, autoAck,
+			mChannel.basicConsume(mQueueName, autoAck,
 					OBSERVATIONS_CONSUMER_TAG, new DefaultConsumer(mChannel) {
 						@Override
 						public void handleDelivery(String consumerTag,
@@ -119,7 +120,7 @@ public abstract class SubscriberRabbitMQ<T extends AbstractMessage> implements
 
 							T protoBuf = deserialiseMessage(bais);
 
-							LOGGER.info("Received message {}",
+							LOGGER.debug("Received message {}",
 									protoBuf.toString());
 
 							// (process the message components here ...)
@@ -136,14 +137,14 @@ public abstract class SubscriberRabbitMQ<T extends AbstractMessage> implements
 	@Override
 	public void subscribe(String topic) throws IOException {
 
-		mChannel.queueBind(QUEUE_NAME, EXCHANGE_NAME, topic, null);
+		mChannel.queueBind(mQueueName, EXCHANGE_NAME, topic, null);
 		LOGGER.info("Subscribed to " + EXCHANGE_NAME + " topic [ {} ]", topic);
 	}
 
 	@Override
 	public void unsubscribe(String topic) throws IOException {
 
-		mChannel.queueUnbind(QUEUE_NAME, EXCHANGE_NAME, topic, null);
+		mChannel.queueUnbind(mQueueName, EXCHANGE_NAME, topic, null);
 		LOGGER.info("Unsubscribed from " + EXCHANGE_NAME + " topic [ {} ]",
 				topic);
 	}

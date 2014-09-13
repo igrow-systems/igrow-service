@@ -17,6 +17,8 @@
 package com.argusat.gjl.publisher.test;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -28,12 +30,15 @@ import com.argusat.gjl.model.Location;
 import com.argusat.gjl.model.Observation;
 import com.argusat.gjl.model.Observation.ModeType;
 import com.argusat.gjl.model.Observation.ObservationType;
+import com.argusat.gjl.publisher.Publisher;
 import com.argusat.gjl.publisher.PublisherRabbitMQ;
 import com.argusat.gjl.service.observation.ObservationProtoBuf;
 
 public class PublisherRabbitMQTest {
 
 	private Observation mObservation;
+	
+	private Publisher mPublisher;
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -61,8 +66,20 @@ public class PublisherRabbitMQTest {
 		location.setHDOP(5.0f);
 		location.setVDOP(12.0f);
 		mObservation.setLocation(location);
-		
+
 		mObservation.isValid();
+		
+		mPublisher = new PublisherRabbitMQ();
+
+		InputStream entityStream = PublisherRabbitMQ.class
+				.getResourceAsStream("/"
+						+ PublisherRabbitMQ.PROPERTIES_FILENAME);
+
+		Properties properties = new Properties();
+		properties.load(entityStream);
+		entityStream.close();
+		
+		mPublisher.initialise(properties);
 
 	}
 
@@ -73,36 +90,33 @@ public class PublisherRabbitMQTest {
 	@Test
 	public void testConnect() throws IOException {
 
-		PublisherRabbitMQ publisher = new PublisherRabbitMQ();
+		
 
-		publisher.connect();
+		mPublisher.connect();
 
-		publisher.close();
+		mPublisher.close();
 
 	}
 
 	@Test
 	public void testPublish() throws IOException {
 
-		PublisherRabbitMQ publisher = new PublisherRabbitMQ();
-
-		publisher.connect();
-		publisher.publish(
+		mPublisher.connect();
+		mPublisher.publish(
 				String.format("observation.%s", mObservation.getDeviceId()),
 				ObservationProtoBuf.Observation.class,
 				mObservation.getObservationProtoBuf());
 
-		publisher.close();
+		mPublisher.close();
 	}
 
 	@Test
 	public void testClose() throws IOException {
 
-		PublisherRabbitMQ publisher = new PublisherRabbitMQ();
 
-		publisher.connect();
+		mPublisher.connect();
 
-		publisher.close();
+		mPublisher.close();
 
 	}
 

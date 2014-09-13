@@ -14,46 +14,60 @@
  * with Argusat Limited.
  */
 
-
 package com.argusat.gjl.locservice;
 
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.ws.rs.ApplicationPath;
 
 import org.glassfish.hk2.api.ServiceLocator;
+import org.glassfish.hk2.api.TypeLiteral;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.server.ResourceConfig;
 
 import com.argusat.gjl.locservice.session.LocatorSessionManager;
-import com.argusat.gjl.locservice.session.LocatorSessionManagerFactory;
+import com.argusat.gjl.publisher.Publisher;
+import com.argusat.gjl.publisher.PublisherRabbitMQ;
+import com.argusat.gjl.service.observation.ObservationProtoBuf.Observation;
+import com.argusat.gjl.subscriber.ObservationSubscriberRabbitMQ;
 import com.argusat.gjl.subscriber.Subscriber;
-import com.argusat.gjl.subscriber.SubscriberFactory;
 
 @ApplicationPath("/")
 public class LocatorServiceApplication extends ResourceConfig {
 
 	@Inject
 	private ServiceLocator mServiceLocator;
-	
+
 	public LocatorServiceApplication() {
-		
+
 		packages("com.argusat.gjl.locservice");
-		
+
 		register(new AbstractBinder() {
-            @Override
-            protected void configure() {
-                bindFactory(LocatorSessionManagerFactory.class).to(LocatorSessionManager.class);
-            }
-        });
-		
+			@Override
+			protected void configure() {
+				bind(LocatorSessionManager.class).to(
+						LocatorSessionManager.class).in(Singleton.class);
+			}
+		});
+
 		register(new AbstractBinder() {
-            @Override
-            protected void configure() {
-                bindFactory(SubscriberFactory.class).to(Subscriber.class);
-            }
-        });
+			@Override
+			protected void configure() {
+				bind(ObservationSubscriberRabbitMQ.class).to(
+						new TypeLiteral<Subscriber<Observation>>() {
+						}).in(Singleton.class);
+			}
+		});
+
+		register(new AbstractBinder() {
+			@Override
+			protected void configure() {
+				bind(PublisherRabbitMQ.class).to(Publisher.class).in(
+						Singleton.class);
+			}
+		});
 
 	}
 
@@ -71,7 +85,7 @@ public class LocatorServiceApplication extends ResourceConfig {
 		super(original);
 		// TODO Auto-generated constructor stub
 	}
-	
+
 	/*
 	 * TODO: mLocator.shutdown() in preDestroy()
 	 */

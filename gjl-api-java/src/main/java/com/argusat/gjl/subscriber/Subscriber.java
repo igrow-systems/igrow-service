@@ -27,16 +27,16 @@ import com.argusat.gjl.subscriber.MessageHandler;
 @Contract
 public interface Subscriber<T> extends Closeable {
 
-	public void connect() throws IOException;
+	void connect() throws IOException;
 	
-	public void initialise(Properties properties);
+	void initialise(Properties properties);
 
-	public void registerMessageHandler(MessageHandler<T> handler);
+	void registerMessageHandler(MessageHandler<T> handler);
 	
-	public void unregisterMessageHandler(MessageHandler<T> handler);
+	void unregisterMessageHandler(MessageHandler<T> handler);
 	
-	public void subscribe(String topic) throws IOException;
+	void subscribe(String topic) throws IOException;
 	
-	public void unsubscribe(String topic) throws IOException;
+	void unsubscribe(String topic) throws IOException;
 
 }

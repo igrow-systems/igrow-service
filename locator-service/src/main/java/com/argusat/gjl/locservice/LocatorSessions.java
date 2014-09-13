@@ -19,12 +19,14 @@ package com.argusat.gjl.locservice;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import java.util.UUID;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -32,10 +34,12 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.UriBuilder;
 
+import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.jersey.client.ClientConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.argusat.gjl.PushMessaging;
 import com.argusat.gjl.devservice.providers.FindLocalDevicesRequestProtobufReader;
 import com.argusat.gjl.devservice.providers.FindLocalDevicesRequestProtobufWriter;
 import com.argusat.gjl.devservice.providers.FindLocalDevicesResponseProtobufReader;
@@ -57,11 +61,9 @@ import com.argusat.gjl.service.device.DeviceProtoBuf.NotifyDeviceResponse;
 import com.argusat.gjl.service.locator.LocatorProtoBuf.BeginLocatorSessionRequest;
 import com.argusat.gjl.service.locator.LocatorProtoBuf.BeginLocatorSessionResponse;
 import com.argusat.gjl.service.locator.LocatorProtoBuf.BeginLocatorSessionResponse.ErrorCode;
-import com.argusat.gjl.service.locator.LocatorProtoBuf.EndLocatorSessionRequest;
 import com.argusat.gjl.service.locator.LocatorProtoBuf.EndLocatorSessionResponse;
 import com.argusat.gjl.service.locator.LocatorProtoBuf.JoinLocatorSessionRequest;
 import com.argusat.gjl.service.locator.LocatorProtoBuf.JoinLocatorSessionResponse;
-import com.argusat.gjl.subscriber.Subscriber;
 
 // The Java class will be hosted at the URI path "/locatorsessions"
 @Path("/locatorsessions")
@@ -74,7 +76,7 @@ public class LocatorSessions {
 	private LocatorSessionManager mLocatorSessionManager = null;
 
 	@Inject
-	private Subscriber mSubscriber;
+	private ServiceLocator mServiceLocator;
 
 	private Client mClient = null;
 
@@ -130,7 +132,7 @@ public class LocatorSessions {
 
 		if (mLocatorSessionManager.containsKey(deviceId)) {
 			// actually this will happen if the device is already
-			// a member of any session, not just an initiator as
+			// an arbitrary member of any session, not just an initiator as
 			// implied
 			responseBuilder.setResponseCode(ErrorCode.SESSION_ALREADY_STARTED);
 			responseBuilder
@@ -164,6 +166,12 @@ public class LocatorSessions {
 
 			LocatorSession locatorSession = LocatorSession
 					.newLocatorSession(deviceId);
+			// inject the dependencies
+			try {
+				mServiceLocator.inject(locatorSession);
+			} catch (Exception e) {
+				LOGGER.error("Failed to inject dependencies ", e);
+			}
 
 			for (DeviceProtoBuf.Device deviceProtoBuf : response
 					.getDevicesList()) {
@@ -173,6 +181,11 @@ public class LocatorSessions {
 				locatorSession.addParticipant(participant);
 				mLocatorSessionManager.put(participant.getDeviceId(),
 						locatorSession);
+
+				LOGGER.info(String.format(
+						"Added device [ %s ] to session [ %s ]", participant
+								.getDeviceId(), locatorSession.getSessionId()
+								.toString()));
 
 				if (deviceProtoBuf.getDeviceId().equals(deviceId)) {
 					// if the device we are doing this on behalf of
@@ -184,12 +197,11 @@ public class LocatorSessions {
 				NotifyDeviceRequest.Builder notifyDeviceBuilder = DeviceProtoBuf.NotifyDeviceRequest
 						.newBuilder();
 				notifyDeviceBuilder.setDeviceId(deviceProtoBuf.getDeviceId());
-				notifyDeviceBuilder
-						.setMessage(String
-								.format("{\"msg_type\":\"begin_locator_session_request\",\"session_id\":\"%s\" }",
-								// .format("{msg_type:begin_locator_session_request,session_id:%s }",
-										locatorSession.getSessionId()
-												.toString()));
+				notifyDeviceBuilder.setMessage(String.format(
+						"{\"msg_type\":\"%s\",\"session_id\":\"%s\" }",
+						// .format("{msg_type:begin_locator_session_request,session_id:%s }",
+						PushMessaging.MESSAGE_TYPE_REQUEST_NEW_SESSION,
+						locatorSession.getSessionId().toString()));
 
 				WebTarget notificationsWr = r.path("notifications");
 				NotifyDeviceResponse notifyDeviceResponse = notificationsWr
@@ -210,16 +222,18 @@ public class LocatorSessions {
 
 			locatorSession.setSessionState(SessionStatus.RUNNING);
 
+			responseBuilder.setSessionId(locatorSession.getSessionId()
+					.toString());
+			responseBuilder.setResponseCode(ErrorCode.NONE);
+
 		}
 
 		if (FindLocalDevicesResponse.ErrorCode.NO_LOCAL_DEVICES == response
 				.getResponseCode()) {
 			responseBuilder
 					.setResponseCode(ErrorCode.INSUFFICIENT_LOCAL_CANDIDATES);
-			return responseBuilder.build();
 		}
 
-		responseBuilder.setResponseCode(ErrorCode.NONE);
 		return responseBuilder.build();
 	}
 
@@ -245,11 +259,82 @@ public class LocatorSessions {
 	@Produces("application/octet-stream")
 	// The Java method will produce content identified by the MIME Media
 	// type "application/octet-stream"
-	@Consumes("application/octet-stream")
+	// @Consumes("application/octet-stream")
+	@Path("/{session_id}")
 	public EndLocatorSessionResponse deleteLocatorSession(
-			EndLocatorSessionRequest endLocatorSessionRequest) {
+	/* EndLocatorSessionRequest endLocatorSessionRequest, */
+	@PathParam("session_id") String sessionId) {
 
-		return null;
+		EndLocatorSessionResponse.Builder responseBuilder = EndLocatorSessionResponse
+				.newBuilder();
+		try {
+			// final String deviceId = endLocatorSessionRequest.getDeviceId();
+
+			LOGGER.info(String.format(">endLocatorSession [ %s ] ", sessionId));
+
+			final UUID sessionUuid = UUID.fromString(sessionId);
+			final LocatorSession session = mLocatorSessionManager
+					.getBySessionId(sessionUuid);
+
+			if (session == null) {
+				responseBuilder
+						.setResponseCode(EndLocatorSessionResponse.ErrorCode.SESSION_INVALID);
+			} else {
+
+				WebTarget r = mClient.target(UriBuilder
+						.fromUri(
+								String.format("http://%s/", mProperties
+										.getProperty("service.device.host")))
+						.port(Integer.parseInt(mProperties
+								.getProperty("service.device.port"))).build());
+
+				for (Participant participant : session.getParticipants()
+						.values()) {
+
+					final String deviceId = participant.getDeviceId();
+
+					if (session.getInitiatorDeviceId().equals(deviceId)) {
+						// don't notify the originator of the request
+						continue;
+					}
+
+					NotifyDeviceRequest.Builder notifyDeviceBuilder = DeviceProtoBuf.NotifyDeviceRequest
+							.newBuilder();
+					notifyDeviceBuilder.setDeviceId(participant.getDeviceId());
+					notifyDeviceBuilder.setMessage(String.format(
+							"{\"msg_type\":\"%s\",\"session_id\":\"%s\" }",
+							// .format("{msg_type:begin_locator_session_request,session_id:%s }",
+							PushMessaging.MESSAGE_TYPE_REQUEST_END_SESSION,
+							session.getSessionId().toString()));
+
+					WebTarget notificationsWr = r.path("notifications");
+					NotifyDeviceResponse notifyDeviceResponse = notificationsWr
+							.request("application/octet-stream").post(
+									Entity.entity(notifyDeviceBuilder.build(),
+											"application/octet-stream"),
+									NotifyDeviceResponse.class);
+
+					if (notifyDeviceResponse.getResponseCode() != NotifyDeviceResponse.ErrorCode.NONE) {
+
+						LOGGER.error(String
+								.format("Failed to notify device [ %s ] reponse was: %s ",
+										deviceId,
+										notifyDeviceResponse.toString()));
+					}
+
+				}
+				
+				LocatorSession locatorSession = mLocatorSessionManager
+						.remove(sessionId);
+				locatorSession.setSessionState(SessionStatus.STOPPED);
+
+				responseBuilder
+						.setResponseCode(EndLocatorSessionResponse.ErrorCode.NONE);
+			}
+		} catch (Exception e) {
+			LOGGER.error("YOWSA!", e);
+		}
+
+		return responseBuilder.build();
 	}
-
 }

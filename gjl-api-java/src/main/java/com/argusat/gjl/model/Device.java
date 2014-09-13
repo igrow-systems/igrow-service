@@ -81,6 +81,10 @@ public class Device {
 		modelDevice.setModel(device.getModel());
 		modelDevice.setProduct(device.getProduct());
 		modelDevice.setDevice(device.getDevice());
+		if (device.hasLastKnownLocation()) {
+			modelDevice.setLastKnownLocation(new Location(device
+					.getLastKnownLocation()));
+		}
 
 		return modelDevice;
 	}
@@ -144,7 +148,8 @@ public class Device {
 
 	public void setLastKnownLocation(Location lastKnownLocation) {
 		mLastKnownLocation = lastKnownLocation;
-		mDeviceProtoBufBuilder.setLastKnownLocation(lastKnownLocation.getLocationProtoBuf());
+		mDeviceProtoBufBuilder.setLastKnownLocation(lastKnownLocation
+				.getLocationProtoBuf());
 		mDirty = true;
 	}
 

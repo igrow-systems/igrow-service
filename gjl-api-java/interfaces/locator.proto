@@ -73,6 +73,7 @@ message EndLocatorSessionResponse {
 
   enum ErrorCode {
     NONE = 0;
+    SESSION_INVALID = 1;
   }
 
   required ErrorCode responseCode = 1;

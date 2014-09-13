@@ -17,6 +17,7 @@
 package com.argusat.gjl.locservice.session;
 
 import com.argusat.gjl.model.Device;
+import com.argusat.gjl.model.Location;
 import com.argusat.gjl.service.locator.LocatorSessionInfoProtoBuf.LocatorSessionInfo;
 import com.argusat.gjl.service.locator.LocatorSessionInfoProtoBuf.LocatorSessionInfo.Participant.ParticipantStatus;
 
@@ -76,8 +77,13 @@ public class Participant {
 				.newBuilder();
 
 		participantBuilder.setDeviceId(getDeviceId());
-		participantBuilder.setLocation(getDevice().getLastKnownLocation()
-				.getLocationProtoBuf());
+
+		Location lastKnownLocation = getDevice().getLastKnownLocation();
+		if (lastKnownLocation != null) {
+			participantBuilder.setLocation(lastKnownLocation
+					.getLocationProtoBuf());
+		}
+		
 		participantBuilder.setLastUpdateTimestamp(getLastUpdateTimestamp());
 
 		switch (getCurrentState()) {

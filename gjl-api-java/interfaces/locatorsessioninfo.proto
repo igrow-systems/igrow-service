@@ -36,8 +36,8 @@ message LocatorSessionInfo {
 
 		required string deviceId = 1;
 		required ParticipantStatus participantStatus = 2;
-		required com.argusat.gjl.observation.Location location = 3;
-		required uint64 lastUpdateTimestamp = 4;
+		optional com.argusat.gjl.observation.Location location = 3;
+		optional uint64 lastUpdateTimestamp = 4;
 	}
 	
 	message GnssJammer {
@@ -46,8 +46,8 @@ message LocatorSessionInfo {
 	
 	required string sessionId = 1;
 	required SessionStatus sessionStatus = 2;
-	repeated Participant participants = 3;
-	repeated GnssJammer jammers = 4;
+	repeated Participant participant = 3;
+	repeated GnssJammer jammer = 4;
 }
 
 

@@ -1,7 +1,7 @@
 /* -*- mode: java; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
 
 /*
- * @(#)Publisher.java        
+ * @(#)PushMessaging.java        
  *
  * Copyright (c) 2014 Argusat Limited
  * 10 Underwood Road,  Southampton.  UK
@@ -14,21 +14,12 @@
  * with Argusat Limited.
  */
 
-package com.argusat.gjl.publisher;
+package com.argusat.gjl;
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.util.Properties;
+public class PushMessaging {
 
-import com.google.protobuf.AbstractMessage;
-
-public interface Publisher extends Closeable {
-
-	void connect() throws IOException;
-
-	<T extends AbstractMessage> void publish(String topic, Class<T> clazz, T message) throws IOException;
-
-	boolean isConnected();
+	public static final String MESSAGE_TYPE_REQUEST_NEW_SESSION = "begin_locator_session_request";
 	
-	void initialise(Properties properties);
+	public static final String MESSAGE_TYPE_REQUEST_END_SESSION = "end_locator_session_request";
+	
 }

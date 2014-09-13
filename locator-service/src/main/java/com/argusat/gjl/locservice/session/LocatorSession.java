@@ -29,8 +29,11 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.argusat.gjl.model.Location;
 import com.argusat.gjl.publisher.Publisher;
 import com.argusat.gjl.service.locator.LocatorSessionInfoProtoBuf.LocatorSessionInfo;
+import com.argusat.gjl.service.observation.ObservationProtoBuf.Observation;
+import com.argusat.gjl.subscriber.Subscriber;
 
 public class LocatorSession {
 
@@ -54,6 +57,9 @@ public class LocatorSession {
 	private final Timer mTimer;
 
 	@Inject
+	private Subscriber<Observation> mSubscriber;
+
+	@Inject
 	private Publisher mPublisher;
 
 	private final class CalculateAndPublishTask extends TimerTask {
@@ -65,11 +71,10 @@ public class LocatorSession {
 
 			if (mPublisher != null && mPublisher.isConnected()) {
 				try {
-					mPublisher.publish(
-							String.format("session.%s", mSessionId),
+					mPublisher.publish(String.format("session.%s", mSessionId),
 							LocatorSessionInfo.class,
 							getLocatorSessionInfoProtoBuf());
-				} catch (IOException e) {
+				} catch (Exception e) {
 					LOGGER.error("Failed to publish LocatorSessionInfo", e);
 				}
 			}
@@ -97,8 +102,13 @@ public class LocatorSession {
 	}
 
 	// TODO: this class is an ideal candidate for
-	// using the GoF State pattern 
+	// using the GoF State pattern
 	public void setSessionState(SessionStatus sessionState) {
+
+		LOGGER.info(String.format(
+				"LocatorSession [ %s ] state [ %s ] - > [ %s ]", mSessionId,
+				mSessionState, sessionState));
+
 		if (sessionState == SessionStatus.RUNNING
 				&& mSessionState != SessionStatus.RUNNING) {
 			mTimer.scheduleAtFixedRate(new CalculateAndPublishTask(), 5000L,
@@ -106,7 +116,24 @@ public class LocatorSession {
 		}
 		if (sessionState == SessionStatus.STOPPED
 				&& mSessionState != SessionStatus.STOPPED) {
-			mTimer.cancel();
+			if (mSubscriber != null) {
+				for (Participant participant : mParticipants.values()) {
+					final String topic = String.format("observation.%s",
+							participant.getDeviceId());
+					try {
+						mSubscriber.unsubscribe(topic);
+					} catch (IOException e) {
+						LOGGER.error(
+								String.format(
+										"Session [ %s ] failed to unsubscribe from topic [ %s ]",
+										mSessionId, topic), e);
+					}
+				}
+			}
+
+			if (mTimer != null) {
+				mTimer.cancel();
+			}
 		}
 		this.mSessionState = sessionState;
 	}
@@ -116,7 +143,19 @@ public class LocatorSession {
 	}
 
 	public void addParticipant(Participant participant) {
+
 		mParticipants.put(participant.getDeviceId(), participant);
+
+		if (mSubscriber != null) {
+			final String topic = String.format("observation.%s",
+					participant.getDeviceId());
+			try {
+				mSubscriber.subscribe(topic);
+			} catch (IOException e) {
+				LOGGER.error(String.format(
+						"Couldn't subscribe to topic [ %s ]", topic), e);
+			}
+		}
 	}
 
 	public UUID getSessionId() {
@@ -137,17 +176,33 @@ public class LocatorSession {
 
 	protected void calculate() {
 
+		final Location meanCentre = new Location();
+
+		double sumlat = 0.0d;
+		double sumlon = 0.0d;
+		int n = 0;
 		for (Participant participant : mParticipants.values()) {
 
-			// get all the latest values
+			Location lastKnownLocation = participant.getDevice()
+					.getLastKnownLocation();
+			if (lastKnownLocation != null) {
 
+				sumlat += lastKnownLocation.getLatitude();
+				sumlon += lastKnownLocation.getLongitude();
+				++n;
+			}
 		}
-
-		// do some computation
+		meanCentre.setLatitude((float) (sumlat / (double) n));
+		meanCentre.setLongitude((float) (sumlon / (double) n));
+		meanCentre.setAltitude(0.0f);
+		meanCentre.setHDOP(15.0f);
+		meanCentre.setVDOP(0.0f);
 
 		// store the results
 		mGnssJammers.clear();
 		GnssJammer jammer = new GnssJammer();
+
+		jammer.setLocation(meanCentre);
 		mGnssJammers.add(jammer);
 	}
 
@@ -156,23 +211,37 @@ public class LocatorSession {
 		LocatorSessionInfo.Builder builder = LocatorSessionInfo.newBuilder();
 		builder.setSessionId(mSessionId.toString());
 
-		int i = 0;
+		switch (mSessionState) {
+		case CREATED:
+			builder.setSessionStatus(LocatorSessionInfo.SessionStatus.CREATED);
+			break;
+		case RUNNING:
+			builder.setSessionStatus(LocatorSessionInfo.SessionStatus.RUNNING);
+			break;
+		case STOPPED:
+			builder.setSessionStatus(LocatorSessionInfo.SessionStatus.STOPPED);
+			break;
+		default:
+			break;
+		}
+
 		Vector<LocatorSessionInfo.Participant> participantProtoBufs = new Vector<LocatorSessionInfo.Participant>(
 				mParticipants.size());
 		for (Participant participant : mParticipants.values()) {
 
-			participantProtoBufs.add(i, participant.getProtoBuf());
+			participantProtoBufs.add(participant.getProtoBuf());
 
 		}
+		builder.addAllParticipant(participantProtoBufs);
 
-		i = 0;
 		Vector<LocatorSessionInfo.GnssJammer> gnssJammerProtoBufs = new Vector<LocatorSessionInfo.GnssJammer>(
 				mGnssJammers.size());
 		for (GnssJammer jammer : mGnssJammers) {
 
-			gnssJammerProtoBufs.add(i, jammer.getProtoBuf());
+			gnssJammerProtoBufs.add(jammer.getProtoBuf());
 
 		}
+		builder.addAllJammer(gnssJammerProtoBufs);
 
 		return builder.build();
 

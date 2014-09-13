@@ -17,8 +17,10 @@
 package com.argusat.gjl.observice;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Properties;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -59,7 +61,19 @@ public class Observations {
 		}
 		try {
 			mPublisher = new PublisherRabbitMQ();
+
+			InputStream entityStream = PublisherRabbitMQ.class
+					.getResourceAsStream("/"
+							+ PublisherRabbitMQ.PROPERTIES_FILENAME);
+
+			Properties properties = new Properties();
+			properties.load(entityStream);
+			entityStream.close();
+
+			mPublisher.initialise(properties);
+
 			mPublisher.connect();
+
 		} catch (IOException e) {
 			LOGGER.error("Couldn't connect to RabbitMQ server", e);
 		}
