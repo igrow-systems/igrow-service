@@ -32,8 +32,9 @@ message BeginLocatorSessionResponse {
 
   enum ErrorCode {
     NONE = 0;
-    SESSION_ALREADY_STARTED = 1;
-    INSUFFICIENT_LOCAL_CANDIDATES = 2;
+    INTERNAL_ERROR = 1;
+    SESSION_ALREADY_STARTED = 2;
+    INSUFFICIENT_LOCAL_CANDIDATES = 3;
   }
 
   required ErrorCode responseCode = 1;
@@ -52,7 +53,8 @@ message JoinLocatorSessionResponse {
 
   enum ErrorCode {
     NONE = 0;
-    SESSION_INVALID = 1;
+    INTERNAL_ERROR = 1;
+    SESSION_INVALID = 2;
   }
 
   required ErrorCode responseCode = 1;
@@ -73,7 +75,8 @@ message EndLocatorSessionResponse {
 
   enum ErrorCode {
     NONE = 0;
-    SESSION_INVALID = 1;
+    INTERNAL_ERROR = 1;
+    SESSION_INVALID = 2;
   }
 
   required ErrorCode responseCode = 1;

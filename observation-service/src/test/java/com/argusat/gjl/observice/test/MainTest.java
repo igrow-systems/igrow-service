@@ -40,11 +40,15 @@ public class MainTest extends TestCase {
 	 * The first 4 pairs are within 1km of 50.9399695,-1.415058,15 and the last
 	 * 4 pairs are more than 1km from 50.9399695,-1.415058,15
 	 * 
-	 * 50.936195, -1.415285 50.942523, -1.409577 50.942604, -1.420563 50.932652,
-	 * -1.418117
+	 * 50.936195, -1.415285 
+	 * 50.942523, -1.409577 
+	 * 50.942604, -1.420563 
+	 * 50.932652, -1.418117
 	 * 
-	 * 50.927242, -1.423310 50.952123, -1.406076 50.949744, -1.442468 50.966449,
-	 * -1.452510
+	 * 50.927242, -1.423310 
+	 * 50.952123, -1.406076 
+	 * 50.949744, -1.442468 
+	 * 50.966449, -1.452510
 	 */
 
 	private static float[] lats = { 50.936195f, 50.942523f, 50.942604f,
@@ -129,10 +133,13 @@ public class MainTest extends TestCase {
 		float latitude = 50.9399695f;
 		float longitude = -1.415058f;
 		int radius = 1000;
+		int limit = 4;
+		
 		WebResource wr = r.path("observations")
 				.queryParam("lat", Float.toString(latitude))
 				.queryParam("lon", Float.toString(longitude))
-				.queryParam("radius", Integer.toString(radius));
+				.queryParam("radius", Integer.toString(radius))
+				.queryParam("limit", Integer.toString(limit));
 		ObservationCollection response = wr.type("text/plain").get(
 				ObservationCollection.class);
 

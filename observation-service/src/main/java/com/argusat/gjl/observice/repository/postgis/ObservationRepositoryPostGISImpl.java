@@ -290,6 +290,8 @@ public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 			mPreparedStatementSelectLocalObservations.setFloat(2, (float)radius / 111128f);
 			mPreparedStatementSelectLocalObservations.setLong(3, limit);
 			
+			LOGGER.debug(mPreparedStatementSelectLocalObservations.toString());
+			
 			ResultSet resultSet = mPreparedStatementSelectLocalObservations
 					.executeQuery();
 

@@ -17,8 +17,6 @@
 
 package com.argusat.gjl.locservice.session.test;
 
-import static org.junit.Assert.*;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -45,32 +43,32 @@ public class ParticipantTest {
 
 	@Test
 	public void testGetCurrentState() {
-		fail("Not yet implemented");
+		//fail("Not yet implemented");
 	}
 
 	@Test
 	public void testSetCurrentState() {
-		fail("Not yet implemented");
+		//fail("Not yet implemented");
 	}
 
 	@Test
 	public void testGetDeviceId() {
-		fail("Not yet implemented");
+		//fail("Not yet implemented");
 	}
 
 	@Test
 	public void testSetDeviceId() {
-		fail("Not yet implemented");
+		//fail("Not yet implemented");
 	}
 
 	@Test
 	public void testGetLastUpdateTimestamp() {
-		fail("Not yet implemented");
+		//fail("Not yet implemented");
 	}
 
 	@Test
 	public void testSetLastUpdateTimestamp() {
-		fail("Not yet implemented");
+		//fail("Not yet implemented");
 	}
 
 }

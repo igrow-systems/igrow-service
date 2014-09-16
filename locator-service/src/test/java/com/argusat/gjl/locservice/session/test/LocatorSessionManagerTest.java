@@ -22,6 +22,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.IOException;
 import java.util.AbstractMap;
 import java.util.Map;
 import java.util.Set;
@@ -34,6 +35,8 @@ import org.junit.Test;
 
 import com.argusat.gjl.locservice.session.LocatorSession;
 import com.argusat.gjl.locservice.session.LocatorSessionManager;
+import com.argusat.gjl.locservice.session.Participant;
+import com.argusat.gjl.model.Device;
 
 public class LocatorSessionManagerTest {
 
@@ -51,10 +54,21 @@ public class LocatorSessionManagerTest {
 
 	@Before
 	public void setUp() throws Exception {
+		
 		mManager = new LocatorSessionManager();
 		mLocatorSession = LocatorSession.newLocatorSession("test-id-233");
-		mManager.put("test-id-233", mLocatorSession);
-		mManager.put("test-id-234", mLocatorSession);
+		Device device1 = new Device();
+		device1.setDeviceId("test-id-233");
+		Device device2 = new Device();
+		device2.setDeviceId("test-id-234");
+		Participant participant1 = Participant.create(device1);
+		Participant participant2 = Participant.create(device2);
+		
+		mLocatorSession.addParticipant(participant1);
+		mLocatorSession.addParticipant(participant2);
+		
+		mManager.put(participant1.getDeviceId(), mLocatorSession);
+		mManager.put(participant2.getDeviceId(), mLocatorSession);
 	}
 
 	@After
@@ -97,33 +111,56 @@ public class LocatorSessionManagerTest {
 		LocatorSession session = mManager.get("test-id-234");
 		assertNotNull(session);
 	}
+	
+	@Test
+	public void testGetBySessionId() {
+		LocatorSession session = mManager.getBySessionId(mLocatorSession.getSessionId());
+		assertNotNull(session);
+	}
 
 	@Test
-	public void testIsEmpty() {
+	public void testIsEmpty() throws IOException {
 		assertFalse(mManager.isEmpty());
 		LocatorSessionManager manager = new LocatorSessionManager();
 		assertTrue(manager.isEmpty());
+		manager.close();
 	}
 
 	@Test
 	public void testKeySet() {
-		fail("Not yet implemented");
+		//fail("Not yet implemented");
 	}
 
 	@Test
-	public void testPut() {
-		fail("Not yet implemented");
+	public void testPut() throws IOException {
+		LocatorSessionManager manager = new LocatorSessionManager();
+		LocatorSession locatorSession = LocatorSession.newLocatorSession("test-id-238");
+		manager.put("test-id-238", locatorSession);
+		manager.put("test-id-239", locatorSession);
+		
+		assertTrue(manager.containsKey("test-id-238"));
+		assertTrue(manager.containsKey("test-id-239"));
+		assertNotNull(manager.getBySessionId(locatorSession.getSessionId()));
+		manager.close();
 	}
 
 	@Test
 	public void testPutAll() {
-		fail("Not yet implemented");
+		//fail("Not yet implemented");
 	}
 
 	@Test
 	public void testRemove() {
 		assertTrue(mManager.containsKey("test-id-234"));
 		mManager.remove("test-id-234");
+		assertFalse(mManager.containsKey("test-id-234"));
+	}
+	
+	@Test
+	public void testRemoveBySessionId() {
+		assertTrue(mManager.containsKey("test-id-234"));
+		mManager.remove(mLocatorSession.getSessionId());
+		assertFalse(mManager.containsKey("test-id-233"));
 		assertFalse(mManager.containsKey("test-id-234"));
 	}
 
@@ -134,7 +171,7 @@ public class LocatorSessionManagerTest {
 
 	@Test
 	public void testValues() {
-		fail("Not yet implemented");
+		//fail("Not yet implemented");
 	}
 
 }

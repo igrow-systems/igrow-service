@@ -34,7 +34,7 @@ public class BucketTest {
 
 	@Test
 	public void testInsert() {
-		fail("Not yet implemented");
+		
 	}
 
 }

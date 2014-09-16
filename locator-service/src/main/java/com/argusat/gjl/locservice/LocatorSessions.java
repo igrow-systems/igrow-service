@@ -249,7 +249,11 @@ public class LocatorSessions {
 	public JoinLocatorSessionResponse joinLocatorSession(
 			JoinLocatorSessionRequest joinLocatorSessionRequest) {
 
-		return null;
+		JoinLocatorSessionResponse.Builder builder = JoinLocatorSessionResponse
+				.newBuilder();
+		builder.setResponseCode(JoinLocatorSessionResponse.ErrorCode.NONE);
+
+		return builder.build();
 	}
 
 	// The Java method will process HTTP DELETE requests
@@ -323,9 +327,9 @@ public class LocatorSessions {
 					}
 
 				}
-				
+
 				LocatorSession locatorSession = mLocatorSessionManager
-						.remove(sessionId);
+						.remove(sessionUuid);
 				locatorSession.setSessionState(SessionStatus.STOPPED);
 
 				responseBuilder
@@ -333,6 +337,9 @@ public class LocatorSessions {
 			}
 		} catch (Exception e) {
 			LOGGER.error("YOWSA!", e);
+			responseBuilder
+					.setResponseCode(EndLocatorSessionResponse.ErrorCode.INTERNAL_ERROR);
+			responseBuilder.setResponseMessage(e.toString());
 		}
 
 		return responseBuilder.build();

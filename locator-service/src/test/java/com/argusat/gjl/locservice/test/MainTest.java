@@ -43,12 +43,15 @@ import com.argusat.gjl.locservice.provider.JoinLocatorSessionResponseProtobufWri
 import com.argusat.gjl.model.Location;
 import com.argusat.gjl.service.locator.LocatorProtoBuf.BeginLocatorSessionRequest;
 import com.argusat.gjl.service.locator.LocatorProtoBuf.BeginLocatorSessionResponse;
+import com.argusat.gjl.service.locator.LocatorProtoBuf.EndLocatorSessionRequest;
 import com.argusat.gjl.service.locator.LocatorProtoBuf.JoinLocatorSessionRequest;
 
 public class MainTest extends TestCase {
 
 	private BeginLocatorSessionRequest mBeginLocatorSessionRequest;
 
+	private HttpServer deviceHttpServer;
+	
 	private HttpServer httpServer;
 
 	private WebTarget r;
@@ -61,6 +64,9 @@ public class MainTest extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 
+		// start the device/notifications server
+		deviceHttpServer = com.argusat.gjl.devservice.Main.startServer();
+		
 		// start the Grizzly2 web container
 		httpServer = Main.startServer();
 
@@ -107,6 +113,8 @@ public class MainTest extends TestCase {
 		super.tearDown();
 
 		httpServer.shutdownNow();
+		
+		deviceHttpServer.shutdownNow();
 	}
 
 	/**
@@ -151,7 +159,7 @@ public class MainTest extends TestCase {
 		assertEquals(BeginLocatorSessionResponse.ErrorCode.NONE,
 				response.getResponseCode());
 		
-		String sessionId = response.getSessionId();
+		//String sessionId = response.getSessionId();
 		
 		JoinLocatorSessionRequest.Builder joinBuilder = JoinLocatorSessionRequest
 				.newBuilder();
@@ -167,6 +175,43 @@ public class MainTest extends TestCase {
 
 		assertEquals(BeginLocatorSessionResponse.ErrorCode.NONE,
 				joinResponse.getResponseCode());
+	}
+	
+	/**
+	 * Test to see that the /locatorsessions endpoint is available and
+	 * processing BeginLocatorSession requests.
+	 */
+	public void testEndLocatorSession() {
+
+		// first create a session (call the other test?)
+		BeginLocatorSessionRequest.Builder builder = BeginLocatorSessionRequest
+				.newBuilder();
+		builder.setDeviceId("test-id-009");
+
+		WebTarget wr = r.path("locatorsessions");
+		BeginLocatorSessionResponse response = wr.request(
+				"application/octet-stream").post(
+				Entity.entity(mBeginLocatorSessionRequest,
+						"application/octet-stream"),
+				BeginLocatorSessionResponse.class);
+
+		assertEquals(BeginLocatorSessionResponse.ErrorCode.NONE,
+				response.getResponseCode());
+		assertTrue(response.hasSessionId());
+		
+		// then delete it.
+		
+		EndLocatorSessionRequest.Builder endSessionBuilder = EndLocatorSessionRequest
+				.newBuilder();
+		endSessionBuilder.setDeviceId("test-id-009");
+
+		wr = r.path(String.format("locatorsessions/%s", response.getSessionId()));
+		BeginLocatorSessionResponse endSessionResponse = wr.request(
+				"application/octet-stream").delete(BeginLocatorSessionResponse.class);
+
+		assertEquals(BeginLocatorSessionResponse.ErrorCode.NONE,
+				endSessionResponse.getResponseCode());
+		//assertTrue(endSessionResponse.hasSessionId());
 	}
 
 	/**
