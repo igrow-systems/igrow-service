@@ -96,9 +96,9 @@ public class Notifications {
 				return builder.build();
 			}
 			
-			String collapseKey = "sample";
+			String collapseKey = "control";
 			Long timeToLive = 10000L;
-			Boolean delayWhileIdle = true;
+			Boolean delayWhileIdle = false;
 			mGcmPushClient.send(SmackCcsClient
 					.createJsonMessage(toRegId, messageId, payload,
 							collapseKey, timeToLive, delayWhileIdle));

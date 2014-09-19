@@ -19,7 +19,12 @@ package com.argusat.gjl.devservice;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -34,6 +39,7 @@ import com.argusat.gjl.devservice.repository.DeviceRepository;
 import com.argusat.gjl.devservice.repository.DeviceRepositoryException;
 import com.argusat.gjl.model.Device;
 import com.argusat.gjl.service.observation.ObservationProtoBuf.Observation;
+import com.argusat.gjl.service.observation.ObservationProtoBuf.Observation.ObservationType;
 import com.argusat.gjl.subscriber.MessageHandler;
 import com.argusat.gjl.subscriber.Subscriber;
 import com.argusat.gjl.subscriber.SubscriberRabbitMQ;
@@ -46,18 +52,69 @@ public class ObservationListener implements MessageHandler<Observation>,
 	private static final transient Logger LOGGER = LoggerFactory
 			.getLogger(ObservationListener.class);
 
+	private static final int CORE_POOL_SIZE = 5;
+
+	private static final int AGGREGATION_DELAY = 5000; // 5s (5000ms)
+
 	@Inject
 	private DeviceRepository mDeviceRepository;
 
 	@Inject
 	private Subscriber<Observation> mSubscriber;
 
+	private class ObservationRunnablePair {
+		public Runnable runnable;
+		public com.argusat.gjl.model.Observation observation;
+	}
+
+	private Map<String, ObservationRunnablePair> mLatestObservations;
+
+	private ScheduledExecutorService mScheduledExecutorService;
+
+	private class UpdateLastKnownLocationRunnable implements Runnable {
+
+		private final String mDeviceId;
+
+		public UpdateLastKnownLocationRunnable(String deviceId) {
+			mDeviceId = deviceId;
+		}
+
+		@Override
+		public void run() {
+
+			final com.argusat.gjl.model.Observation observation = mLatestObservations
+					.get(mDeviceId).observation;
+
+			LOGGER.info(String.format(
+					"Updating last known location of device [ %s ] to %s",
+					mDeviceId, observation.getLocation().toString()));
+
+			final Device device = mDeviceRepository.findDevice(observation
+					.getDeviceId());
+
+			assert (device != null);
+			device.setLastKnownLocation(observation.getLocation());
+
+			try {
+				mDeviceRepository.storeDevice(device);
+			} catch (DeviceRepositoryException e) {
+				LOGGER.error("Couldn't store device", e);
+			}
+			// remove the mapping so any subsequent update
+			// for this device causes a new runnable to be scheduled
+			mLatestObservations.remove(mDeviceId);
+		}
+
+	}
+
 	private static class SingletonHelper {
 		private static final ObservationListener INSTANCE = new ObservationListener();
 	}
 
 	public ObservationListener() {
-
+		mLatestObservations = new ConcurrentHashMap<String, ObservationRunnablePair>();
+		mScheduledExecutorService = Executors
+				.newScheduledThreadPool(CORE_POOL_SIZE);
 	}
 
 	public static ObservationListener getInstance() {
@@ -71,19 +128,34 @@ public class ObservationListener implements MessageHandler<Observation>,
 
 		com.argusat.gjl.model.Observation observation = com.argusat.gjl.model.Observation
 				.newObservation(observationProtoBuf);
-
 		assert (observation != null);
-
-		Device device = mDeviceRepository.findDevice(observation.getDeviceId());
-
-		assert (device != null);
-		device.setLastKnownLocation(observation.getLocation());
-
-		try {
-			mDeviceRepository.storeDevice(device);
-		} catch (DeviceRepositoryException e) {
-			LOGGER.error("Couldn't store device", e);
+		if (!observation.getType().equals(ObservationType.LOCATION_ONLY)) {
+			// only interested in location updates
+			return;
 		}
+		
+		final String deviceId = observation.getDeviceId();
+
+		ObservationRunnablePair observationRunnablePair = mLatestObservations
+				.get(deviceId);
+		if (observationRunnablePair == null) {
+
+			// If we haven't seen an update for this device
+			// create the runnable, schedule it and store
+			// it along with the actual observation
+			final Runnable updateLastKnownLocationRunnable = new UpdateLastKnownLocationRunnable(
+					deviceId);
+			observationRunnablePair = new ObservationRunnablePair();
+			observationRunnablePair.observation = observation;
+			observationRunnablePair.runnable = updateLastKnownLocationRunnable;
+
+			mScheduledExecutorService.schedule(updateLastKnownLocationRunnable,
+					AGGREGATION_DELAY, TimeUnit.MILLISECONDS);
+		} else {
+			// otherwise just update the observation
+			observationRunnablePair.observation = observation;
+		}
+		mLatestObservations.put(deviceId, observationRunnablePair);
 
 	}
 
@@ -120,7 +192,7 @@ public class ObservationListener implements MessageHandler<Observation>,
 			entityStream.close();
 
 			mSubscriber.initialise(properties);
-			
+
 			mSubscriber.registerMessageHandler(this);
 			mSubscriber.connect();
 			mSubscriber.subscribe("observation.*");

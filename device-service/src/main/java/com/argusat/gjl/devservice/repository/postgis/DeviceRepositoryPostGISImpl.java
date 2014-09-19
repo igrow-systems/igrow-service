@@ -114,7 +114,7 @@ public class DeviceRepositoryPostGISImpl implements DeviceRepository {
 	}
 
 	@Override
-	public void storeDevice(Device device) throws DeviceRepositoryException {
+	public synchronized void storeDevice(Device device) throws DeviceRepositoryException {
 
 		if (device == null) {
 			throw new DeviceRepositoryException("Device was null!");
@@ -222,7 +222,7 @@ public class DeviceRepositoryPostGISImpl implements DeviceRepository {
 	}
 
 	@Override
-	public void close() throws IOException {
+	public synchronized void close() throws IOException {
 
 		if (mConnection != null) {
 			try {
@@ -259,7 +259,7 @@ public class DeviceRepositoryPostGISImpl implements DeviceRepository {
 	}
 
 	@Override
-	public Device findDevice(String deviceId) {
+	public synchronized Device findDevice(String deviceId) {
 
 		Device device = null;
 		try {
@@ -307,7 +307,7 @@ public class DeviceRepositoryPostGISImpl implements DeviceRepository {
 	}
 
 	@Override
-	public List<Device> findLocalDevices(double latitude, double longitude,
+	public synchronized List<Device> findLocalDevices(double latitude, double longitude,
 			long radius, long limit) {
 
 		List<Device> devices = null;

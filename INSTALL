@@ -36,6 +36,12 @@ CREATE EXTENSION postgis_topology;
 Build postgis-jdbc.jar
 =======================
 
+Mac OS X 
+--------
+
+modify jdbc/Makefile to set ant path correctly.  Hmmm.  Actually, invoke mvn directly because the ant-maven-tasks integration does something funky with M2_HOME by the looks of things.
+
+--------
 
 build postgis-2.1.x and mvn install the jar.  Using postgis-2.1.2 so that generated postgis-jdbc.jar matches already installed postgis version
 
@@ -123,3 +129,18 @@ apt-get install tomcat7
 usermod -U jsr --append -G tomcat7
 
 mvn -DskipTests=true compile war:exploded
+
+
+
+
+Eclipse and dev environment
+=============================
+
+mvn eclipse:clean
+mvn eclipse:eclipse
+
+Set M2_REPO classpath variable:
+
+mvn -Declipse.workspace="/Users/jsr/dev/gjl_service_eclipse" eclipse:configure-workspace
+
+

@@ -40,7 +40,6 @@ import org.jivesoftware.smack.packet.PacketExtension;
 import org.jivesoftware.smack.provider.PacketExtensionProvider;
 import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smack.util.StringUtils;
-import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
@@ -343,7 +342,7 @@ public class SmackCcsClient {
 
 			@Override
 			public void reconnectingIn(int seconds) {
-				LOGGER.info("Reconnecting in %d secs", seconds);
+				LOGGER.info(String.format("Reconnecting in %d secs", seconds));
 			}
 
 			@Override

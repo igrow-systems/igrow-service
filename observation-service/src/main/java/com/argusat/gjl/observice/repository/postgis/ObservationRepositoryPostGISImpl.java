@@ -23,7 +23,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.List;
@@ -62,15 +61,15 @@ public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 			// + "(ST_SetSRID(ST_MakePoint(?,?,?), 4326) ,?,?,?,?,?,?,?,?,?,?)";
 			+ "(ST_GeomFromEWKB(?),?,?,?,?,?,?,?,?,?,?,?,?)";
 
-	//private static final String SELECT_LOCAL_OBSERVATIONS_SQL = "select distinct on (o.device_id) "
+	// private static final String SELECT_LOCAL_OBSERVATIONS_SQL =
+	// "select distinct on (o.device_id) "
 	private static final String SELECT_LOCAL_OBSERVATIONS_SQL = "select "
 			+ " o.location, o.obs_timestamp, o.device_id, o.sensor_id, "
 			+ " o.hdop, o.vdop, o.obs_type, o.obs_mode, "
 			+ " o.value0, o.value1, o.value2, o.value3, o.value4"
 			+ " from observations o"
 			+ " where ST_DWithin(ST_GeomFromEWKB(?), o.location, ?) "
-			+ " order by obs_timestamp desc"
-			+ " limit(?)";
+			+ " order by obs_timestamp desc" + " limit(?)";
 
 	private PreparedStatement mPreparedStatementInsertObservation;
 
@@ -116,43 +115,10 @@ public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 	@Override
 	public void storeObservation(Observation observation) {
 
-		/*
-		 * Create a statement and execute a select query.
-		 */
-		Statement s = null;
-		try {
-			s = mConnection.createStatement();
-
-			ResultSet r = s.executeQuery("select geom,id from ");
-			while (r.next()) {
-				/*
-				 * Retrieve the geometry as an object then cast it to the
-				 * geometry type. Print things out.
-				 */
-				PGgeometry geom = (PGgeometry) r.getObject(1);
-				int id = r.getInt(2);
-				System.out.println("Row " + id + ":");
-				System.out.println(geom.toString());
-			}
-
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} finally {
-			if (s != null) {
-				try {
-					s.close();
-				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		}
-
 	}
 
 	@Override
-	public void storeObservations(List<Observation> observations) {
+	public synchronized void storeObservations(List<Observation> observations) {
 
 		try {
 
@@ -201,8 +167,7 @@ public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 						observationType.name());
 
 				ModeType mode = observation.getMode();
-				mPreparedStatementInsertObservation.setString(8,
-						mode.name());
+				mPreparedStatementInsertObservation.setString(8, mode.name());
 
 				float[] values = observation.getValues();
 				if (values != null) {
@@ -247,7 +212,7 @@ public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 	}
 
 	@Override
-	public void close() throws IOException {
+	public synchronized void close() throws IOException {
 
 		if (mConnection != null) {
 			try {
@@ -268,8 +233,8 @@ public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 	}
 
 	@Override
-	public List<Observation> findObservations(float latitude, float longitude,
-			long radius, long limit) {
+	public synchronized List<Observation> findObservations(float latitude,
+			float longitude, long radius, long limit) {
 
 		ObservationCollection obsCollection = new ObservationCollection();
 		try {
@@ -286,12 +251,14 @@ public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 			PGgeometry geometry = new PGgeometry(point);
 
 			mPreparedStatementSelectLocalObservations.setObject(1, geometry);
-			// TODO: Fix this hack.  Learn about coordinate systems and projections
-			mPreparedStatementSelectLocalObservations.setFloat(2, (float)radius / 111128f);
+			// TODO: Fix this hack. Learn about coordinate systems and
+			// projections
+			mPreparedStatementSelectLocalObservations.setFloat(2,
+					(float) radius / 111128f);
 			mPreparedStatementSelectLocalObservations.setLong(3, limit);
-			
+
 			LOGGER.debug(mPreparedStatementSelectLocalObservations.toString());
-			
+
 			ResultSet resultSet = mPreparedStatementSelectLocalObservations
 					.executeQuery();
 
@@ -322,7 +289,7 @@ public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 				observation.setTimestamp(resultSet.getTimestamp(2).getTime());
 				observation.setDeviceId(resultSet.getString(3));
 				observation.setMode(ModeType.valueOf(resultSet.getString(8)));
-				
+
 				if (observation.getType() == ObservationType.TYPE_GNSS_CHANNEL) {
 					((GnssChannelObservation) observation).setPrn(resultSet
 							.getInt(4));
