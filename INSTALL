@@ -33,6 +33,13 @@ CREATE EXTENSION postgis;
 CREATE EXTENSION postgis_topology;
 
 
+RabbitMQ
+=========
+
+rabbitmqctl add_user argusat-gjl-dev argusat-gjl-dev
+rabbitmqctl set_permissions -p / argusat-gjl-dev ".*" ".*" ".*"
+
+
 Build postgis-jdbc.jar
 =======================
 
