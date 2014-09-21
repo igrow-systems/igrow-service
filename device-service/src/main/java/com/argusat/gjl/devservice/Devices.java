@@ -141,8 +141,11 @@ public class Devices {
 			}
 			builder.setResponseCode(FindLocalDevicesResponse.ErrorCode.NONE);
 		}
+		
+		FindLocalDevicesResponse response = builder.build();
+		LOGGER.debug(response.toString());
 
-		return builder.build();
+		return response;
 
 	}
 
