@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ ! -n ${M2_REPO:+1} ]; then
+if [ -n ${M2_REPO:+1} ]; then
     echo Please set M2_REPO to the path containing your maven repository.  Exiting.
     exit 1
 fi

@@ -129,7 +129,7 @@ public class ObservationListener implements MessageHandler<Observation>,
 		com.argusat.gjl.model.Observation observation = com.argusat.gjl.model.Observation
 				.newObservation(observationProtoBuf);
 		assert (observation != null);
-		if (!observation.getType().equals(ObservationType.LOCATION_ONLY)) {
+		if (observation.getType() != com.argusat.gjl.model.Observation.ObservationType.TYPE_LOCATION_ONLY) {
 			// only interested in location updates
 			return;
 		}
