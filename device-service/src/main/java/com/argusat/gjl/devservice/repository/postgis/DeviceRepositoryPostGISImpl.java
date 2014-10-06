@@ -331,7 +331,9 @@ public class DeviceRepositoryPostGISImpl implements DeviceRepository {
 					(float) radius / 111128f);
 			mPreparedStatementSelectLocalDevices.setObject(3, geometry);
 			mPreparedStatementSelectLocalDevices.setLong(4, limit);
-
+			
+			LOGGER.debug(mPreparedStatementSelectLocalDevices.toString());
+			
 			ResultSet resultSet = mPreparedStatementSelectLocalDevices
 					.executeQuery();
 

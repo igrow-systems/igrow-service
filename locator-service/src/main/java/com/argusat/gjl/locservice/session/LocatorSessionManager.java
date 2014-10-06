@@ -80,7 +80,7 @@ public class LocatorSessionManager implements Map<String, LocatorSession>,
 
 			mSubscriber.initialise(properties);
 
-			mSubscriber.registerMessageHandler(this);
+			//mSubscriber.registerMessageHandler(this);
 			mSubscriber.connect();
 			// mSubscriber.subscribe("observation.*");
 

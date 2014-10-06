@@ -38,6 +38,7 @@ message LocatorSessionInfo {
 		required ParticipantStatus participantStatus = 2;
 		optional com.argusat.gjl.observation.Location location = 3;
 		optional uint64 lastUpdateTimestamp = 4;
+		optional float averageSignalStrength = 5;
 	}
 	
 	message GnssJammer {

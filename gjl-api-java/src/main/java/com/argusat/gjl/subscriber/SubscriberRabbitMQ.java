@@ -67,6 +67,8 @@ public abstract class SubscriberRabbitMQ<T extends AbstractMessage> implements
 	private MessageHandler<T> mMessageHandler;
 	
 	private String mQueueName;
+	
+	private boolean mInitialised = false;
 
 	public SubscriberRabbitMQ() {
 
@@ -81,7 +83,7 @@ public abstract class SubscriberRabbitMQ<T extends AbstractMessage> implements
 				.getProperty(RABBITMQ_PORT_PROPERTY));
 		mRabbitMQUser = mProperties.getProperty(RABBITMQ_USER_PROPERTY);
 		mRabbitMQPassword = mProperties.getProperty(RABBITMQ_PASSWORD_PROPERTY);
-
+		mInitialised = true;
 	}
 
 	@Override
@@ -185,5 +187,9 @@ public abstract class SubscriberRabbitMQ<T extends AbstractMessage> implements
 	}
 
 	abstract T deserialiseMessage(ByteArrayInputStream bais);
+
+	public boolean isInitialised() {
+		return mInitialised;
+	}
 
 }

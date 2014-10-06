@@ -17,25 +17,29 @@
 package com.argusat.gjl.locservice.session;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.argusat.gjl.locservice.session.Participant.ParticipantState;
+import com.argusat.gjl.model.GnssChannelObservation;
 import com.argusat.gjl.model.Location;
 import com.argusat.gjl.publisher.Publisher;
 import com.argusat.gjl.service.locator.LocatorSessionInfoProtoBuf.LocatorSessionInfo;
 import com.argusat.gjl.service.observation.ObservationProtoBuf.Observation;
+import com.argusat.gjl.subscriber.MessageHandler;
 import com.argusat.gjl.subscriber.Subscriber;
 
-public class LocatorSession {
+public class LocatorSession implements MessageHandler<Observation> {
 
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(LocatorSession.class);
@@ -43,6 +47,21 @@ public class LocatorSession {
 	public enum SessionStatus {
 		CREATED, RUNNING, STOPPED
 	}
+
+	private class AveragerState {
+		public long timestamp;
+		public double total;
+		public int numSamples;
+		
+		public double getAverage() {
+			return total / (double) numSamples;
+		}
+	}
+
+	private static final double EXPONENTIAL_DECAY_CONSTANT = 0.9999; // 1 / (1 -
+																		// 0.9999)
+																		// = 10s
+																		// ?
 
 	private UUID mSessionId;
 
@@ -53,6 +72,8 @@ public class LocatorSession {
 	private final Map<String, Participant> mParticipants;
 
 	private final Vector<GnssJammer> mGnssJammers;
+
+	private final Map<String, AveragerState> mAveragerStates;
 
 	private final Timer mTimer;
 
@@ -86,8 +107,9 @@ public class LocatorSession {
 	protected LocatorSession(String deviceId) {
 		mSessionState = SessionStatus.CREATED;
 		mInitiatorDeviceId = deviceId;
-		mParticipants = new HashMap<String, Participant>();
+		mParticipants = new ConcurrentHashMap<String, Participant>();
 		mGnssJammers = new Vector<GnssJammer>(1);
+		mAveragerStates = new ConcurrentHashMap<String, AveragerState>();
 		mTimer = new Timer();
 	}
 
@@ -95,6 +117,11 @@ public class LocatorSession {
 		LocatorSession locatorSession = new LocatorSession(deviceId);
 		locatorSession.newSessionId();
 		return locatorSession;
+	}
+
+	@PostConstruct
+	public void postConstruct() {
+		mSubscriber.registerMessageHandler(this);
 	}
 
 	public SessionStatus getSessionState() {
@@ -106,7 +133,7 @@ public class LocatorSession {
 	public void setSessionState(SessionStatus sessionState) {
 
 		LOGGER.info(String.format(
-				"LocatorSession [ %s ] state [ %s ] - > [ %s ]", mSessionId,
+				"LocatorSession [ %s ] state [ %s ] -> [ %s ]", mSessionId,
 				mSessionState, sessionState));
 
 		if (sessionState == SessionStatus.RUNNING
@@ -245,5 +272,76 @@ public class LocatorSession {
 
 		return builder.build();
 
+	}
+
+	@Override
+	public void handleMessage(Observation message) {
+
+		final com.argusat.gjl.model.Observation observation = com.argusat.gjl.model.Observation
+				.newObservation(message);
+		final Participant participant = mParticipants.get(observation
+				.getDeviceId());
+		if (observation.getType() == com.argusat.gjl.model.Observation.ObservationType.TYPE_LOCATION_ONLY) {
+
+			// TODO the following line is not really true
+			if (participant.getCurrentState() != ParticipantState.ACCEPTED) {
+				participant.setCurrentState(ParticipantState.ACCEPTED);
+			}
+			participant.getDevice().setLastKnownLocation(
+					observation.getLocation());
+			// Don't update the timestamp as this will
+			// interfere with the calculation of
+			// exponentially decaying total.
+			// participant.setLastUpdateTimestamp(observation);
+		} else if (observation.getType() == com.argusat.gjl.model.Observation.ObservationType.TYPE_GNSS_CHANNEL) {
+			// newX = oldX * (p ^ (newT - oldT)) + delta
+			final GnssChannelObservation gnssObservation = (GnssChannelObservation) observation;
+			final String deviceId = gnssObservation.getDeviceId();
+
+			AveragerState averagerState = mAveragerStates.get(deviceId);
+			if (averagerState == null) {
+
+				// haven't seen an update for this device before
+				// so initialise state for this accumulation
+				// /averageing
+
+				final AveragerState newAveragerState = new AveragerState();
+				newAveragerState.total = gnssObservation.getC0_n();
+				newAveragerState.numSamples = 1;
+				newAveragerState.timestamp = gnssObservation.getTimestamp();
+				averagerState = mAveragerStates.putIfAbsent(deviceId,
+						newAveragerState);
+
+				if (averagerState == null) {
+					averagerState = newAveragerState;
+				}
+			} else {
+				// we've seen updates for this device before
+				if (observation.getTimestamp() == averagerState.timestamp) {
+					// this is from the same 'batch' of observations
+					averagerState.numSamples += 1;
+					averagerState.total += gnssObservation.getC0_n();
+					
+				} else {
+
+					float newValue = (float) ((double) participant
+							.getAverageSignalStrength()
+							* (Math.pow(
+									EXPONENTIAL_DECAY_CONSTANT,
+									(double) (gnssObservation.getTimestamp() - participant
+											.getLastUpdateTimestamp()))) + averagerState.getAverage());
+					participant.setAverageSignalStrength(newValue);
+					participant.setLastUpdateTimestamp(gnssObservation
+							.getTimestamp());
+					
+					// then reset the accumulation/averaging state
+					averagerState.total = gnssObservation.getC0_n();
+					averagerState.numSamples = 1;
+					averagerState.timestamp = gnssObservation.getTimestamp();
+					
+				}
+			}
+
+		}
 	}
 }

@@ -32,6 +32,8 @@ public class Participant {
 	private long mLastUpdateTimestamp;
 
 	private Device mDevice;
+	
+	private float mAverageSignalStrength;
 
 	protected Participant() {
 		mCurrentState = ParticipantState.CREATED;
@@ -71,6 +73,14 @@ public class Participant {
 		this.mDevice = mDevice;
 	}
 
+	public float getAverageSignalStrength() {
+		return mAverageSignalStrength;
+	}
+
+	public void setAverageSignalStrength(float averageSignalStrength) {
+		this.mAverageSignalStrength = averageSignalStrength;
+	}
+
 	public LocatorSessionInfo.Participant getProtoBuf() {
 
 		LocatorSessionInfo.Participant.Builder participantBuilder = LocatorSessionInfo.Participant
@@ -108,6 +118,8 @@ public class Participant {
 		default:
 			break;
 		}
+		
+		participantBuilder.setAverageSignalStrength(getAverageSignalStrength());
 
 		return participantBuilder.build();
 	}

@@ -39,7 +39,6 @@ import com.argusat.gjl.devservice.repository.DeviceRepository;
 import com.argusat.gjl.devservice.repository.DeviceRepositoryException;
 import com.argusat.gjl.model.Device;
 import com.argusat.gjl.service.observation.ObservationProtoBuf.Observation;
-import com.argusat.gjl.service.observation.ObservationProtoBuf.Observation.ObservationType;
 import com.argusat.gjl.subscriber.MessageHandler;
 import com.argusat.gjl.subscriber.Subscriber;
 import com.argusat.gjl.subscriber.SubscriberRabbitMQ;
@@ -135,6 +134,7 @@ public class ObservationListener implements MessageHandler<Observation>,
 		}
 		
 		final String deviceId = observation.getDeviceId();
+		LOGGER.debug(deviceId);
 
 		ObservationRunnablePair observationRunnablePair = mLatestObservations
 				.get(deviceId);

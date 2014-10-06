@@ -144,7 +144,7 @@ public class LocatorSessions {
 		FindLocalDevicesRequest.Builder requestBuilder = FindLocalDevicesRequest
 				.newBuilder();
 		requestBuilder.setCentre(beginLocatorSessionRequest.getLocation());
-		requestBuilder.setRadius(1000L);
+		requestBuilder.setRadius(5000L);
 		requestBuilder.setLimit(5);
 
 		WebTarget r = mClient
@@ -161,16 +161,27 @@ public class LocatorSessions {
 						"application/octet-stream"),
 				FindLocalDevicesResponse.class);
 
+		LOGGER.info(response.toString());
+
 		if (FindLocalDevicesResponse.ErrorCode.NONE == response
 				.getResponseCode()) {
 
+			// I expect there is a 'better' or cleaner
+			// way of doing this with HK2 using qualifiers
+			// or something similar
 			LocatorSession locatorSession = LocatorSession
 					.newLocatorSession(deviceId);
-			// inject the dependencies
+			// inject the dependencies and postConstruct
 			try {
 				mServiceLocator.inject(locatorSession);
+				mServiceLocator.postConstruct(locatorSession);
 			} catch (Exception e) {
 				LOGGER.error("Failed to inject dependencies ", e);
+				// can't do anything to recover at this point
+				responseBuilder
+						.setResponseCode(BeginLocatorSessionResponse.ErrorCode.INTERNAL_ERROR);
+				responseBuilder.setResponseMessage(e.toString());
+				return responseBuilder.build();
 			}
 
 			for (DeviceProtoBuf.Device deviceProtoBuf : response
@@ -336,7 +347,6 @@ public class LocatorSessions {
 						.setResponseCode(EndLocatorSessionResponse.ErrorCode.NONE);
 			}
 		} catch (Exception e) {
-			LOGGER.error("YOWSA!", e);
 			responseBuilder
 					.setResponseCode(EndLocatorSessionResponse.ErrorCode.INTERNAL_ERROR);
 			responseBuilder.setResponseMessage(e.toString());
