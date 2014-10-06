@@ -73,7 +73,7 @@ public class LocatorSession implements MessageHandler<Observation> {
 
 	private final Vector<GnssJammer> mGnssJammers;
 
-	private final Map<String, AveragerState> mAveragerStates;
+	private final ConcurrentHashMap<String, AveragerState> mAveragerStates;
 
 	private final Timer mTimer;
 
