@@ -11,14 +11,17 @@ This README would normally document whatever steps are necessary to get your app
 ### How do I get set up? ###
 
 * Summary of set up
-* Configuration <code>mvn -D
-* Dependencies
+* Configuration `mvn -D`
+* Dependencies `mvn depends-tree-or-something`
 * Database configuration
-* How to run tests:  <code>mvn test</code>
+* How to run tests:  `mvn test`
 * Deployment instructions:
-  * Run the start scripts to start the Device Service <code>start-</code>
-  * Run the start scripts to start the Observation Service <code>mvn test</code>
-  * Run the start scripts to start the Locator Service <code>mvn test</code>
+  * Run the start script to to start the RabbitMQ instance with 
+  * Run the start scripts to start the Device Service `start-device-server.sh`
+  * Run the start scripts to start the Observation Service `start-observation-server.sh`
+  * Run the start scripts to start the Locator Service `start-locator-server.sh`
+
+
 
 ### Contribution guidelines ###
 
