@@ -4,7 +4,7 @@ This README would normally document whatever steps are necessary to get your app
 
 ### What is this repository for? ###
 
-* This repository contains the server-side components of the GNSS Jammer Locator distributed system suite
+* This repository contains the server-side components of the _GNSS Jammer Locator_ distributed system suite
 * Version
 * [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
 
@@ -12,9 +12,9 @@ This README would normally document whatever steps are necessary to get your app
 
 * Summary of set up
 * Configuration `mvn -D`
-* Dependencies `mvn depends-tree-or-something`
+* Dependencies `mvn depends-tree-or-something`.  When rebuilding with new dependencies and prior to deployment, one should execute `mvn dependency:build-classpath -DincludeScope=runtime` and use that to set the classpath in the relevant start script.
 * Database configuration
-* How to run tests:  `mvn test`
+* How to run tests:  `mvn test` 
 * Deployment instructions:
   * Run the start script to to start the RabbitMQ instance with 
   * Run the start scripts to start the Device Service `start-device-server.sh`
