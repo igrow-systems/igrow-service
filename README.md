@@ -12,28 +12,12 @@ This README would normally document whatever steps are necessary to get your app
 
 * Machine packages/ packacges not Maven managed.
 
-  postgresql
-  postgresql-client
-  postgresql-contrib
-
-  postgresql-9.3-postgis-2.1
-
-  git
-  maven
-
-  openjdk-7-jdk
-
-  rabbitmq-server
-
-
-
-
+ `apt-get install postgresql postgresql-client postgresql-contrib postgresql-9.3-postgis-2.1 git maven openjdk-7-jdk rabbitmq-server`
 
 * RabbitMQ configuration
 
-
-  `rabbitmqctl add_user argusat-gjl-dev argusat-gjl-dev`
-  `rabbitmqctl set_permissions -p / argusat-gjl-dev ".*" ".*" ".*"`
+  `rabbitmqctl add_user argusat-gjl-dev argusat-gjl-dev
+  rabbitmqctl set_permissions -p / argusat-gjl-dev ".*" ".*" ".*"`
 
 
 * Building postgis-jdbc.jar
@@ -52,7 +36,7 @@ http://trac.osgeo.org/postgis/wiki/UsersWikiPostGIS21Ubuntu1404src
 
 stop after make step.
 
-
+````
 
   PostGIS is now configured for x86_64-unknown-linux-gnu
 
@@ -87,54 +71,52 @@ stop after make step.
   convert:              
   mathml2.dtd:          /usr/share/xml/schema/w3c/mathml/dtd/mathml2.dtd
 
-modify liblwgeom/lwin_geojson.c 
+````
 
-json ->  json-c
+  modify `liblwgeom/lwin_geojson.c`
 
-#include <json-c/json.h>
-#include <json-c/json_object_private.h>
+  `json ->  json-c`
 
-cd java
-make
+  `#include <json-c/json.h>
+  #include <json-c/json_object_private.h>`
 
-mvn install:install-file -Dfile=../../depends/postgis-2.1.2/java/jdbc/target/postgis-jdbc-2.1.2.jar -DgroupId=org.postgis -DartifactId=postgis-jdbc -Dpackaging=jar -Dversion=2.1.2
+  `cd java
+  make
 
-
-
-Build services
-================
-
-
-modified pom.xml postgis-jdbc-2.1.0SVN -> postgis-jdbc-2.1.2
-
-install protobuf-compiler
-
-cd gjl-api-java
-mvn test package install
-
-cd observation-service
-psql -U argusat-gjl-dev -h localhost < src/main/resources/initdb.sql
-mvn test package install
-
-mvn clean compile assembly:single
-
-mvn -DskipTests=true -Djersey.test.port=9998 -Dcom.argusat.gjl.observice.debug=true -e exec:java
+  mvn install:install-file -Dfile=../../depends/postgis-2.1.2/java/jdbc/target/postgis-jdbc-2.1.2.jar -DgroupId=org.postgis -DartifactId=postgis-jdbc -Dpackaging=jar -Dversion=2.1.2`
 
 
 
-Eclipse and dev environment
-=============================
-
-mvn eclipse:clean
-mvn eclipse:eclipse
-
-Set M2_REPO classpath variable:
-
-mvn -Declipse.workspace="/Users/jsr/dev/gjl_service_eclipse" eclipse:configure-workspace
+* Build the services
 
 
-* Summary of set up
-* Configuration `mvn -D`
+  modified pom.xml postgis-jdbc-2.1.0SVN -> postgis-jdbc-2.1.2
+
+  ````apt-get install protobuf-compiler
+
+  cd gjl-api-java
+  mvn test package install
+
+  cd observation-service
+  psql -U argusat-gjl-dev -h localhost < src/main/resources/initdb.sql
+  mvn test package install
+
+  mvn clean compile assembly:single
+
+  mvn -DskipTests=true -Djersey.test.port=9998 -Dcom.argusat.gjl.observice.debug=true -e exec:java````
+
+
+
+* Configure Eclipse and the dev environment
+
+  `mvn eclipse:clean
+  mvn eclipse:eclipse`
+
+  Set `M2_REPO` classpath variable:
+
+  `mvn -Declipse.workspace="/Users/jsr/dev/gjl_service_eclipse" eclipse:configure-workspace`
+
+
 * Dependencies `mvn depends-tree-or-something`.  When rebuilding with new dependencies and prior to deployment, one should execute `mvn dependency:build-classpath -DincludeScope=runtime` and use that to set the classpath in the relevant start script.
 * Database configuration:
   `createuser --no-superuser --no-createdb --no-createrole --pwprompt argusat-gjl-dev`
