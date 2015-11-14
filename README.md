@@ -6,7 +6,7 @@
 * Version
 * [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
 
-Architecture
+### Architecture ###
 
 ![Architecture Diagram](arch.jpg "Architecture Diagram")
 
@@ -119,11 +119,11 @@ Architecture
 
 * Database configuration:
 
-        createuser --no-superuser --no-createdb --no-createrole --pwprompt argusat-gjl-dev`
+        createuser --no-superuser --no-createdb --no-createrole --pwprompt argusat-gjl-dev
 
-        createdb --owner argusat-gjl-dev argusat-gjl-dev`
+        createdb --owner argusat-gjl-dev argusat-gjl-dev
 
-        psql -d argusat-gjl-dev`
+        psql -d argusat-gjl-dev
 
         CREATE EXTENSION postgis;
         CREATE EXTENSION postgis_topology;
@@ -144,13 +144,18 @@ Architecture
     * Run the start scripts to start the Observation Service `start-observation-server.sh`
     * Run the start scripts to start the Locator Service `start-locator-server.sh`
 
+### Some Data Analysis in R ###
 
+There is some R code which interfaces with the data store provided.  Here's a screenshot:
+
+![Analysis in R](analysis.png "Analysis in R")
 
 ### Contribution guidelines ###
 
 * Writing tests
 * Code review
 * Other guidelines
+
 
 ### Who do I talk to? ###
 
