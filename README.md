@@ -3,7 +3,7 @@
 ### What is this repository for? ###
 
 * This repository contains the server-side components of the __GNSS Jammer Locator__ distributed system suite
-* Version
+* Current Version:  1.0.6
 * [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
 
 ### Architecture ###
