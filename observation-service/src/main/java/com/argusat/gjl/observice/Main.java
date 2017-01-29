@@ -16,11 +16,13 @@
 
 package com.argusat.gjl.observice;
 
-import com.sun.jersey.api.container.grizzly2.GrizzlyWebContainerFactory;
-
 import org.glassfish.grizzly.filterchain.FilterChain;
 import org.glassfish.grizzly.http.HttpCodecFilter;
 import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.hk2.api.ServiceLocator;
+import org.glassfish.hk2.api.ServiceLocatorFactory;
+import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
+import org.glassfish.jersey.server.ResourceConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +37,8 @@ public class Main {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
+	private static ServiceLocator mServiceLocator;
+  
 	private static int getPort(int defaultPort) {
 		// grab port from environment, otherwise fall back to default port 9998
 		String httpPort = System.getProperty("jersey.test.port");
@@ -57,15 +61,21 @@ public class Main {
 	public static HttpServer startServer() throws IOException {
 		final Map<String, String> initParams = new HashMap<String, String>();
 
-		initParams.put("com.sun.jersey.config.property.packages",
-				"com.argusat.gjl.observice");
+
+    ResourceConfig resourceConfig = new ObservationServiceApplication();
 
 		LOGGER.info("Starting grizzly2...");
-		return GrizzlyWebContainerFactory.create(BASE_URI, initParams);
+		return GrizzlyHttpServerFactory.createHttpServer(BASE_URI,
+				resourceConfig, mServiceLocator);
+
 	}
 
 	public static void main(String[] args) throws IOException {
-		// Grizzly 2 initialization
+
+		mServiceLocator = ServiceLocatorFactory.getInstance().create(
+				"non-Jersey types");
+
+    // Grizzly 2 initialization
 		final HttpServer httpServer = startServer();
 
 		if (Boolean.valueOf(System.getProperty(
@@ -85,7 +95,7 @@ public class Main {
 			@Override
 			public void run() {
 				LOGGER.info("Stopping server..");
-				httpServer.stop();
+				httpServer.shutdownNow();
 			}
 		}, "shutdownHook"));
 

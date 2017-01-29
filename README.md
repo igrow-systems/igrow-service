@@ -15,75 +15,16 @@
 
 * Install system packages or rather dependencies that are not managed by Maven.
 
-        apt-get install postgresql postgresql-client postgresql-contrib postgresql-9.3-postgis-2.1 git maven openjdk-7-jdk rabbitmq-server`
+        Describes system configuration for a Ubuntu 16.04 system
+
+        `apt install postgresql postgresql-client postgresql-contrib postgis libpostgis-java git maven openjdk-8-jdk rabbitmq-server protobuf-complier`
 
 * RabbitMQ configuration
 
-        rabbitmqctl add_user argusat-gjl-dev argusat-gjl-dev
-        rabbitmqctl set_permissions -p / argusat-gjl-dev ".*" ".*" ".*"
+        As user rabbitmq,
 
-
-* Building postgis-jdbc.jar
-
-
-    * Mac OS X 
-
-        modify jdbc/Makefile to set ant path correctly.  Hmmm.  Actually, invoke `mvn` directly because the ant-maven-tasks integration does something funky with `M2_HOME` by the looks of things.
-
-
-
-        build postgis-2.1.x and mvn install the jar.  Using postgis-2.1.2 so that generated postgis-jdbc.jar matches already installed postgis version install from source following these instructions [UsersWikiPostGIS21Ubuntu1404src](http://trac.osgeo.org/postgis/wiki/UsersWikiPostGIS21Ubuntu1404src)
-
-        stop after make step.
-
-````
-  PostGIS is now configured for x86_64-unknown-linux-gnu
-
- -------------- Compiler Info ------------- 
-  C compiler:           gcc -g -O2
-  C++ compiler:         g++ -g -O2
-  SQL preprocessor:     /usr/bin/cpp -w -traditional-cpp -P
-
- -------------- Dependencies -------------- 
-  GEOS config:          /usr/bin/geos-config
-  GEOS version:         3.4.2
-  GDAL config:          /usr/bin/gdal-config
-  GDAL version:         1.10.1
-  PostgreSQL config:    /usr/bin/pg_config
-  PostgreSQL version:   PostgreSQL 9.3.4
-  PROJ4 version:        48
-  Libxml2 config:       /usr/bin/xml2-config
-  Libxml2 version:      2.9.1
-  JSON-C support:       yes
-  PostGIS debug level:  0
-  Perl:                 /usr/bin/perl
-
- --------------- Extensions --------------- 
-  PostGIS Raster:       enabled
-  PostGIS Topology:     enabled
-  SFCGAL support:       disabled
-
- -------- Documentation Generation -------- 
-  xsltproc:             /usr/bin/xsltproc
-  xsl style sheets:     /usr/share/xml/docbook/stylesheet/nwalsh
-  dblatex:              
-  convert:              
-  mathml2.dtd:          /usr/share/xml/schema/w3c/mathml/dtd/mathml2.dtd
-
-````
-
-        modify `liblwgeom/lwin_geojson.c`
-
-        json ->  json-c
-
-            #include <json-c/json.h> -> #include <json-c/json_object_private.h>`
-
-            cd java
-            make
-
-            mvn install:install-file -Dfile=../../depends/postgis-2.1.2/java/jdbc/target/postgis-jdbc-2.1.2.jar -DgroupId=org.postgis -DartifactId=postgis-jdbc -Dpackaging=jar -Dversion=2.1.2`
-
-
+        `rabbitmqctl add_user argusat-gjl-dev argusat-gjl-dev`
+        `rabbitmqctl set_permissions -p / argusat-gjl-dev ".*" ".*" ".*"`
 
 * Build the services
 

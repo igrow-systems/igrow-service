@@ -16,6 +16,7 @@
 
 package com.argusat.gjl.locservice.test;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -25,7 +26,6 @@ import junit.framework.TestCase;
 
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.client.ClientConfig;
-import org.glassfish.jersey.message.internal.MediaTypes;
 
 import com.argusat.gjl.locservice.Main;
 import com.argusat.gjl.locservice.provider.BeginLocatorSessionRequestProtobufReader;
@@ -189,20 +189,20 @@ public class MainTest extends TestCase {
 		builder.setDeviceId("test-id-009");
 
 		WebTarget wr = r.path("locatorsessions");
-		BeginLocatorSessionResponse response = wr.request(
-				"application/octet-stream").post(
-				Entity.entity(mBeginLocatorSessionRequest,
-						"application/octet-stream"),
-				BeginLocatorSessionResponse.class);
+		BeginLocatorSessionResponse response = wr
+      .request(MediaType.APPLICATION_OCTET_STREAM_TYPE)
+      .post(Entity.entity(mBeginLocatorSessionRequest,
+                          MediaType.APPLICATION_OCTET_STREAM_TYPE),
+            BeginLocatorSessionResponse.class);
 
 		assertEquals(BeginLocatorSessionResponse.ErrorCode.NONE,
-				response.getResponseCode());
+                 response.getResponseCode());
 		assertTrue(response.hasSessionId());
 		
 		// then delete it.
 		
-		EndLocatorSessionRequest.Builder endSessionBuilder = EndLocatorSessionRequest
-				.newBuilder();
+		EndLocatorSessionRequest.Builder endSessionBuilder
+      = EndLocatorSessionRequest.newBuilder();
 		endSessionBuilder.setDeviceId("test-id-009");
 
 		wr = r.path(String.format("locatorsessions/%s", response.getSessionId()));
@@ -220,7 +220,7 @@ public class MainTest extends TestCase {
 	 */
 	public void testApplicationWadl() {
 		String serviceWadl = r.path("application.wadl")
-				.request(MediaTypes.WADL).get(String.class);
+				.request(MediaType.APPLICATION_XML_TYPE).get(String.class);
 
 		assertTrue(serviceWadl.length() > 0);
 	}

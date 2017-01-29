@@ -3,7 +3,7 @@
 /*
  * @(#)MainTest.java        
  *
- * Copyright (c) 2013 - 2014 Argusat Limited
+ * Copyright (c) 2013 - 2014, 2017 Argusat Limited
  * 10 Underwood Road,  Southampton.  UK
  * All rights reserved.
  *
@@ -16,8 +16,15 @@
 
 package com.argusat.gjl.observice.test;
 
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
+
 import junit.framework.TestCase;
 
+import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.grizzly.http.server.HttpServer;
 
 import com.argusat.gjl.model.Location;
@@ -28,11 +35,6 @@ import com.argusat.gjl.model.ObservationCollection;
 import com.argusat.gjl.observice.Main;
 import com.argusat.gjl.observice.ObservationProtobufReader;
 import com.argusat.gjl.observice.ObservationProtobufWriter;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
-import com.sun.jersey.core.header.MediaTypes;
 
 public class MainTest extends TestCase {
 
@@ -59,9 +61,9 @@ public class MainTest extends TestCase {
 
 	private ObservationCollection mObservationCollection;
 
-	private HttpServer httpServer;
+  private HttpServer mHttpServer;
 
-	private WebResource r;
+	private WebTarget mTarget;
 
 	public MainTest(String testName) {
 		super(testName);
@@ -72,15 +74,17 @@ public class MainTest extends TestCase {
 		super.setUp();
 
 		// start the Grizzly2 web container
-		httpServer = Main.startServer();
+		mHttpServer = Main.startServer();
 
-		ClientConfig cc = new DefaultClientConfig();
+		ClientConfig cc = new ClientConfig();
 		cc.getClasses().add(ObservationProtobufReader.class);
 		cc.getClasses().add(ObservationProtobufWriter.class);
 
-		Client c = Client.create(cc);
+    Client client = ClientBuilder.newClient(cc);
 
-		r = c.resource(Main.BASE_URI);
+    // TODO: I think this is inefficient use of Client and WebTarget
+    //       need to check the documentation.
+    mTarget = client.target(Main.BASE_URI);
 
 		mObservationCollection = new ObservationCollection();
 
@@ -113,7 +117,8 @@ public class MainTest extends TestCase {
 	protected void tearDown() throws Exception {
 		super.tearDown();
 
-		httpServer.stop();
+    mHttpServer.shutdownNow();
+
 	}
 
 	/**
@@ -121,10 +126,12 @@ public class MainTest extends TestCase {
 	 */
 	public void testPostObservations() {
 
-		WebResource wr = r.path("observations");
-		String response = wr.type("application/octet-stream").post(
-				String.class, mObservationCollection);
-
+		WebTarget wt = mTarget.path("observations");
+		String response = wt.request(MediaType.APPLICATION_OCTET_STREAM_TYPE)
+      .post(Entity.entity(mObservationCollection,
+                          MediaType.APPLICATION_OCTET_STREAM_TYPE),
+            String.class);
+    
 		assertEquals("OK", response);
 	}
 
@@ -135,13 +142,16 @@ public class MainTest extends TestCase {
 		int radius = 1000;
 		int limit = 4;
 		
-		WebResource wr = r.path("observations")
-				.queryParam("lat", Float.toString(latitude))
-				.queryParam("lon", Float.toString(longitude))
-				.queryParam("radius", Integer.toString(radius))
-				.queryParam("limit", Integer.toString(limit));
-		ObservationCollection response = wr.type("text/plain").get(
-				ObservationCollection.class);
+		WebTarget wt = mTarget.path("observations");
+
+    ObservationCollection response = wt
+      .queryParam("lat", Float.toString(latitude))
+      .queryParam("lon", Float.toString(longitude))
+      .queryParam("radius", Integer.toString(radius))
+      .queryParam("limit", Integer.toString(limit))
+      .request()
+      .accept(MediaType.APPLICATION_OCTET_STREAM_TYPE)
+      .get(ObservationCollection.class);
 
 		assertEquals(4, response.getObservations().size());
 	}
@@ -151,8 +161,10 @@ public class MainTest extends TestCase {
 	 * "application.wadl".
 	 */
 	public void testApplicationWadl() {
-		String serviceWadl = r.path("application.wadl").accept(MediaTypes.WADL)
-				.get(String.class);
+		String serviceWadl = mTarget.path("application.wadl")
+      .request()
+      .accept(MediaType.APPLICATION_XML_TYPE)
+      .get(String.class);
 
 		assertTrue(serviceWadl.length() > 0);
 	}
