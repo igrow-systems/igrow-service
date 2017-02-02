@@ -26,24 +26,36 @@
         `rabbitmqctl add_user argusat-gjl-dev argusat-gjl-dev`
         `rabbitmqctl set_permissions -p / argusat-gjl-dev ".*" ".*" ".*"`
 
-* Build the services
+* Database configuration:
 
-    modify `pom.xml` postgis-jdbc-2.1.0SVN -> postgis-jdbc-2.1.2 
+        createuser --no-superuser --no-createdb --no-createrole --pwprompt argusat-gjl-dev
 
-        apt-get install protobuf-compiler
+        createdb --owner argusat-gjl-dev argusat-gjl-dev
 
-        cd gjl-api-java
-        mvn test package install
+        psql -d argusat-gjl-dev
+
+        CREATE EXTENSION postgis;
+        CREATE EXTENSION postgis_topology;
+
+* Initialise the database
 
         cd observation-service
         psql -U argusat-gjl-dev -h localhost < src/main/resources/initdb.sql
-        mvn test package install
+
+        cd ../device-service
+        psql -U argusat-gjl-dev -h localhost < src/main/resources/initdb.sql
+
+
+* Build the services
+
+        mvn package install
 
         mvn clean compile assembly:single
 
+
+* To run individual services
+
         mvn -DskipTests=true -Djersey.test.port=9998 -Dcom.argusat.gjl.observice.debug=true -e exec:java
-
-
 
 
 * Configure Eclipse and the dev environment
@@ -58,19 +70,13 @@
 
 * Dependencies: `mvn depends-tree-or-something`.  When rebuilding with new dependencies and prior to deployment, one should execute `mvn dependency:build-classpath -DincludeScope=runtime` and use that to set the classpath in the relevant start script.  FIXME properly.
 
-* Database configuration:
-
-        createuser --no-superuser --no-createdb --no-createrole --pwprompt argusat-gjl-dev
-
-        createdb --owner argusat-gjl-dev argusat-gjl-dev
-
-        psql -d argusat-gjl-dev
-
-        CREATE EXTENSION postgis;
-        CREATE EXTENSION postgis_topology;
-
 
 * How to run tests:  `mvn test` 
+
+        Code run under JRE 1.8, which is true for these instructions, causes tests to fail due to javax.annotations-version defaulting to 1.2 under this JRE.  Tests are being forked from Maven so a workaround for running tests by forcing test not to fork.
+
+        mvn -DforkCount=0 -Djavax.annotation-version=1.1 test
+
 
 * Deployment instructions:
 
