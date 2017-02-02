@@ -15,16 +15,16 @@
 
 * Install system packages or rather dependencies that are not managed by Maven.
 
-        Describes system configuration for a Ubuntu 16.04 system
+    Describes system configuration for a Ubuntu 16.04 system
 
-        `apt install postgresql postgresql-client postgresql-contrib postgis libpostgis-java git maven openjdk-8-jdk rabbitmq-server protobuf-complier`
+        apt install postgresql postgresql-client postgresql-contrib postgis libpostgis-java git maven openjdk-8-jdk rabbitmq-server protobuf-complier
 
 * RabbitMQ configuration
 
-        As user rabbitmq,
+    As user rabbitmq,
 
-        `rabbitmqctl add_user argusat-gjl-dev argusat-gjl-dev`
-        `rabbitmqctl set_permissions -p / argusat-gjl-dev ".*" ".*" ".*"`
+        rabbitmqctl add_user argusat-gjl-dev argusat-gjl-dev
+        rabbitmqctl set_permissions -p / argusat-gjl-dev ".*" ".*" ".*"
 
 * Database configuration:
 
@@ -36,6 +36,10 @@
 
         CREATE EXTENSION postgis;
         CREATE EXTENSION postgis_topology;
+
+    If starting on boot is required, this can be enabled with:
+
+        sudo update-rc.d postgresql enable
 
 * Initialise the database
 
@@ -68,21 +72,22 @@
         mvn -Declipse.workspace="/Users/jsr/dev/gjl_service_eclipse" eclipse:configure-workspace
 
 
-* Dependencies: `mvn depends-tree-or-something`.  When rebuilding with new dependencies and prior to deployment, one should execute `mvn dependency:build-classpath -DincludeScope=runtime` and use that to set the classpath in the relevant start script.  FIXME properly.
+* Dependencies:
+    `mvn depends-tree-or-something`.  When rebuilding with new dependencies and prior to deployment, one should execute `mvn dependency:build-classpath -DincludeScope=runtime` and use that to set the classpath in the relevant start script.  FIXME properly.
 
 
 * How to run tests:  `mvn test` 
 
-        Code run under JRE 1.8, which is true for these instructions, causes tests to fail due to javax.annotations-version defaulting to 1.2 under this JRE.  Tests are being forked from Maven so a workaround for running tests by forcing test not to fork.
+    Code run under JRE 1.8, which is true for these instructions, causes tests to fail due to javax.annotations-version defaulting to 1.2 under this JRE.  Tests are being forked from Maven so a workaround for running tests by forcing test not to fork.
 
         mvn -DforkCount=0 -Djavax.annotation-version=1.1 test
 
 
 * Deployment instructions:
 
-        apt-get install tomcat7
+        apt-get install tomcat8
 
-        usermod -U myuid --append -G tomcat7
+        usermod -U myuid --append -G tomcat8
 
         mvn -DskipTests=true compile war:exploded
 
