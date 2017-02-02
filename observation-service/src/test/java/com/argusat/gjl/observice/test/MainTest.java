@@ -77,8 +77,8 @@ public class MainTest extends TestCase {
 		mHttpServer = Main.startServer();
 
 		ClientConfig cc = new ClientConfig();
-		cc.getClasses().add(ObservationProtobufReader.class);
-		cc.getClasses().add(ObservationProtobufWriter.class);
+		cc.register(ObservationProtobufReader.class);
+		cc.register(ObservationProtobufWriter.class);
 
     Client client = ClientBuilder.newClient(cc);
 
@@ -127,7 +127,7 @@ public class MainTest extends TestCase {
 	public void testPostObservations() {
 
 		WebTarget wt = mTarget.path("observations");
-		String response = wt.request(MediaType.APPLICATION_OCTET_STREAM_TYPE)
+		String response = wt.request(MediaType.TEXT_PLAIN_TYPE)
       .post(Entity.entity(mObservationCollection,
                           MediaType.APPLICATION_OCTET_STREAM_TYPE),
             String.class);
