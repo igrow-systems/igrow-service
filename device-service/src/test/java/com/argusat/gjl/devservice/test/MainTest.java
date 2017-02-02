@@ -3,7 +3,7 @@
 /*
  * @(#)MainTest.java        
  *
- * Copyright (c) 2014 Argusat Limited
+ * Copyright (c) 2014, 2017 Argusat Limited
  * 10 Underwood Road,  Southampton.  UK
  * All rights reserved.
  *
@@ -94,7 +94,7 @@ public class MainTest extends TestCase {
 		{
 			DeviceProtoBuf.Device.Builder deviceBuilder = DeviceProtoBuf.Device
 					.newBuilder();
-			deviceBuilder.setDeviceId("test-id-010");
+			deviceBuilder.setDeviceId("b024ac7008bb0b69");
 			deviceBuilder
 					.setOsType(DeviceProtoBuf.Device.OSType.GOOGLE_ANDROID);
 			deviceBuilder.setOsVersion("4.1.1_r99");
@@ -103,6 +103,19 @@ public class MainTest extends TestCase {
 			deviceBuilder.setModel("HUAWEI G510-0100");
 			deviceBuilder.setProduct("G510-0100");
 			deviceBuilder.setDevice("hwG510-0100");
+
+      // Set a spoofed location in order to run tests
+      Location location = new Location();
+			location.setLatitude(50.9399695f);
+			location.setLongitude(-1.415058f);
+			// the following need to be set
+			// to form a valid Location but
+			// the values are currently ignored
+			// by the service.
+			location.setAltitude(0.0f);
+			location.setHDOP(0.0f);
+			location.setVDOP(0.0f);
+      deviceBuilder.setLastKnownLocation(location.getLocationProtoBuf());
 
 			RegisterDeviceRequest.Builder builder = DeviceProtoBuf.RegisterDeviceRequest
 					.newBuilder();
