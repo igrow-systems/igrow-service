@@ -54,7 +54,7 @@ public class PublisherRabbitMQTest {
 		mObservation = Observation
 				.newObservation(ObservationType.TYPE_LOCATION_ONLY);
 
-		mObservation.setDeviceId("test-id-007");
+		mObservation.setSensorId("test-id-007");
 		mObservation.setTimestamp(111889349L);
 		mObservation.setMode(ModeType.PASSIVE);
 		// assertEquals()
@@ -103,7 +103,7 @@ public class PublisherRabbitMQTest {
 
 		mPublisher.connect();
 		mPublisher.publish(
-				String.format("observation.%s", mObservation.getDeviceId()),
+				String.format("observation.%s", mObservation.getSensorId()),
 				ObservationProtoBuf.Observation.class,
 				mObservation.getObservationProtoBuf());
 

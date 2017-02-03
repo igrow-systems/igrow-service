@@ -89,7 +89,7 @@ public class ObservationListener implements MessageHandler<Observation>,
 					mDeviceId, observation.getLocation().toString()));
 
 			final Device device = mDeviceRepository.findDevice(observation
-					.getDeviceId());
+					.getSensorId());
 
 			assert (device != null);
 			device.setLastKnownLocation(observation.getLocation());
@@ -133,7 +133,7 @@ public class ObservationListener implements MessageHandler<Observation>,
 			return;
 		}
 		
-		final String deviceId = observation.getDeviceId();
+		final String deviceId = observation.getSensorId();
 		LOGGER.debug(deviceId);
 
 		ObservationRunnablePair observationRunnablePair = mLatestObservations

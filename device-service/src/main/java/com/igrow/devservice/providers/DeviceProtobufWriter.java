@@ -28,7 +28,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 
-import com.igrow.protobuf.DeviceProtoBuf;
+import com.igrow.protobuf.device.DeviceProtoBuf;
 
 @Provider
 @Produces("application/octet-stream")

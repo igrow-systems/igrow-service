@@ -103,7 +103,7 @@ public class Observations {
 					if (mPublisher != null && mPublisher.isConnected()) {
 						mPublisher.publish(
 								String.format("observation.%s",
-										observation.getDeviceId()),
+										observation.getSensorId()),
 								ObservationProtoBuf.Observation.class,
 								observation.getObservationProtoBuf());
 					}

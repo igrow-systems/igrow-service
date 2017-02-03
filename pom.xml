@@ -7,13 +7,12 @@
 	<version>1.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
-	<name>iGrow Systems Service</name>
+	<name>iGrow Systems Services</name>
 	<url>http://www.igrowsystems.com</url>
 
 	<modules>
 	  <module>igrow-api-java</module>
 	  <module>device-service</module>
 	  <module>observation-service</module>
-	  <module>locator-service</module>
 	</modules>
 </project>

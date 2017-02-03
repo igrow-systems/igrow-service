@@ -1,7 +1,7 @@
 /* -*- mode: java; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
 
 /*
- * @(#)RowKey.java        
+ * @(#)BucketTest.java        
  *
  * Copyright (c) 2013 Argusat Limited
  * 10 Underwood Road,  Southampton.  UK
@@ -14,26 +14,27 @@
  * with Argusat Limited.
  */
 
-package com.igrow.observice.repository.hbase;
+package com.igrow.observice.repository.hbase.test;
 
-import com.igrow.model.Observation;
+import static org.junit.Assert.*;
 
-public class RowKey {
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-	private byte[] longestCommonPrefixName;
-	
-	public RowKey(Observation observation) {
-		
-		int lat = (int) (observation.getLocation().getLatitude() * 10E6);
-		int lon = (int) (observation.getLocation().getLongitude() * 10E6);
-		
-		long timestamp = observation.getTimestamp();
-		
+public class BucketTest {
+
+	@Before
+	public void setUp() throws Exception {
+	}
+
+	@After
+	public void tearDown() throws Exception {
+	}
+
+	@Test
+	public void testInsert() {
 		
 	}
-	
-	public byte[] getByteArray() {
-		return null;
-	}
-	
+
 }

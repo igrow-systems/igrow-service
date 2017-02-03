@@ -53,7 +53,7 @@ public class ObservationCollectionTest {
 			Observation observation = Observation
 					.newObservation(ObservationType.TYPE_LOCATION_ONLY);
 
-			observation.setDeviceId("test-id-007");
+			observation.setSensorId("test-id-007");
 			observation.setTimestamp(111889349L);
 			observation.setMode(ModeType.PASSIVE);
 			// assertEquals()

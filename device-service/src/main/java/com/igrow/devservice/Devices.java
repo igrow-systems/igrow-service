@@ -35,7 +35,7 @@ import com.igrow.devservice.repository.DeviceRepository;
 import com.igrow.devservice.repository.DeviceRepositoryException;
 import com.igrow.model.Device;
 import com.igrow.model.Location;
-import com.igrow.protobuf.service.device.DeviceProtoBuf.RegisterDeviceResponse;
+import com.igrow.protobuf.device.DeviceProtoBuf.RegisterDeviceResponse;
 
 // The Java class will be hosted at the URI path "/devices"
 @Path("/devices")

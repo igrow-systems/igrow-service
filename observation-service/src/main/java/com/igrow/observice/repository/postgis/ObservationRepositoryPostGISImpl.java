@@ -32,7 +32,7 @@ import org.postgis.Point;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.igrow.model.GnssChannelObservation;
+import com.igrow.model.EnvironmentalSensorObservation;
 import com.igrow.model.Location;
 import com.igrow.model.Observation;
 import com.igrow.model.ObservationCollection;
@@ -147,14 +147,14 @@ public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 						new Timestamp(observation.getTimestamp()));
 
 				mPreparedStatementInsertObservation.setString(3,
-						observation.getDeviceId());
+						observation.getSensorId());
 
-				if (observation.getType() == ObservationType.TYPE_GNSS_CHANNEL) {
-					mPreparedStatementInsertObservation.setLong(4,
-							((GnssChannelObservation) observation).getPrn());
-				} else {
+//				if (observation.getType() == ObservationType.TYPE_ENVIRONMENTAL_SENSOR) {
+//					mPreparedStatementInsertObservation.setLong(4,
+//							((EnvironmentalSensorObservation) observation).getPrn());
+//				} else {
 					mPreparedStatementInsertObservation.setNull(4, Types.NULL);
-				}
+//				}
 
 				mPreparedStatementInsertObservation.setFloat(5, observation
 						.getLocation().getHDOP());
@@ -287,13 +287,13 @@ public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 				observation.setLocation(location);
 
 				observation.setTimestamp(resultSet.getTimestamp(2).getTime());
-				observation.setDeviceId(resultSet.getString(3));
+				observation.setSensorId(resultSet.getString(3));
 				observation.setMode(ModeType.valueOf(resultSet.getString(8)));
 
-				if (observation.getType() == ObservationType.TYPE_GNSS_CHANNEL) {
-					((GnssChannelObservation) observation).setPrn(resultSet
-							.getInt(4));
-				}
+//				if (observation.getType() == ObservationType.TYPE_ENVIRONMENTAL_SENSOR) {
+//					((EnvironmentalSensorObservation) observation).setPrn(resultSet
+//							.getInt(4));
+//				}
 
 				float[] values = new float[5];
 

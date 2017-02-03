@@ -48,7 +48,7 @@ public class EnvironmentalSensorObservationTest {
 	public void setUp() throws Exception {
 		mObservation = Observation.newObservation(ObservationType.TYPE_LOCATION_ONLY);
 		
-		mObservation.setDeviceId("test-id-007");
+		mObservation.setSensorId("test-id-007");
 		mObservation.setTimestamp(111889349L);
 		mObservation.setMode(ModeType.PASSIVE);
 		//assertEquals()
@@ -124,7 +124,7 @@ public class EnvironmentalSensorObservationTest {
     	ObservationProtoBuf.Observation protoBuf = mObservation.getObservationProtoBuf();
     	
     	assertTrue(protoBuf.getType() == ObservationProtoBuf.Observation.ObservationType.LOCATION_ONLY);
-    	assertEquals("test-id-007", protoBuf.getDeviceId());
+    	assertEquals("test-id-007", protoBuf.getSensorId());
     	assertTrue(111889349L == protoBuf.getTimestamp());
     	assertEquals(19843891L, protoBuf.getLocation().getLatitude());
     	assertEquals(-40783718L, protoBuf.getLocation().getLongitude());
