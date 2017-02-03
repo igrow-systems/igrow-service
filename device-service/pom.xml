@@ -3,8 +3,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>com.argusat.gjl</groupId>
-    <artifactId>gjl-service</artifactId>
+    <groupId>com.igrow</groupId>
+    <artifactId>igrow-service</artifactId>
     <version>1.0-SNAPSHOT</version>
   </parent>
 
@@ -117,8 +117,8 @@
     </dependency>
     <!-- Our local dependency -->
     <dependency>
-      <groupId>com.argusat.gjl</groupId>
-      <artifactId>gjl-api-java</artifactId>
+      <groupId>com.igrow</groupId>
+      <artifactId>igrow-api-java</artifactId>
       <version>1.0-SNAPSHOT</version>
     </dependency>
   </dependencies>
@@ -139,7 +139,7 @@
 	<configuration>
 	  <archive>
 	    <manifest>
-	      <mainClass>com.argusat.gjl.devservice.Main</mainClass>
+	      <mainClass>com.igrow.devservice.Main</mainClass>
 	    </manifest>
 	  </archive>
 	  <descriptorRefs>
@@ -168,7 +168,7 @@
 	  </execution>
 	</executions>
 	<configuration>
-	  <mainClass>com.argusat.gjl.devservice.Main</mainClass>
+	  <mainClass>com.igrow.devservice.Main</mainClass>
 	</configuration>
       </plugin>
     </plugins>

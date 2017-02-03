@@ -1,0 +1,150 @@
+/* -*- mode: protobuf; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
+
+/*
+ * @(#)device.proto        
+ *
+ * Copyright (c) 2014, 2017 Argusat Limited
+ * 10 Underwood Road,  Southampton.  UK
+ * All rights reserved.
+ *
+ * This software is the confidential and proprietary information of 
+ * Argusat Limited. ("Confidential Information").  You shall not
+ * disclose such Confidential Information and shall use it only in
+ * accordance with the terms of the license agreement you entered into
+ * with Argusat Limited.
+ */
+
+syntax = "proto3";
+
+package com.igrow.device;
+
+option java_package = "com.igrow.protobuf.device";
+option java_outer_classname = "DeviceProtoBuf";
+
+import "location.proto";
+import "sensor.proto";
+
+message Device {
+
+  enum OSType {
+    MS_WINDOWS = 0;
+    GOOGLE_ANDROID = 1;
+    APPLE_IOS = 2;
+  }
+
+  string deviceId = 1;
+  OSType osType = 2;
+  string osVersion = 3;
+  string pushToken = 4;
+  string manufacturer = 5;
+  string model = 6;
+  string product = 7;
+  string device = 8;
+  com.igrow.observation.Location lastKnownLocation = 9;
+}
+
+message RegisterDeviceRequest {
+  Device device = 1;
+}
+
+message RegisterDeviceResponse {
+
+  enum ErrorCode {
+    NONE = 0;
+  }
+
+  ErrorCode responseCode = 1;
+  string responseMessage = 2;
+  
+}
+
+message AssociateSensorWithDeviceRequest {
+  string deviceId = 1;
+  string sensorId = 2;
+}
+
+message AssociateSensorWithDeviceResponse {
+
+  enum ErrorCode {
+    NONE = 0;
+  }
+
+  ErrorCode responseCode = 1;
+  string responseMessage = 2;
+  
+}
+
+message DisassociateSensorFromDeviceRequest {
+  string deviceId = 1;
+  string sensorId = 2;
+}
+
+message DisassociateSensorFromDeviceResponse {
+
+  enum ErrorCode {
+    NONE = 0;
+  }
+
+  ErrorCode responseCode = 1;
+  string responseMessage = 2;
+  
+}
+
+message NotifyDeviceRequest {
+  string deviceId = 1;
+  string message = 2;
+}
+
+message NotifyDeviceResponse {
+
+  enum ErrorCode {
+    NONE = 0;
+    DEVICE_NOT_FOUND = 1;
+    DEVICE_NOT_SUPPORTED = 2;
+    INTERNAL_ERROR = 3;
+    MESSAGE_PARSE_ERROR = 4;
+  }
+
+  ErrorCode responseCode = 1;
+  string responseMessage = 2;
+  
+}
+
+message FindLocalDevicesRequest {
+  com.igrow.observation.Location centre = 1;
+  uint64 radius = 2;
+  uint32 limit = 3;
+}
+
+message FindLocalDevicesResponse {
+
+  enum ErrorCode {
+    NONE = 0;
+    NO_LOCAL_DEVICES = 1;
+  }
+
+  ErrorCode responseCode = 1;
+  string responseMessage = 2;
+  
+  repeated Device devices = 3;
+}
+
+message FindAssociatedSensorsRequest {
+  string deviceId = 1;
+}
+
+message FindAssociatedSensorsResponse {
+
+  enum ErrorCode {
+    NONE = 0;
+    NO_ASSOCIATED_SENSORS = 1;
+  }
+
+  ErrorCode responseCode = 1;
+  string responseMessage = 2;
+  
+  repeated com.igrow.sensor.Sensor sensors = 3;
+}
+
+
+

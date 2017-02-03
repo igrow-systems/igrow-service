@@ -1,0 +1,69 @@
+/* -*- mode: protobuf; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
+
+/*
+ * @(#)observation.proto        
+ *
+ * Copyright (c) 2013 - 2014, 2017 Argusat Limited
+ * 10 Underwood Road,  Southampton.  UK
+ * All rights reserved.
+ *
+ * This software is the confidential and proprietary information of 
+ * Argusat Limited. ("Confidential Information").  You shall not
+ * disclose such Confidential Information and shall use it only in
+ * accordance with the terms of the license agreement you entered into
+ * with Argusat Limited.
+ */
+
+syntax = "proto3";
+
+package com.igrow.observation;
+
+option java_package = "com.igrow.protobuf.observation";
+option java_outer_classname = "ObservationProtoBuf";
+
+import "location.proto";
+
+message Observation {
+
+  enum ObservationType {
+    LOCATION_ONLY = 0;
+    ENVIRONMENTAL_SENSOR = 1;
+    BATTERY_LEVEL = 2;
+  }
+
+  ObservationType type = 1;
+  string sensorId = 2;
+  uint64 timestamp = 3;        // The type and timestamp form a unique ID in the context of a sensor
+  Location location = 4;
+
+  enum ModeType {
+    PASSIVE = 0;
+    ACTIVE = 1;
+  }
+
+  ModeType mode = 5;
+
+  message EnvironmentalSensorObservation {
+    
+    float temperature = 1;
+    float humidity = 2;
+    float irradiance = 3;
+ 
+  }
+
+  EnvironmentalSensorObservation envSensorObservation = 6;
+
+  message BatteryLevelObservation {
+    
+    float batteryLevel = 1;
+ 
+  }
+  
+  BatteryLevelObservation batteryLevelObservation = 7;
+}
+
+// Our observation is just one of a collection of observations.
+message Observations {
+
+  repeated Observation observations = 1;
+}

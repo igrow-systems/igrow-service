@@ -1,0 +1,57 @@
+/* -*- mode: protobuf; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
+
+/*
+ * @(#)sensor.proto        
+ *
+ * Copyright (c) 2014, 2017 Argusat Limited
+ * 10 Underwood Road,  Southampton.  UK
+ * All rights reserved.
+ *
+ * This software is the confidential and proprietary information of 
+ * Argusat Limited. ("Confidential Information").  You shall not
+ * disclose such Confidential Information and shall use it only in
+ * accordance with the terms of the license agreement you entered into
+ * with Argusat Limited.
+ */
+
+syntax = "proto3";
+
+package com.igrow.sensor;
+
+option java_package = "com.igrow.protobuf.sensor";
+option java_outer_classname = "SensorProtoBuf";
+
+import "location.proto";
+
+message Sensor {
+
+  enum SensorType {
+    IGROW_101 = 0;
+    IGROW_TDR_MOISTURE = 1;
+    IGROW_SPECTROMETER = 2;
+  }
+
+  string sensorId = 1;
+  SensorType sensorType = 2;
+  string firmwareVersion = 3;
+  string nickname = 4;
+  string model = 5;
+  string product = 6;
+  com.igrow.observation.Location lastKnownLocation = 7;
+}
+
+message RegisterSensorRequest {
+  Sensor sensor = 1;
+}
+
+message RegisterSensorResponse {
+
+  enum ErrorCode {
+    NONE = 0;
+  }
+
+  ErrorCode responseCode = 1;
+  string responseMessage = 2;
+  
+}
+
