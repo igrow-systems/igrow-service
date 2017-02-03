@@ -3,7 +3,7 @@
 /*
  * @(#)device.proto        
  *
- * Copyright (c) 2014 Argusat Limited
+ * Copyright (c) 2014, 2017 Argusat Limited
  * 10 Underwood Road,  Southampton.  UK
  * All rights reserved.
  *
@@ -13,6 +13,8 @@
  * accordance with the terms of the license agreement you entered into
  * with Argusat Limited.
  */
+
+syntax = "proto3";
 
 package com.argusat.gjl.locator;
 
@@ -29,19 +31,19 @@ message Device {
     APPLE_IOS = 2;
   }
 
-  required string deviceId = 1;
-  required OSType osType = 2;
-  required string osVersion = 3;
-  required string pushToken = 4;
-  required string manufacturer = 5;
-  required string model = 6;
-  required string product = 7;
-  required string device = 8;
-  optional com.argusat.gjl.observation.Location lastKnownLocation = 9;
+  string deviceId = 1;
+  OSType osType = 2;
+  string osVersion = 3;
+  string pushToken = 4;
+  string manufacturer = 5;
+  string model = 6;
+  string product = 7;
+  string device = 8;
+  com.argusat.gjl.observation.Location lastKnownLocation = 9;
 }
 
 message RegisterDeviceRequest {
-  required Device device = 1;
+  Device device = 1;
 }
 
 message RegisterDeviceResponse {
@@ -50,14 +52,14 @@ message RegisterDeviceResponse {
     NONE = 0;
   }
 
-  required ErrorCode responseCode = 1;
-  optional string responseMessage = 2;
+  ErrorCode responseCode = 1;
+  string responseMessage = 2;
   
 }
 
 message NotifyDeviceRequest {
-  required string deviceId = 1;
-  required string message = 2;
+  string deviceId = 1;
+  string message = 2;
 }
 
 message NotifyDeviceResponse {
@@ -70,15 +72,15 @@ message NotifyDeviceResponse {
     MESSAGE_PARSE_ERROR = 4;
   }
 
-  required ErrorCode responseCode = 1;
-  optional string responseMessage = 2;
+  ErrorCode responseCode = 1;
+  string responseMessage = 2;
   
 }
 
 message FindLocalDevicesRequest {
-  required com.argusat.gjl.observation.Location centre = 1;
-  required uint64 radius = 2;
-  required uint32 limit = 3;
+  com.argusat.gjl.observation.Location centre = 1;
+  uint64 radius = 2;
+  uint32 limit = 3;
 }
 
 message FindLocalDevicesResponse {
@@ -88,8 +90,8 @@ message FindLocalDevicesResponse {
     NO_LOCAL_DEVICES = 1;
   }
 
-  required ErrorCode responseCode = 1;
-  optional string responseMessage = 2;
+  ErrorCode responseCode = 1;
+  string responseMessage = 2;
   
   repeated Device devices = 3;
 }

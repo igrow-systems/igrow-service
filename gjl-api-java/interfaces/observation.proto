@@ -3,7 +3,7 @@
 /*
  * @(#)observation.proto        
  *
- * Copyright (c) 2013 - 2014 Argusat Limited
+ * Copyright (c) 2013 - 2014, 2017 Argusat Limited
  * 10 Underwood Road,  Southampton.  UK
  * All rights reserved.
  *
@@ -13,6 +13,8 @@
  * accordance with the terms of the license agreement you entered into
  * with Argusat Limited.
  */
+
+syntax = "proto3";
 
 package com.argusat.gjl.observation;
 
@@ -30,59 +32,59 @@ message Observation {
     ROTATION_VECTOR = 3;
   }
 
-  required ObservationType type = 1;
-  required string deviceId = 2;
-  required uint64 timestamp = 3;        // The type and timestamp form a unique ID in the context of a device/client
-  required Location location = 4;
+  ObservationType type = 1;
+  string deviceId = 2;
+  uint64 timestamp = 3;        // The type and timestamp form a unique ID in the context of a device/client
+  Location location = 4;
 
   enum ModeType {
     PASSIVE = 0;
     ACTIVE = 1;
   }
 
-  required ModeType mode = 5;
+  ModeType mode = 5;
 
   message C0NObservation {
     
     message ReceiverChannel {
-      required uint32 prn = 1;
-      required float azimuth = 2;
-      required float elevation = 3;
-      required float c0_n = 4;
+      uint32 prn = 1;
+      float azimuth = 2;
+      float elevation = 3;
+      float c0_n = 4;
     }
 
     repeated ReceiverChannel channels = 1;
   }
 
-  optional C0NObservation c0nobservation = 6;
+  C0NObservation c0nobservation = 6;
 
   message AccelerometerObservation {
   }
 
-  optional AccelerometerObservation accelerometerobservation = 7;
+  AccelerometerObservation accelerometerobservation = 7;
 
   message MagneticCompassObservation {
     
     message Direction {
-      required uint32 heading = 1;
-      required uint32 error = 2;
+      uint32 heading = 1;
+      uint32 error = 2;
     }
 
-    required Direction direction = 1;
+    Direction direction = 1;
   }
 
-  optional MagneticCompassObservation magneticCompassObservation = 8;
+  MagneticCompassObservation magneticCompassObservation = 8;
 
   message GeoMagneticObservation {
 
-      required float x = 1;
-      required float y = 2;
-      required float z = 3;
-      required float sigma = 5;
-      required float error = 6;
+      float x = 1;
+      float y = 2;
+      float z = 3;
+      float sigma = 5;
+      float error = 6;
   }
 
-  optional GeoMagneticObservation geoMagneticObservation = 9;
+  GeoMagneticObservation geoMagneticObservation = 9;
  
   
 }

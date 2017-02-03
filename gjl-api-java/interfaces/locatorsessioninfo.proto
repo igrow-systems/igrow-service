@@ -1,7 +1,7 @@
 /* -*- mode: protobuf; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */ /*
- * @(#)locator.proto        
+ * @(#)locatorsessioninfo.proto
  *
- * Copyright (c) 2014 Argusat Limited
+ * Copyright (c) 2014, 2017 Argusat Limited
  * 10 Underwood Road,  Southampton.  UK
  * All rights reserved.
  *
@@ -11,7 +11,9 @@
  * accordance with the terms of the license agreement you entered into
  * with Argusat Limited.
  */ 
- 
+
+syntax = "proto3";
+
 package com.argusat.gjl.locator;
 
 option java_package = "com.argusat.gjl.service.locator";
@@ -34,19 +36,19 @@ message LocatorSessionInfo {
 			STOPPED = 2;
 		}
 
-		required string deviceId = 1;
-		required ParticipantStatus participantStatus = 2;
-		optional com.argusat.gjl.observation.Location location = 3;
-		optional uint64 lastUpdateTimestamp = 4;
-		optional float averageSignalStrength = 5;
+		string deviceId = 1;
+		ParticipantStatus participantStatus = 2;
+		com.argusat.gjl.observation.Location location = 3;
+		uint64 lastUpdateTimestamp = 4;
+		float averageSignalStrength = 5;
 	}
 	
 	message GnssJammer {
-		required com.argusat.gjl.observation.Location location = 1;
+		com.argusat.gjl.observation.Location location = 1;
 	}
 	
-	required string sessionId = 1;
-	required SessionStatus sessionStatus = 2;
+	string sessionId = 1;
+	SessionStatus sessionStatus = 2;
 	repeated Participant participant = 3;
 	repeated GnssJammer jammer = 4;
 }
