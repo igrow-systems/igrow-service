@@ -1,17 +1,16 @@
+*.class
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files #
+*.jar
+*.war
+*.ear
+
 *~
 *#
-gjl-api-java/target/
-observation-service/target/
-device-service/target/
-locator-service/target/
-*.o
-autom4te.cache/
-config.log
-config.status
-stamp-h1
-.libs/
-*.so
-.deps/
-*.lo
-depends/
-*.log
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+

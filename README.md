@@ -1,9 +1,10 @@
+
 # README #
 
 ### What is this repository for? ###
 
-* This repository contains the server-side components of the __GNSS Jammer Locator__ distributed system suite
-* Current Version:  1.0.6
+* This repository contains the server-side components of the __iGrow Systems__ suite
+* Current Version:  0.0.2
 * [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
 
 ### Architecture ###
@@ -23,16 +24,16 @@
 
     As user rabbitmq,
 
-        rabbitmqctl add_user argusat-gjl-dev argusat-gjl-dev
-        rabbitmqctl set_permissions -p / argusat-gjl-dev ".*" ".*" ".*"
+        rabbitmqctl add_user igrow-service-dev igrow-service-dev
+        rabbitmqctl set_permissions -p / igrow-service-dev ".*" ".*" ".*"
 
 * Database configuration:
 
-        createuser --no-superuser --no-createdb --no-createrole --pwprompt argusat-gjl-dev
+        createuser --no-superuser --no-createdb --no-createrole --pwprompt igrow-service-dev
 
-        createdb --owner argusat-gjl-dev argusat-gjl-dev
+        createdb --owner igrow-service-dev igrow-service-dev
 
-        psql -d argusat-gjl-dev
+        psql -d igrow-service-dev
 
         CREATE EXTENSION postgis;
         CREATE EXTENSION postgis_topology;
@@ -44,10 +45,10 @@
 * Initialise the database
 
         cd observation-service
-        psql -U argusat-gjl-dev -h localhost < src/main/resources/initdb.sql
+        psql -U igrow-service-dev -h localhost < src/main/resources/initdb.sql
 
         cd ../device-service
-        psql -U argusat-gjl-dev -h localhost < src/main/resources/initdb.sql
+        psql -U igrow-service-dev -h localhost < src/main/resources/initdb.sql
 
 
 * Build the services
@@ -59,7 +60,7 @@
 
 * To run individual services
 
-        mvn -DskipTests=true -Djersey.test.port=9998 -Dcom.argusat.gjl.observice.debug=true -e exec:java
+        mvn -DskipTests=true -Djersey.test.port=9998 -Dcom.igrow.gjl.observice.debug=true -e exec:java
 
 
 * Configure Eclipse and the dev environment
@@ -69,7 +70,7 @@
 
     Set `M2_REPO` classpath variable:
 
-        mvn -Declipse.workspace="/Users/jsr/dev/gjl_service_eclipse" eclipse:configure-workspace
+        mvn -Declipse.workspace="igrow-service-eclipse" eclipse:configure-workspace
 
 
 * Dependencies:
@@ -96,11 +97,6 @@
     * Run the start scripts to start the Observation Service `start-observation-server.sh`
     * Run the start scripts to start the Locator Service `start-locator-server.sh`
 
-### Some Data Analysis in R ###
-
-There is some R code which interfaces with the data store provided.  Here's a screenshot:
-
-![Analysis in R](analysis.png "Analysis in R")
 
 ### Contribution guidelines ###
 
@@ -111,4 +107,4 @@ There is some R code which interfaces with the data store provided.  Here's a sc
 
 ### Who do I talk to? ###
 
-* jeremy.reeve@opengpssignal.com
+* jeremy.reeve@igrow-systems.com
