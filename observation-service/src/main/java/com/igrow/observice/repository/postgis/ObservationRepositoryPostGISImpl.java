@@ -3,7 +3,7 @@
 /*
  * @(#)ObservationRepositoryPostGISImpl.java        
  *
- * Copyright (c) 2013 - 2014 Argusat Limited
+ * Copyright (c) 2013 - 2014, 2017 Argusat Limited
  * 10 Underwood Road,  Southampton.  UK
  * All rights reserved.
  *
@@ -146,15 +146,15 @@ public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 				mPreparedStatementInsertObservation.setTimestamp(2,
 						new Timestamp(observation.getTimestamp()));
 
-				mPreparedStatementInsertObservation.setString(3,
-						observation.getSensorId());
-
 //				if (observation.getType() == ObservationType.TYPE_ENVIRONMENTAL_SENSOR) {
-//					mPreparedStatementInsertObservation.setLong(4,
-//							((EnvironmentalSensorObservation) observation).getPrn());
-//				} else {
-					mPreparedStatementInsertObservation.setNull(4, Types.NULL);
-//				}
+//				mPreparedStatementInsertObservation.setLong(4,
+//						((EnvironmentalSensorObservation) observation).getPrn());
+//			} else {
+				mPreparedStatementInsertObservation.setNull(3, Types.NULL);
+//			}
+				
+				mPreparedStatementInsertObservation.setString(4,
+						observation.getSensorId());
 
 				mPreparedStatementInsertObservation.setFloat(5, observation
 						.getLocation().getHDOP());
@@ -275,8 +275,8 @@ public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 
 				PGgeometry geomLocation = (PGgeometry) resultSet.getObject(1);
 				point = geomLocation.getGeometry().getFirstPoint();
-				float hdop = resultSet.getFloat(4);
-				float vdop = resultSet.getFloat(5);
+				float hdop = resultSet.getFloat(5);
+				float vdop = resultSet.getFloat(6);
 
 				Location location = new Location();
 				location.setLatitude((float) point.y);
@@ -287,7 +287,7 @@ public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 				observation.setLocation(location);
 
 				observation.setTimestamp(resultSet.getTimestamp(2).getTime());
-				observation.setSensorId(resultSet.getString(3));
+				observation.setSensorId(resultSet.getString(4));
 				observation.setMode(ModeType.valueOf(resultSet.getString(8)));
 
 //				if (observation.getType() == ObservationType.TYPE_ENVIRONMENTAL_SENSOR) {

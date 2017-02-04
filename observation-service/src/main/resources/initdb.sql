@@ -4,8 +4,8 @@ DROP TABLE observations;
 CREATE TABLE observations (
     location geometry(POINTZ,4326) NOT NULL,
     obs_timestamp timestamp NOT NULL,
-    device_id varchar(255) NOT NULL,    
-    sensor_id integer,
+    device_id varchar(255),    
+    sensor_id varchar(255) NOT NULL,
     hdop real,
     vdop real,
     obs_type varchar(64) NOT NULL,

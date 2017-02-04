@@ -3,7 +3,7 @@
 /*
  * @(#)ObservationRepositoryPostGISImplTest.java        
  *
- * Copyright (c) 2013 Argusat Limited
+ * Copyright (c) 2013, 2017 Argusat Limited
  * 10 Underwood Road,  Southampton.  UK
  * All rights reserved.
  *
