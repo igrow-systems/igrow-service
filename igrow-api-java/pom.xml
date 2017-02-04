@@ -19,8 +19,10 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <!-- protobuf paths -->
     <protobuf.input.directory>${project.basedir}/interfaces</protobuf.input.directory>
-    <protobuf.output.directory>${project.build.directory}/generated-sources/java</protobuf.output.directory>
-
+    <protobuf.java.output.directory>${project.build.directory}/generated-sources/java</protobuf.java.output.directory>
+    <protobuf.python.output.directory>${project.build.directory}/generated-sources/python</protobuf.python.output.directory>
+    <protobuf.js.output.directory>${project.build.directory}/generated-sources/js</protobuf.js.output.directory>
+    
     <!-- library versions -->
     <build-helper-maven-plugin.version>1.9.1</build-helper-maven-plugin.version>
     <maven-antrun-plugin.version>1.8</maven-antrun-plugin.version>
@@ -157,14 +159,14 @@
 	<version>${maven-antrun-plugin.version}</version>
 	<executions>
 	  <execution>
-	    <id>exec-protoc</id>
+	    <id>exec-protoc-java</id>
 	    <phase>generate-sources</phase>
 	    <configuration>
 	      <target>
 		<property name="protoc.filename" value="protoc-${protobuf.version}-${os.detected.classifier}.exe"/>
 		<property name="protoc.filepath" value="${project.build.directory}/${protoc.filename}"/>
 		<chmod file="${protoc.filepath}" perm="ugo+rx"/>
-		<mkdir dir="${protobuf.output.directory}" />
+		<mkdir dir="${protobuf.java.output.directory}" />
 		<path id="protobuf.input.filepaths.path">
 		  <fileset dir="${protobuf.input.directory}">
 		    <include name="**/*.proto"/>
@@ -175,7 +177,63 @@
 		  <arg value="-I"/>
 		  <arg value="${protobuf.input.directory}"/>
 		  <arg value="--java_out"/>
-		  <arg value="${protobuf.output.directory}"/>
+		  <arg value="${protobuf.java.output.directory}"/>
+		  <arg line="${protobuf.input.filepaths}"/>
+		</exec>
+	      </target>
+	    </configuration>
+	    <goals>
+	      <goal>run</goal>
+	    </goals>
+	  </execution>
+          <execution>
+	    <id>exec-protoc-python</id>
+	    <phase>generate-sources</phase>
+	    <configuration>
+	      <target>
+		<property name="protoc.filename" value="protoc-${protobuf.version}-${os.detected.classifier}.exe"/>
+		<property name="protoc.filepath" value="${project.build.directory}/${protoc.filename}"/>
+		<chmod file="${protoc.filepath}" perm="ugo+rx"/>
+		<mkdir dir="${protobuf.python.output.directory}" />
+		<path id="protobuf.input.filepaths.path">
+		  <fileset dir="${protobuf.input.directory}">
+		    <include name="**/*.proto"/>
+		  </fileset>
+		</path>
+		<pathconvert pathsep=" " property="protobuf.input.filepaths" refid="protobuf.input.filepaths.path"/>
+		<exec executable="${protoc.filepath}" failonerror="true">
+		  <arg value="-I"/>
+		  <arg value="${protobuf.input.directory}"/>
+		  <arg value="--python_out"/>
+		  <arg value="${protobuf.python.output.directory}"/>
+		  <arg line="${protobuf.input.filepaths}"/>
+		</exec>
+	      </target>
+	    </configuration>
+	    <goals>
+	      <goal>run</goal>
+	    </goals>
+	  </execution>
+	  <execution>
+	    <id>exec-protoc-js</id>
+	    <phase>generate-sources</phase>
+	    <configuration>
+	      <target>
+		<property name="protoc.filename" value="protoc-${protobuf.version}-${os.detected.classifier}.exe"/>
+		<property name="protoc.filepath" value="${project.build.directory}/${protoc.filename}"/>
+		<chmod file="${protoc.filepath}" perm="ugo+rx"/>
+		<mkdir dir="${protobuf.js.output.directory}" />
+		<path id="protobuf.input.filepaths.path">
+		  <fileset dir="${protobuf.input.directory}">
+		    <include name="**/*.proto"/>
+		  </fileset>
+		</path>
+		<pathconvert pathsep=" " property="protobuf.input.filepaths" refid="protobuf.input.filepaths.path"/>
+		<exec executable="${protoc.filepath}" failonerror="true">
+		  <arg value="-I"/>
+		  <arg value="${protobuf.input.directory}"/>
+		  <arg value="--js_out"/>
+		  <arg value="${protobuf.js.output.directory}"/>
 		  <arg line="${protobuf.input.filepaths}"/>
 		</exec>
 	      </target>
