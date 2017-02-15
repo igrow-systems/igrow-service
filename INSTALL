@@ -1,6 +1,3 @@
-
-
-
 Machine
 ========
 
@@ -21,12 +18,12 @@ rabbitmq-server
 Postgresql
 ============
 
-createuser --no-superuser --no-createdb --no-createrole --pwprompt argusat-gjl-dev
+createuser --no-superuser --no-createdb --no-createrole --pwprompt igrow-service-dev
 
-createdb --owner argusat-gjl-dev argusat-gjl-dev
+createdb --owner igrow-service-dev igrow-service-dev
 
 
-log in as superuser, psql -d argusat-gjl-dev
+log in as superuser, psql -d igrow-service-dev
 
 
 CREATE EXTENSION postgis;
@@ -36,14 +33,14 @@ CREATE EXTENSION postgis_topology;
 RabbitMQ
 =========
 
-rabbitmqctl add_user argusat-gjl-dev argusat-gjl-dev
-rabbitmqctl set_permissions -p / argusat-gjl-dev ".*" ".*" ".*"
+rabbitmqctl add_user igrow-service-dev igrow-service-dev
+rabbitmqctl set_permissions -p / igrow-service-dev ".*" ".*" ".*"
 
 
 Build postgis-jdbc.jar
 =======================
 
-Mac OS X 
+Mac OS X
 --------
 
 modify jdbc/Makefile to set ant path correctly.  Hmmm.  Actually, invoke mvn directly because the ant-maven-tasks integration does something funky with M2_HOME by the looks of things.
@@ -60,12 +57,12 @@ stop after make step.
 
   PostGIS is now configured for x86_64-unknown-linux-gnu
 
- -------------- Compiler Info ------------- 
+ -------------- Compiler Info -------------
   C compiler:           gcc -g -O2
   C++ compiler:         g++ -g -O2
   SQL preprocessor:     /usr/bin/cpp -w -traditional-cpp -P
 
- -------------- Dependencies -------------- 
+ -------------- Dependencies --------------
   GEOS config:          /usr/bin/geos-config
   GEOS version:         3.4.2
   GDAL config:          /usr/bin/gdal-config
@@ -79,19 +76,19 @@ stop after make step.
   PostGIS debug level:  0
   Perl:                 /usr/bin/perl
 
- --------------- Extensions --------------- 
+ --------------- Extensions ---------------
   PostGIS Raster:       enabled
   PostGIS Topology:     enabled
   SFCGAL support:       disabled
 
- -------- Documentation Generation -------- 
+ -------- Documentation Generation --------
   xsltproc:             /usr/bin/xsltproc
   xsl style sheets:     /usr/share/xml/docbook/stylesheet/nwalsh
-  dblatex:              
-  convert:              
+  dblatex:
+  convert:
   mathml2.dtd:          /usr/share/xml/schema/w3c/mathml/dtd/mathml2.dtd
 
-modify liblwgeom/lwin_geojson.c 
+modify liblwgeom/lwin_geojson.c
 
 json ->  json-c
 
@@ -117,12 +114,12 @@ cd gjl-api-java
 mvn test package install
 
 cd observation-service
-psql -U argusat-gjl-dev -h localhost < src/main/resources/initdb.sql
+psql -U igrow-service-dev -h localhost < src/main/resources/initdb.sql
 mvn test package install
 
 mvn clean compile assembly:single
 
-mvn -DskipTests=true -Djersey.test.port=9998 -Dcom.argusat.gjl.observice.debug=true -e exec:java
+mvn -DskipTests=true -Djersey.test.port=9998 -Dcom.igrow.igrow-service.observation-service.debug=true -e exec:java
 
 
 
