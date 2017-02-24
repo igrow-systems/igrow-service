@@ -3,7 +3,7 @@
 /*
  * @(#)Observations.java        
  *
- * Copyright (c) 2013 - 2014 Argusat Limited
+ * Copyright (c) 2013 - 2014, 2017 Argusat Limited
  * 10 Underwood Road,  Southampton.  UK
  * All rights reserved.
  *
@@ -26,6 +26,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
@@ -41,7 +42,7 @@ import com.igrow.publisher.Publisher;
 import com.igrow.publisher.PublisherRabbitMQ;
 
 // The Java class will be hosted at the URI path "/observations"
-@Path("/observations")
+@Path("/")
 public class Observations {
 
 	private static final Logger LOGGER = LoggerFactory
@@ -83,6 +84,7 @@ public class Observations {
 
 	}
 
+	@Path("/observations")
 	// The Java method will process HTTP POST requests
 	@POST
 	// The Java method will produce content identified by the MIME Media
@@ -117,6 +119,7 @@ public class Observations {
 
 	}
 
+	@Path("/observations")
 	// The Java method will process HTTP GET requests
 	@GET
 	// The Java method will produce content identified by the MIME Media
@@ -128,10 +131,36 @@ public class Observations {
 	public ObservationCollection getObservations(
 			@QueryParam("lat") float latitude,
 			@QueryParam("lon") float longitude,
-			@QueryParam("radius") long radius, @QueryParam("limit") long limit) {
+			@QueryParam("radius") long radius,
+			@QueryParam("limit") long limit) {
 
 		List<Observation> obs = mObservationRepository.findObservations(
 				latitude, longitude, radius, limit);
+		ObservationCollection obsCollection = new ObservationCollection();
+		obsCollection.setObservations(obs);
+
+		return obsCollection;
+
+	}
+	
+	@Path("/sensor/{sensorid}/observations")
+	// The Java method will process HTTP GET requests
+	@GET
+	// The Java method will produce content identified by the MIME Media
+	// type "application/octet-stream"
+	@Produces("application/octet-stream")
+	// The Java method will consume content identified by the MIME Media
+	// type "text/plain"
+	@Consumes("text/plain")
+	public ObservationCollection getObservationsByTimestampRange(
+			@QueryParam("tss") long timestampStart,
+			@QueryParam("tse") long timestampEnd,
+			@PathParam("sensorid") String sensorId,
+			@QueryParam("limit") long limit) {
+
+		
+		List<Observation> obs = mObservationRepository.findObservations(
+				sensorId, timestampStart, timestampEnd, limit);
 		ObservationCollection obsCollection = new ObservationCollection();
 		obsCollection.setObservations(obs);
 

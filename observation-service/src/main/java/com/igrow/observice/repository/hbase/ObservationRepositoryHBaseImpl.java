@@ -125,4 +125,10 @@ public class ObservationRepositoryHBaseImpl implements ObservationRepository,
 		return null;
 	}
 
+	@Override
+	public List<Observation> findObservations(String sensorId, long timestampStart, long timestampEnd, long limit) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

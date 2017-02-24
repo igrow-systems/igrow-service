@@ -63,17 +63,29 @@ public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 
 	// private static final String SELECT_LOCAL_OBSERVATIONS_SQL =
 	// "select distinct on (o.device_id) "
-	private static final String SELECT_LOCAL_OBSERVATIONS_SQL = "select "
+	private static final String SELECT_SPATIALLY_LOCAL_OBSERVATIONS_SQL = "select "
 			+ " o.location, o.obs_timestamp, o.device_id, o.sensor_id, "
 			+ " o.hdop, o.vdop, o.obs_type, o.obs_mode, "
 			+ " o.value0, o.value1, o.value2, o.value3, o.value4"
 			+ " from observations o"
 			+ " where ST_DWithin(ST_GeomFromEWKB(?), o.location, ?) "
 			+ " order by obs_timestamp desc" + " limit(?)";
+	
+	private static final String SELECT_TEMPORALLY_LOCAL_OBSERVATIONS_SQL = "select "
+			+ " o.location, o.obs_timestamp, o.device_id, o.sensor_id, "
+			+ " o.hdop, o.vdop, o.obs_type, o.obs_mode, "
+			+ " o.value0, o.value1, o.value2, o.value3, o.value4"
+			+ " from observations o"
+			+ " where o.sensor_id = '?'"
+			+ " and o.obs_timestamp >= ?"
+			+ " and o.obs_timestamp <= ?"
+			+ " order by obs_timestamp desc" + " limit(?)";
 
 	private PreparedStatement mPreparedStatementInsertObservation;
 
-	private PreparedStatement mPreparedStatementSelectLocalObservations;
+	private PreparedStatement mPreparedStatementSelectSpatiallyLocalObservations;
+	
+	private PreparedStatement mPreparedStatementSelectTemporallyLocalObservations;
 
 	private Connection mConnection;
 
@@ -104,8 +116,11 @@ public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 			// Class.forName("org.postgis.PGbox3d"));
 			mPreparedStatementInsertObservation = mConnection
 					.prepareStatement(INSERT_OBSERVATION_SQL);
-			mPreparedStatementSelectLocalObservations = mConnection
-					.prepareStatement(SELECT_LOCAL_OBSERVATIONS_SQL);
+			mPreparedStatementSelectSpatiallyLocalObservations = mConnection
+					.prepareStatement(SELECT_SPATIALLY_LOCAL_OBSERVATIONS_SQL);
+			mPreparedStatementSelectTemporallyLocalObservations = mConnection
+					.prepareStatement(SELECT_TEMPORALLY_LOCAL_OBSERVATIONS_SQL);
+			
 		} catch (Throwable t) {
 			LOGGER.error(
 					"Unable to construct ObservationRepositoryPostGISImpl", t);
@@ -233,8 +248,11 @@ public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 	}
 
 	@Override
-	public synchronized List<Observation> findObservations(float latitude,
-			float longitude, long radius, long limit) {
+	public synchronized List<Observation> findObservations(
+			float latitude,
+			float longitude,
+			long radius,
+			long limit) {
 
 		ObservationCollection obsCollection = new ObservationCollection();
 		try {
@@ -250,16 +268,16 @@ public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 
 			PGgeometry geometry = new PGgeometry(point);
 
-			mPreparedStatementSelectLocalObservations.setObject(1, geometry);
+			mPreparedStatementSelectSpatiallyLocalObservations.setObject(1, geometry);
 			// TODO: Fix this hack. Learn about coordinate systems and
 			// projections
-			mPreparedStatementSelectLocalObservations.setFloat(2,
+			mPreparedStatementSelectSpatiallyLocalObservations.setFloat(2,
 					(float) radius / 111128f);
-			mPreparedStatementSelectLocalObservations.setLong(3, limit);
+			mPreparedStatementSelectSpatiallyLocalObservations.setLong(3, limit);
 
-			LOGGER.debug(mPreparedStatementSelectLocalObservations.toString());
+			LOGGER.debug(mPreparedStatementSelectSpatiallyLocalObservations.toString());
 
-			ResultSet resultSet = mPreparedStatementSelectLocalObservations
+			ResultSet resultSet = mPreparedStatementSelectSpatiallyLocalObservations
 					.executeQuery();
 
 			if (!resultSet.isBeforeFirst()) {
@@ -274,6 +292,106 @@ public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 				Observation observation = Observation.newObservation(obsType);
 
 				PGgeometry geomLocation = (PGgeometry) resultSet.getObject(1);
+				point = geomLocation.getGeometry().getFirstPoint();
+				float hdop = resultSet.getFloat(5);
+				float vdop = resultSet.getFloat(6);
+
+				Location location = new Location();
+				location.setLatitude((float) point.y);
+				location.setLongitude((float) point.x);
+				location.setAltitude((float) point.z);
+				location.setHDOP(hdop);
+				location.setVDOP(vdop);
+				observation.setLocation(location);
+
+				observation.setTimestamp(resultSet.getTimestamp(2).getTime());
+				observation.setSensorId(resultSet.getString(4));
+				observation.setMode(ModeType.valueOf(resultSet.getString(8)));
+
+//				if (observation.getType() == ObservationType.TYPE_ENVIRONMENTAL_SENSOR) {
+//					((EnvironmentalSensorObservation) observation).setPrn(resultSet
+//							.getInt(4));
+//				}
+
+				float[] values = new float[5];
+
+				for (int i = 0; i < 5; ++i) {
+					values[i] = resultSet.getFloat(i + 9);
+				}
+				observation.setValues(values);
+				// TODO: The following ensures the protobuf gets constructed by
+				// a call to buildPartial().
+				// This needs attention so that a method named isValid() with no
+				// implied
+				// side effects actually has no side effects!
+				if (observation.isValid()) {
+					obsCollection.add(observation);
+				} else {
+					for (String error : observation.getObservationProtoBuf()
+							.findInitializationErrors())
+						LOGGER.error(error);
+				}
+
+				mConnection.commit();
+
+			}
+
+		} catch (SQLException e) {
+			LOGGER.error("findObservations", e);
+		} catch (Throwable t) {
+			LOGGER.error("findObservations", t);
+		} finally {
+			if (mConnection != null) {
+				try {
+					mConnection.setAutoCommit(true);
+				} catch (SQLException e) {
+					LOGGER.error("findObservations", e);
+				}
+			}
+		}
+		return obsCollection.getObservations();
+	}
+
+
+	@Override
+	public synchronized List<Observation> findObservations(
+			final String sensorId,
+			long timestampStart,
+			long timestampEnd,
+			long limit) {
+
+		ObservationCollection obsCollection = new ObservationCollection();
+		try {
+
+			mConnection.setAutoCommit(false);
+
+			mPreparedStatementSelectTemporallyLocalObservations.setString(1,
+					sensorId);
+			mPreparedStatementSelectTemporallyLocalObservations.setTimestamp(2,
+					new Timestamp(timestampStart));
+			mPreparedStatementSelectTemporallyLocalObservations.setTimestamp(3,
+					new Timestamp(timestampEnd));
+			mPreparedStatementSelectTemporallyLocalObservations.setLong(4,
+					limit);
+
+			LOGGER.debug(mPreparedStatementSelectTemporallyLocalObservations.toString());
+
+			ResultSet resultSet = mPreparedStatementSelectTemporallyLocalObservations
+					.executeQuery();
+
+			if (!resultSet.isBeforeFirst()) {
+				return null;
+			}
+
+			while (resultSet.next()) {
+
+				ObservationType obsType = ObservationType.valueOf(resultSet
+						.getString(7));
+
+				Observation observation = Observation.newObservation(obsType);
+
+				PGgeometry geomLocation = (PGgeometry) resultSet.getObject(1);
+				Point point = new Point();
 				point = geomLocation.getGeometry().getFirstPoint();
 				float hdop = resultSet.getFloat(5);
 				float vdop = resultSet.getFloat(6);
