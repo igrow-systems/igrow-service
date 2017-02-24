@@ -17,6 +17,9 @@
 package com.igrow.observice.test;
 
 import javax.ws.rs.core.MediaType;
+
+import java.util.UUID;
+
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -59,11 +62,19 @@ public class MainTest extends TestCase {
 	private static float[] lons = { -1.415285f, -1.409577f, -1.420563f,
 			-1.418117f, -1.423310f, -1.406076f, -1.442468f, -1.452510f };
 
+	private static long[] timestamps = {
+			1486501200000L, 1486501205000L,
+			1486501210000L, 1486501215000L,
+			1486501220000L, 1486501225000L,
+			1486501230000L, 1486501235000L };
+	
 	private ObservationCollection mObservationCollection;
 
   private HttpServer mHttpServer;
 
 	private WebTarget mTarget;
+	
+	private String mSensorId;
 
 	public MainTest(String testName) {
 		super(testName);
@@ -86,15 +97,110 @@ public class MainTest extends TestCase {
     //       need to check the documentation.
     mTarget = client.target(Main.BASE_URI);
 
+
+
+		// mObservationsProtoBuf = builder.build();
+	}
+
+	@Override
+	protected void tearDown() throws Exception {
+		super.tearDown();
+
+		mHttpServer.shutdownNow();
+
+	}
+
+	/**
+	 * Test to see that the message "Got it!" is sent in the response.
+	 */
+	public void testPostObservations() {
+
+		generateObservations();
+		
+		WebTarget wt = mTarget.path("observations");
+		String response = wt.request(MediaType.TEXT_PLAIN_TYPE)
+				.post(Entity.entity(mObservationCollection,
+                MediaType.APPLICATION_OCTET_STREAM_TYPE),
+            String.class);
+    
+		assertEquals("OK", response);
+	}
+
+	public void testGetSpatiallyLocalObservations() {
+
+		float latitude = 50.9399695f;
+		float longitude = -1.415058f;
+		int radius = 1000;
+		int limit = 4;
+		
+		WebTarget wt = mTarget.path("observations");
+
+	    ObservationCollection response = wt
+	      .queryParam("lat", Float.toString(latitude))
+	      .queryParam("lon", Float.toString(longitude))
+	      .queryParam("radius", Integer.toString(radius))
+	      .queryParam("limit", Integer.toString(limit))
+	      .request()
+	      .accept(MediaType.APPLICATION_OCTET_STREAM_TYPE)
+	      .get(ObservationCollection.class);
+
+		assertEquals(4, response.getObservations().size());
+	}
+	
+	public void testGetTemporallyLocalObservations() {
+		
+		// We need to call the postObservations test
+		// because we can't guarantee the order of
+		// test execution.  A side effect of this is
+		// to call generateObservations() which creates
+		// a new UUID which is stored in mSensorId
+		testPostObservations();
+		// 250ms after the first timestamp
+		long timestampStart = timestamps[0] - 250L;
+		// 250ms before the final timestamp
+		long timestampEnd = timestamps[timestamps.length - 1] + 250L;
+		String sensorId = mSensorId;
+		int limit = 1000;
+		
+		WebTarget wt = mTarget.path("sensor/" + sensorId + "/observations");
+
+	    ObservationCollection response = wt
+	      .queryParam("tss", Long.toString(timestampStart))
+	      .queryParam("tse", Long.toString(timestampEnd))
+	      .queryParam("limit", Integer.toString(limit))
+	      .request()
+	      .accept(MediaType.APPLICATION_OCTET_STREAM_TYPE)
+	      .get(ObservationCollection.class);
+
+		assertEquals(8, response.getObservations().size());
+	}
+
+	/**
+	 * Test if a WADL document is available at the relative path
+	 * "application.wadl".
+	 */
+	public void testApplicationWadl() {
+		String serviceWadl = mTarget.path("application.wadl")
+	      .request()
+	      .accept(MediaType.APPLICATION_XML_TYPE)
+	      .get(String.class);
+
+		assertTrue(serviceWadl.length() > 0);
+	}
+	
+	private void generateObservations() {
+    	
+		mSensorId = UUID.randomUUID().toString();
+        
 		mObservationCollection = new ObservationCollection();
 
 		for (int i = 0; i < 8; ++i) {
 			Observation observation = Observation
 					.newObservation(ObservationType.TYPE_LOCATION_ONLY);
 
-			observation.setSensorId("test-id-00" + Integer.toString(i));
-			observation.setTimestamp(111889349L);
-			observation.setMode(ModeType.PASSIVE);
+			observation.setSensorId(mSensorId);
+			observation.setTimestamp(timestamps[i]);
+			observation.setMode(ModeType.ACTIVE);
 			// assertEquals()
 			// assertEquals(137483L, location.getLatitude());
 			Location location = observation.getLocation();
@@ -109,63 +215,5 @@ public class MainTest extends TestCase {
 
 			mObservationCollection.add(observation);
 		}
-
-		// mObservationsProtoBuf = builder.build();
-	}
-
-	@Override
-	protected void tearDown() throws Exception {
-		super.tearDown();
-
-    mHttpServer.shutdownNow();
-
-	}
-
-	/**
-	 * Test to see that the message "Got it!" is sent in the response.
-	 */
-	public void testPostObservations() {
-
-		WebTarget wt = mTarget.path("observations");
-		String response = wt.request(MediaType.TEXT_PLAIN_TYPE)
-      .post(Entity.entity(mObservationCollection,
-                          MediaType.APPLICATION_OCTET_STREAM_TYPE),
-            String.class);
-    
-		assertEquals("OK", response);
-	}
-
-	public void testGetLocalObservations() {
-
-		float latitude = 50.9399695f;
-		float longitude = -1.415058f;
-		int radius = 1000;
-		int limit = 4;
-		
-		WebTarget wt = mTarget.path("observations");
-
-    ObservationCollection response = wt
-      .queryParam("lat", Float.toString(latitude))
-      .queryParam("lon", Float.toString(longitude))
-      .queryParam("radius", Integer.toString(radius))
-      .queryParam("limit", Integer.toString(limit))
-      .request()
-      .accept(MediaType.APPLICATION_OCTET_STREAM_TYPE)
-      .get(ObservationCollection.class);
-
-		assertEquals(4, response.getObservations().size());
-	}
-
-	/**
-	 * Test if a WADL document is available at the relative path
-	 * "application.wadl".
-	 */
-	public void testApplicationWadl() {
-		String serviceWadl = mTarget.path("application.wadl")
-      .request()
-      .accept(MediaType.APPLICATION_XML_TYPE)
-      .get(String.class);
-
-		assertTrue(serviceWadl.length() > 0);
 	}
 }
