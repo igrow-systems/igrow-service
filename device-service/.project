@@ -3,7 +3,7 @@
   <name>device-service</name>
   <comment>NO_M2ECLIPSE_SUPPORT: Project files created with the maven-eclipse-plugin are not supported in M2Eclipse.</comment>
   <projects>
-    <project>gjl-api-java</project>
+    <project>igrow-api-java</project>
   </projects>
   <buildSpec>
     <buildCommand>

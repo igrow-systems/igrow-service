@@ -30,6 +30,7 @@ import org.glassfish.jersey.server.ResourceConfig;
 import com.igrow.protobuf.observation.ObservationProtoBuf.Observation;
 import com.igrow.devservice.repository.DeviceRepository;
 import com.igrow.devservice.repository.postgis.DeviceRepositoryPostGISImpl;
+import com.igrow.devservice.CORSResponseFilter;
 import com.igrow.subscriber.ObservationSubscriberRabbitMQ;
 import com.igrow.subscriber.Subscriber;
 
@@ -88,6 +89,8 @@ public class DeviceServiceApplication extends ResourceConfig {
 						.in(Singleton.class);
 			}
 		});
+		
+		register(CORSResponseFilter.class);
 	}
 
 	public DeviceServiceApplication(Set<Class<?>> classes) {

@@ -23,15 +23,11 @@ import javax.inject.Singleton;
 import javax.ws.rs.ApplicationPath;
 
 import org.glassfish.hk2.api.ServiceLocator;
-import org.glassfish.hk2.api.TypeLiteral;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.server.ResourceConfig;
 
-import com.igrow.protobuf.observation.ObservationProtoBuf.Observation;
 import com.igrow.observice.repository.ObservationRepository;
 import com.igrow.observice.repository.postgis.ObservationRepositoryPostGISImpl;
-import com.igrow.subscriber.ObservationSubscriberRabbitMQ;
-import com.igrow.subscriber.Subscriber;
 
 @ApplicationPath("/")
 public class ObservationServiceApplication extends ResourceConfig {
@@ -65,6 +61,8 @@ public class ObservationServiceApplication extends ResourceConfig {
 						ObservationRepository.class).in(Singleton.class);
 			}
 		});
+		
+		register(CORSResponseFilter.class);
 
 	}
 
