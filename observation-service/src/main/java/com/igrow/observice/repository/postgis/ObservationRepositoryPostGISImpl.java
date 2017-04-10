@@ -76,7 +76,7 @@ public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 			+ " o.hdop, o.vdop, o.obs_type, o.obs_mode, "
 			+ " o.value0, o.value1, o.value2, o.value3, o.value4"
 			+ " from observations o"
-			+ " where o.sensor_id = '?'"
+			+ " where o.sensor_id = ?"
 			+ " and o.obs_timestamp >= ?"
 			+ " and o.obs_timestamp <= ?"
 			+ " order by obs_timestamp desc" + " limit(?)";
@@ -203,6 +203,8 @@ public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 					mPreparedStatementInsertObservation.setNull(13, Types.NULL);
 				}
 
+				LOGGER.debug(mPreparedStatementInsertObservation.toString());
+				
 				int rowsAffected = mPreparedStatementInsertObservation
 						.executeUpdate();
 				mConnection.commit();
@@ -362,7 +364,7 @@ public class ObservationRepositoryPostGISImpl implements ObservationRepository,
 
 		ObservationCollection obsCollection = new ObservationCollection();
 		try {
-
+			
 			mConnection.setAutoCommit(false);
 
 			mPreparedStatementSelectTemporallyLocalObservations.setString(1,
