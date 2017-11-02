@@ -2,7 +2,7 @@
 DROP TABLE IF EXISTS observations;
 
 CREATE TABLE observations (
-    obs_timestamp TIMESTAMPZ            NOT NULL,
+    obs_timestamp timestamptz           NOT NULL,
     location      geometry(POINTZ,4326) NOT NULL,
     device_id     varchar(255),    
     sensor_id     varchar(255) NOT NULL,

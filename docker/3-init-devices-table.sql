@@ -13,4 +13,4 @@ CREATE TABLE devices (
     last_known_location geometry(POINTZ,4326)
 );
 
-SELECT create_hypertable('last_known_location', 4);
+
