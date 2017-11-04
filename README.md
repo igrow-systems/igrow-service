@@ -20,6 +20,20 @@
 
         apt install postgresql postgresql-client postgresql-contrib postgis libpostgis-java git maven openjdk-8-jdk rabbitmq-server protobuf-complier
 
+
+* Docker image
+
+    As of commit f19600f there is now a docker image which greatly simplifies configuration of the new timescaledb-postgis environment which means issuing
+
+        docker build -t igrowservice .
+
+should build a suitable docker image and
+
+        docker run -d --name igrow-service-dev -p 5432:5432 igrowservice
+
+should initialise the database and start the container running.
+
+
 * RabbitMQ configuration
 
     As user rabbitmq,
