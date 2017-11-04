@@ -38,7 +38,7 @@ public class Main {
 	private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
 	private static ServiceLocator mServiceLocator;
-  
+
 	private static int getPort(int defaultPort) {
 		// grab port from environment, otherwise fall back to default port 9998
 		String httpPort = System.getProperty("jersey.test.port");
@@ -52,8 +52,7 @@ public class Main {
 	}
 
 	private static URI getBaseURI() {
-		return UriBuilder.fromUri("http://0.0.0.0/").port(getPort(9998))
-				.build();
+		return UriBuilder.fromUri("http://0.0.0.0/").port(getPort(9998)).build();
 	}
 
 	public static final URI BASE_URI = getBaseURI();
@@ -61,30 +60,25 @@ public class Main {
 	public static HttpServer startServer() throws IOException {
 		final Map<String, String> initParams = new HashMap<String, String>();
 
-
-    ResourceConfig resourceConfig = new ObservationServiceApplication();
+		ResourceConfig resourceConfig = new ObservationServiceApplication();
 
 		LOGGER.info("Starting grizzly2...");
-		return GrizzlyHttpServerFactory.createHttpServer(BASE_URI,
-				resourceConfig, mServiceLocator);
+		return GrizzlyHttpServerFactory.createHttpServer(BASE_URI, resourceConfig, mServiceLocator);
 
 	}
 
 	public static void main(String[] args) throws IOException {
 
-		mServiceLocator = ServiceLocatorFactory.getInstance().create(
-				"non-Jersey types");
+		mServiceLocator = ServiceLocatorFactory.getInstance().create("non-Jersey types");
 
-    // Grizzly 2 initialization
+		// Grizzly 2 initialization
 		final HttpServer httpServer = startServer();
 
-		if (Boolean.valueOf(System.getProperty(
-				"com.igrow.observice.debug", "false"))) {
+		if (Boolean.valueOf(System.getProperty("com.igrow.observice.debug", "false"))) {
 
 			LOGGER.info("Enabling debug output");
 
-			final FilterChain filterChain = httpServer.getListener("grizzly")
-					.getFilterChain();
+			final FilterChain filterChain = httpServer.getListener("grizzly").getFilterChain();
 			HttpCodecFilter codecFilter = (HttpCodecFilter) filterChain
 					.get(filterChain.indexOfType(HttpCodecFilter.class));
 			codecFilter.getMonitoringConfig().addProbes(new LoggingHttpProbe());
@@ -100,14 +94,11 @@ public class Main {
 		}, "shutdownHook"));
 
 		try {
-			//httpServer.start();
-			LOGGER.info(String.format(
-					"Jersey app started with WADL available at "
-							+ "%sapplication.wadl.", BASE_URI));
+			// httpServer.start();
+			LOGGER.info(String.format("Jersey app started with WADL available at " + "%sapplication.wadl.", BASE_URI));
 			Thread.currentThread().join();
 		} catch (Exception e) {
-			LOGGER.error(
-					"There was an error while starting Grizzly HTTP server.", e);
+			LOGGER.error("There was an error while starting Grizzly HTTP server.", e);
 		}
 	}
 }
