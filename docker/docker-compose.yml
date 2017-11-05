@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  db:
+    build: timescaledb-postgis
+    image: timescaledb-postgis
+    ports:
+      - "5432:5432"
+
+
+  rabbitmq:
+    build: rabbitmq
+    image: rabbitmq
+    ports:
+      - "5672:5672"
