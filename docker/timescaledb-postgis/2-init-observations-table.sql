@@ -18,5 +18,5 @@ CREATE TABLE observations (
 );
 
 -- Then we convert it into a hypertable that is partitioned by time
-SELECT create_hypertable('observations', 'obs_timestamp', 'location', 4);
-
+--SELECT create_hypertable('observations', 'obs_timestamp', 'location', 4);
+SELECT create_hypertable('observations', 'obs_timestamp');

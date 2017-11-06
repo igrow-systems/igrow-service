@@ -37,7 +37,7 @@ import com.igrow.protobuf.observation.ObservationProtoBuf;
 import com.igrow.model.Observation;
 import com.igrow.model.ObservationCollection;
 import com.igrow.observice.repository.ObservationRepository;
-import com.igrow.observice.repository.postgis.ObservationRepositoryPostGISImpl;
+import com.igrow.observice.repository.postgis.ObservationRepositoryTimescaleDbPostGISImpl;
 import com.igrow.publisher.Publisher;
 import com.igrow.publisher.PublisherRabbitMQ;
 
@@ -54,7 +54,7 @@ public class Observations {
 
 	static {
 		try {
-			mObservationRepository = new ObservationRepositoryPostGISImpl();
+			mObservationRepository = new ObservationRepositoryTimescaleDbPostGISImpl();
 		} catch (ClassNotFoundException e) {
 			LOGGER.error("Couldn't construct PostGIS repository", e);
 		} catch (SQLException e) {

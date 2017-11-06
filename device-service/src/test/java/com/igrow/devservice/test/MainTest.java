@@ -198,18 +198,18 @@ public class MainTest extends TestCase {
 	/**
 	 * Test to see that a device can be notified
 	 */
-	@Test
-	public void testNotifyDevice() {
-
-		WebTarget wt = mTarget.path("notifications");
-		NotifyDeviceResponse response = wt
-				.request("application/octet-stream")
-				.post(Entity.entity(mNotifyDeviceRequest,
-						"application/octet-stream"), NotifyDeviceResponse.class);
-
-		assertEquals(NotifyDeviceResponse.ErrorCode.NONE,
-				response.getResponseCode());
-	}
+//	@Test
+//	public void testNotifyDevice() {
+//
+//		WebTarget wt = mTarget.path("notifications");
+//		NotifyDeviceResponse response = wt
+//				.request("application/octet-stream")
+//				.post(Entity.entity(mNotifyDeviceRequest,
+//						"application/octet-stream"), NotifyDeviceResponse.class);
+//
+//		assertEquals(NotifyDeviceResponse.ErrorCode.NONE,
+//				response.getResponseCode());
+//	}
 
 	/**
 	 * Test if a WADL document is available at the relative path
